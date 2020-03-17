@@ -19,15 +19,9 @@ class Game {
         /* Set the initial king */
         this.king = Math.floor(Math.random() * this.players.length);
         console.log('Initial king: ' + this.players[this.king].login);
-    }
 
-    /* Checks if our game is finished */
-    is_finished() {
-        for (const player in this.players)
-            if (this.players[player].districts.length >= 8)
-                return true;
-
-        return false;
+        /* This tells us if the game id finished */
+        this.is_finished = false;
     }
 
     /* Distribute characters to all players */

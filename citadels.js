@@ -30,7 +30,7 @@ const citadels = () => {
     const game = new Game(test_logins);
 
     /* The actual game loop */
-    while (!game.is_finished()) {
+    while (!game.is_finished) {
 
         /* Choose characters */
         game.distribute_characters();
