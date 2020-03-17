@@ -1,0 +1,20 @@
+{
+  "name": "citadels",
+  "version": "0.0.1",
+  "description": "a simple implementation of the Citadels card game in JavaScript",
+  "main": "citadels.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node citadels.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zuh0/citadels-js.git"
+  },
+  "author": "Gabriel Duque <gabriel.duque@lse.epita.fr> (zuh0)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zuh0/citadels-js/issues"
+  },
+  "homepage": "https://github.com/zuh0/citadels-js#readme"
+}
