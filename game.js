@@ -23,8 +23,10 @@ class Game {
 
     /* Checks if our game is finished */
     is_finished() {
+        for (const player in this.players)
+            if (this.players[player].districts.length >= 8)
+                return true;
 
-        // XXX: Actually check no player has 8 districts
         return false;
     }
 
