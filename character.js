@@ -16,13 +16,13 @@ class Character {
 /* An aray for the different characters */
 const characters = [
     new Character('Assassin', ''),
-    new Character('Thief', ''),
-    new Character('Magician', ''),
-    new Character('King', ''),
-    new Character('Bishop', ''),
-    new Character('Merchant', ''),
-    new Character('Architect', ''),
-    new Character('Warlord', '')
+    new Character('Voleur', ''),
+    new Character('Magicien', ''),
+    new Character('Roi', ''),
+    new Character('Eveque', ''),
+    new Character('Marchand', ''),
+    new Character('Architecte', ''),
+    new Character('Condottiere', '')
 ];
 
 module.exports = characters;

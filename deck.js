@@ -12,8 +12,8 @@ const initial_deck = [
         price: 1,
         value: 1,
         color: colors.GREEN,
-        name: 'Tavern',
-        description: 'Tavern',
+        name: 'Taverne',
+        description: '',
         image_path: ''
     },
     {
@@ -21,8 +21,8 @@ const initial_deck = [
         price: 2,
         value: 2,
         color: colors.GREEN,
-        name: 'Market',
-        description: 'Market',
+        name: 'Marche',
+        description: '',
         image_path: ''
     },
     {
@@ -30,8 +30,16 @@ const initial_deck = [
         price: 2,
         value: 2,
         color: colors.GREEN,
-        name: 'Trading Post',
-        description: 'Trading Post',
+        name: 'Echoppe',
+        description: '',
+        image_path: ''
+    },
+    {
+        count: 3,
+        price: 3,
+        color: colors.GREEN,
+        name: 'Comptoir',
+        description: '',
         image_path: ''
     },
     {
@@ -39,8 +47,8 @@ const initial_deck = [
         price: 4,
         value: 4,
         color: colors.GREEN,
-        name: 'Harbor',
-        description: 'Harbor',
+        name: 'Port',
+        description: '',
         image_path: ''
     },
     {
@@ -48,8 +56,8 @@ const initial_deck = [
         price: 5,
         value: 5,
         color: colors.GREEN,
-        name: 'Town Hall',
-        description: 'Town Hall',
+        name: 'Hotel de Ville',
+        description: '',
         image_path: ''
     },
 
@@ -60,16 +68,16 @@ const initial_deck = [
         value: 1,
         color: colors.BLUE,
         name: 'Temple',
-        description: 'Temple',
+        description: '',
         image_path: ''
     },
     {
-        count: 3,
+        count: 4,
         price: 2,
         value: 2,
         color: colors.BLUE,
-        name: 'Church',
-        description: 'Church',
+        name: 'Eglise',
+        description: '',
         image_path: ''
     },
     {
@@ -77,8 +85,8 @@ const initial_deck = [
         price: 3,
         value: 3,
         color: colors.BLUE,
-        name: 'Monastery',
-        description: 'Monastery',
+        name: 'Monastere',
+        description: '',
         image_path: ''
     },
     {
@@ -86,8 +94,8 @@ const initial_deck = [
         price: 5,
         value: 5,
         color: colors.BLUE,
-        name: 'Cathedral',
-        description: 'Cathedral',
+        name: 'Cathedrale',
+        description: '',
         image_path: ''
     },
 
@@ -97,8 +105,8 @@ const initial_deck = [
         price: 1,
         value: 1,
         color: colors.RED,
-        name: 'Watchtower',
-        description: 'Watchtower',
+        name: 'Tour de guet',
+        description: '',
         image_path: ''
     },
     {
@@ -107,7 +115,7 @@ const initial_deck = [
         value: 2,
         color: colors.RED,
         name: 'Prison',
-        description: 'Prison',
+        description: '',
         image_path: ''
     },
     {
@@ -115,8 +123,8 @@ const initial_deck = [
         price: 3,
         value: 3,
         color: colors.RED,
-        name: 'Battlefield',
-        description: 'Battlefield',
+        name: 'Caserne',
+        description: '',
         image_path: ''
     },
     {
@@ -124,8 +132,8 @@ const initial_deck = [
         price: 5,
         value: 5,
         color: colors.RED,
-        name: 'Fortress',
-        description: 'Fortress',
+        name: 'Forteresse',
+        description: '',
         image_path: ''
     },
 
@@ -135,8 +143,8 @@ const initial_deck = [
         price: 3,
         value: 3,
         color: colors.YELLOW,
-        name: 'Manor',
-        description: 'Manor',
+        name: 'Manoir',
+        description: '',
         image_path: ''
     },
     {
@@ -144,17 +152,17 @@ const initial_deck = [
         price: 4,
         value: 4,
         color: colors.YELLOW,
-        name: 'Castle',
-        description: 'Castle',
+        name: 'Chateau',
+        description: '',
         image_path: ''
     },
     {
-        count: 3,
+        count: 2,
         price: 5,
         value: 5,
         color: colors.YELLOW,
-        name: 'Palace',
-        description: 'Palace',
+        name: 'Palais',
+        description: '',
         image_path: ''
     },
 
@@ -164,8 +172,8 @@ const initial_deck = [
         price: 2,
         value: 2,
         color: colors.PURPLE,
-        name: 'Haunted City',
-        description: 'Haunted City',
+        name: 'Cour des miracles',
+        description: 'Pour le decompte final des points, la cour des miracles est consideree comme un quartier de la couleur de votre choix. Vous ne pouvez pas utilisez cette capacite si vous avez construit la cour des miracles au dernier tour de jeu.',
         image_path: ''
     },
     {
@@ -173,8 +181,8 @@ const initial_deck = [
         price: 3,
         value: 3,
         color: colors.PURPLE,
-        name: 'Keep',
-        description: 'Keep',
+        name: 'Donjon',
+        description: 'Le Donjon ne peut pas etre detruit par le Condottiere.',
         image_path: ''
     },
     {
@@ -182,8 +190,8 @@ const initial_deck = [
         price: 5,
         value: 5,
         color: colors.PURPLE,
-        name: 'Laboratory',
-        description: 'Laboratory',
+        name: 'Laboratoire',
+        description: "Une fois par tour, vous pouvez vous defausser d'une carte quartier de votre main et recevoir une piece d'or en contrepartie.",
         image_path: ''
     },
     {
@@ -191,8 +199,8 @@ const initial_deck = [
         price: 5,
         value: 5,
         color: colors.PURPLE,
-        name: 'Smithy',
-        description: 'Smithy',
+        name: 'Manufacture',
+        description: "Une fois par tour, vous pouvez payer trois pieces d'or pour piocher trois cartes.",
         image_path: ''
     },
     {
@@ -200,8 +208,8 @@ const initial_deck = [
         price: 5,
         value: 5,
         color: colors.PURPLE,
-        name: 'Graveyard',
-        description: 'Graveyard',
+        name: 'Cimetiere',
+        description: "Lorsque le Condottiere detruit un quartier, vous pouvez payer une piece d'or pour le reprendre dans votre main. Vous ne pouvez pas faire cela si vous etes vous-meme Condottiere.",
         image_path: ''
     },
     {
@@ -209,8 +217,8 @@ const initial_deck = [
         price: 5,
         value: 5,
         color: colors.PURPLE,
-        name: 'Observatory',
-        description: 'Observatory',
+        name: 'Observatoire',
+        description: "Si vous choisissez de piocher des cartes au debut de votre tour, vous en piochez trois, en choisissez une et defaussez les deux autres.",
         image_path: ''
     },
     {
@@ -218,8 +226,8 @@ const initial_deck = [
         price: 6,
         value: 6,
         color: colors.PURPLE,
-        name: 'School of Magic',
-        description: 'School of Magic',
+        name: 'Ecole de Magie',
+        description: "Pour la perception des revenus, l'ecole de magie est consideree comme un quartier de la couleur de votre choix, elle vous rapporte donc si vous etes, Roi, Eveque, Marchand ou Condottiere.",
         image_path: ''
     },
     {
@@ -227,17 +235,8 @@ const initial_deck = [
         price: 6,
         value: 6,
         color: colors.PURPLE,
-        name: 'Library',
-        description: 'Library',
-        image_path: ''
-    },
-    {
-        count: 1,
-        price: 6,
-        value: 6,
-        color: colors.PURPLE,
-        name: 'Great Wall',
-        description: 'Great Wall',
+        name: 'Bibliotheque',
+        description: "Si vous choisissez de piocher des cartes au debut de votre tour, vous en piochez deux et les conservez toutes les deux.",
         image_path: ''
     },
     {
@@ -245,8 +244,8 @@ const initial_deck = [
         price: 6,
         value: 8,
         color: colors.PURPLE,
-        name: 'University',
-        description: 'University',
+        name: 'Universite',
+        description: "Cette realisation de prestige (nul n'a jamais compris a quoi pouvait bien servir une universite) coute six pieces d'or a batir mais vaux huit points dans le decompte de fin de partie.",
         image_path: ''
     },
     {
@@ -254,8 +253,8 @@ const initial_deck = [
         price: 6,
         value: 8,
         color: colors.PURPLE,
-        name: 'Dragon Gate',
-        description: 'Dragon Gate',
+        name: 'Dracoport',
+        description: "Cette realisation de prestige (on n'a pas vu de dragon dans le Royaume depuis bientot mille ans) coute six pieces d'or à batir mais vaut huit points dans le decompte de fin de partie.",
         image_path: ''
     },
 
