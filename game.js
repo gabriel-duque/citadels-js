@@ -22,6 +22,9 @@ class Game {
 
         /* This tells us if the game id finished */
         this.is_finished = false;
+
+        /* First player to put an 8th district */
+        this.first_8th = null;
     }
 
     /* Distribute characters to all players */
@@ -66,7 +69,79 @@ class Game {
 
     /* Count points and dump scores */
     dump() {
-        // XXX: count points and dump final scores
+
+        const scores = new Array();
+
+        for (const player_ndx in this.players) {
+            const player = this.players[player_ndx];
+            const color_map = {
+                RED: false,
+                BLUE: false,
+                GREEN: false,
+                YELLOW: false,
+                PURPLE: false
+            };
+
+            let got_haunted_city = false; // Cour des miracles
+            let score = 0;
+
+            for (const district in player.districts) {
+                /* Add basic value */
+                score += district.value;
+
+                /* Add it to our color list (yes, this is ugly, f*** you.) */
+                if (district.color == colors.RED)
+                    color_map.RED = true;
+                else if (district.color = colors.BLUE)
+                    color_map.BLUE = true;
+                else if (district.color = colors.GREEN)
+                    color_map.GREEN = true;
+                else if (district.color = colors.YELLOW)
+                    color_map.YELLOW = true;
+                else if (district.color = colors.PURPLE)
+                    color_map.PURPLE = true;
+
+                /* Special rule for 'Haunted City' */
+                if (district.name = 'Cour des miracles')
+                    got_haunted_city = true;
+            }
+
+            /* Count how many colors */
+            let color_count = 0;
+            for (const color in color_map)
+                if (color_map.color)
+                    ++color_count;
+
+            /* Give points for colors */
+            if (color_count == 5 || (color_count == 4 && got_haunted_city))
+                score += 3;
+
+            /* Special case for the first player to build 8th district */
+            if (this.first_8th == player)
+                score += 4;
+            else if (player.districts.length >= 8)
+                score += 2;
+
+            /* Add entry to our scores array for this player */
+            scores.push({
+                login: player.login,
+                score: score
+            });
+        }
+
+        scores.sort((e1, e2) => {
+            if (e1.score > e2.score)
+                return -1;
+            else if (e1.score < e2.score)
+                return 1;
+            return 0;
+        }
+        );
+
+        console.log('SCORES:');
+        for (const res in scores)
+            console.log('\tLogin: ' + scores[res].login
+                        + ' Score: ' + scores[res].score);
     }
 }
 
