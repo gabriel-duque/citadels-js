@@ -6,7 +6,6 @@
  *
  */
 
-
 /* Import our Citadels implementation */
 const Game = require('./game.js');
 

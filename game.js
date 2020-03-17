@@ -1,19 +1,8 @@
 /* Import what we need from other files */
 const {colors, District} = require('./district.js');
+const characters = require('./character.js');
 const Deck = require('./deck.js');
 const Player = require('./player.js');
-
-/* An aray for the different characters */
-const characters = [
-    'Assassin',
-    'Thief',
-    'Magician',
-    'King',
-    'Bishop',
-    'Merchant',
-    'Architect',
-    'Warlord'
-];
 
 /* This class represents a game */
 class Game {
@@ -44,7 +33,7 @@ class Game {
 
         /* Get the index of the card ignored this turn */
         const ignored = Math.floor(Math.random() * characters.length);
-        console.log('Ignoring character: ' + characters[ignored]);
+        console.log('Ignoring character: ' + characters[ignored].name);
 
         /* Get the list of available characters */
         const remaining_characters = new Array();
@@ -66,8 +55,8 @@ class Game {
             this.players[player].character = remaining_characters[character];
 
             console.log(this.players[player].login
-                + ' chose '
-                + remaining_characters[character]);
+                        + ' chose '
+                        + this.players[player].character.name);
 
             /* Remove the character from the remaining characters array */
             remaining_characters.splice(character, 1);
