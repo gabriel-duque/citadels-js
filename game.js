@@ -129,19 +129,13 @@ class Game {
             });
         }
 
-        scores.sort((e1, e2) => {
-            if (e1.score > e2.score)
-                return -1;
-            else if (e1.score < e2.score)
-                return 1;
-            return 0;
-        }
-        );
+        /* Sort our score array */
+        scores.sort((e1, e2) => {return e2.score - e1.score});
 
         console.log('SCORES:');
         for (const res in scores)
             console.log('\tLogin: ' + scores[res].login
-                        + ' Score: ' + scores[res].score);
+                        + ', Score: ' + scores[res].score);
     }
 }
 
