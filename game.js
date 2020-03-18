@@ -92,17 +92,17 @@ class Game {
                 /* Add it to our color list (yes, this is ugly, f*** you.) */
                 if (district.color == colors.RED)
                     color_map.RED = true;
-                else if (district.color = colors.BLUE)
+                else if (district.color == colors.BLUE)
                     color_map.BLUE = true;
-                else if (district.color = colors.GREEN)
+                else if (district.color == colors.GREEN)
                     color_map.GREEN = true;
-                else if (district.color = colors.YELLOW)
+                else if (district.color == colors.YELLOW)
                     color_map.YELLOW = true;
-                else if (district.color = colors.PURPLE)
+                else if (district.color == colors.PURPLE)
                     color_map.PURPLE = true;
 
                 /* Special rule for 'Haunted City' */
-                if (district.name = 'Cour des miracles')
+                if (district.name == 'Cour des miracles')
                     got_haunted_city = true;
             }
 
