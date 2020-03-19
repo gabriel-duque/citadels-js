@@ -37,6 +37,7 @@ const initial_deck = [
     {
         count: 3,
         price: 3,
+        value: 3,
         color: colors.GREEN,
         name: 'Comptoir',
         description: '',

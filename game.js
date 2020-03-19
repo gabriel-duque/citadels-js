@@ -151,7 +151,6 @@ class Game {
             else if (player.districts.length >= 8)
                 score += 2;
 
-            console.log(score);
             /* Add entry to our scores array for this player */
             scores.push({
                 login: player.login,
