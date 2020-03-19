@@ -293,6 +293,10 @@ class Deck {
             cards.push(this.cards.pop());
         return cards;
     }
+
+    discard(cards) {
+        this.cards.unshift(...cards);
+    }
 }
 
 module.exports = Deck;

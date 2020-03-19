@@ -5,7 +5,6 @@ class Player {
         this.hand = hand;
         this.districts = new Array();
         this.gold = 2; /* Players start with 2 gold coins */
-        this.character;
     }
 
     render() {

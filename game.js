@@ -1,6 +1,6 @@
 /* Import what we need from other files */
 const {colors, District} = require('./district.js');
-const characters = require('./character.js');
+const {characters, Character} = require('./character.js');
 const Deck = require('./deck.js');
 const Player = require('./player.js');
 
@@ -16,12 +16,22 @@ class Game {
         for (const login in logins)
             this.players.push(new Player(logins[login], this.deck.draw(4)));
 
+        /* The characters */
+        this.characters = new Array();
+        for (const character in characters)
+            this.characters.push(new Character(characters[character].name,
+                                               characters[character].do_turn,
+                                               characters[character].image_path));
+
         /* Set the initial king */
         this.king = Math.floor(Math.random() * this.players.length);
         console.log('Initial king: ' + this.players[this.king].login);
 
         /* This tells us if the game id finished */
         this.is_finished = false;
+
+        /* The dead character */
+        this.dead_character = null;
 
         /* First player to put an 8th district */
         this.first_8th = null;
@@ -31,15 +41,16 @@ class Game {
     distribute_characters() {
 
         /* Get the index of the card ignored this turn */
-        const ignored = Math.floor(Math.random() * characters.length);
-        console.log('Ignoring character: ' + characters[ignored].name);
+        const ignored = Math.floor(Math.random() * this.characters.length);
+        this.characters[ignored].player = null;
+        console.log('Ignoring character: ' + this.characters[ignored].name);
 
         /* Get the list of available characters */
         const remaining_characters = new Array();
-        for (let i = 0; i < characters.length; ++i) {
+        for (let i = 0; i < this.characters.length; ++i) {
             if (i == ignored)
                 continue;
-            remaining_characters.push(characters[i]);
+            remaining_characters.push(this.characters[i]);
         }
 
         /* Actually get the players choices */
@@ -51,11 +62,11 @@ class Game {
             const character = Math.floor(Math.random()
                     * remaining_characters.length);
 
-            this.players[player].character = remaining_characters[character];
+            remaining_characters[character].player = this.players[player];
 
             console.log(this.players[player].login
                         + ' chose '
-                        + this.players[player].character.name);
+                        + remaining_characters[character].name);
 
             /* Remove the character from the remaining characters array */
             remaining_characters.splice(character, 1);
@@ -64,16 +75,32 @@ class Game {
 
     /* Reveal characters and actually play turns */
     reveal_characters() {
-        // XXX: reveal characters and handle each players turn
+        for (let i = 0; i < this.characters.length; ++i) {
+            console.log(this.characters[i]);
+            if (this.characters[i].player != null
+                && this.characters[i] != this.dead_character) {
+                if (this.characters[i] == this.stolen_character) {
+                    this.characters[1].player.gold += this.characters[i].gold;
+                    this.characters[i].gold = 0;
+                }
+                this.characters[i].do_turn(this.characters[i].player, this);
+            }
+        }
+
+        console.log('The dead character was: ' + this.dead_character);
+        this.dead_character = null;
+        this.stolen_character = null;
     }
 
     /* Count points and dump scores */
     dump() {
+        console.log('SCORE COUNTING');
 
         const scores = new Array();
 
         for (const player_ndx in this.players) {
             const player = this.players[player_ndx];
+            console.log(player);
             const color_map = {
                 RED: false,
                 BLUE: false,
@@ -85,7 +112,9 @@ class Game {
             let got_haunted_city = false; // Cour des miracles
             let score = 0;
 
-            for (const district in player.districts) {
+            for (const district_ndx in player.districts) {
+                const district = player.districts[district_ndx];
+
                 /* Add basic value */
                 score += district.value;
 
@@ -122,6 +151,7 @@ class Game {
             else if (player.districts.length >= 8)
                 score += 2;
 
+            console.log(score);
             /* Add entry to our scores array for this player */
             scores.push({
                 login: player.login,
@@ -130,7 +160,7 @@ class Game {
         }
 
         /* Sort our score array */
-        scores.sort((e1, e2) => {return e2.score - e1.score});
+        scores.sort((e1, e2) =>  e2.score - e1.score);
 
         console.log('SCORES:');
         for (const res in scores)
