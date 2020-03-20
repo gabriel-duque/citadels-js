@@ -33,6 +33,9 @@ class Game {
         /* The dead character */
         this.dead_character = null;
 
+        /* The stolen character */
+        this.stolen_character = null;
+
         /* First player to put an 8th district */
         this.first_8th = null;
     }
@@ -80,8 +83,8 @@ class Game {
             if (this.characters[i].player != null
                 && this.characters[i] != this.dead_character) {
                 if (this.characters[i] == this.stolen_character) {
-                    this.characters[1].player.gold += this.characters[i].gold;
-                    this.characters[i].gold = 0;
+                    this.characters[1].player.gold += this.characters[i].player.gold;
+                    this.characters[i].player.gold = 0;
                 }
                 this.characters[i].do_turn(this.characters[i].player, this);
             }
