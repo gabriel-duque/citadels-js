@@ -36,14 +36,21 @@ app.get("/", function(request, response) {
 
 const Citadels = require(__dirname + '/utils/citadels');
 var players = {};
-// var logins = [
-//   'ShallowRed',
-//   'Bovary',
-//   'Roonie',
-//   'Bagu'
-// ];
-var logins = [];
-var isready = [];
+
+ var logins = [
+  'Bovary',
+  'Roonie',
+  'Bagu'
+];
+
+ var isready = [
+  'Bovary',
+  'Roonie',
+  'Bagu'
+];
+
+// var logins = [];
+// var isready = [];
 
 //execute on each connection
 io.on('connection', function(socket) {
@@ -94,7 +101,7 @@ function addplayer(socket, userinput) {
 }
 
 function launchgame() {
-  if (logins.length == 5) {
+  if (logins.length > 3) {
     io.emit("message", "Game started");
     Citadels(logins);
   }
