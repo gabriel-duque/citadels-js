@@ -56,7 +56,7 @@ const do_normal_end = (player, game) => {
                 game.first_8th = player;
             game.is_finished = true;
         }
-            
+
     }
 };
 
@@ -74,7 +74,7 @@ const assassin = (player, game) => {
 /* Thief's turn */
 const thief = (player, game) => {
     const choice = champion.get_thief();
-    
+
     /* Can't steel the assassin, it's victim or the thief himself */
     if (choice > 1 && game.characters[choice] != game.dead_character)
         game.stolen_character = game.characters[choice];

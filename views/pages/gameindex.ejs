@@ -1,0 +1,28 @@
+ <!DOCTYPE html>
+ <html>
+
+ <head>
+   <link rel="stylesheet" type="text/css" href="semantic/gamemain.css">
+   <link rel="stylesheet" type="text/css" href="semantic/font.css">
+   <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+   <title>Citadelles</title>
+   <script src="socket.io/socket.io.js"></script>
+   <meta name="viewport" content="width=device-width, height=device-height">
+ </head>
+
+ <body>
+   <div id="logwindow">
+     <input type="text" id="userName" placeholder="Nom d'utilisateur ..." /><br>
+     <input type="password" id="Password" placeholder="Mot de passe ..." /><br>
+     <button id="Login_Register"><a>S'inscrire / Se connecter</a></button>
+   </div>
+   <div id="lobbywindow">
+     <ul id="playerlist"></ul>
+     <button id="startgame"><a>Start game</a></button>
+   </div>
+   <div id="gamewindow">
+   </div>
+
+   <script src="static/clientgame.js"></script>
+ </body>
+ <html>

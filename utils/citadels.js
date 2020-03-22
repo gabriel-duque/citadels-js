@@ -10,24 +10,10 @@
 const Game = require('./game.js');
 
 /* The main entrypoint to our script */
-const citadels = () => {
-    /* 
-     * XXX: Here we should get input from our users which should be a login
-     *      array.
-     *
-     *      This is just test input I used to test the game
-     *
-     */
-    const test_logins = [
-        'zuh0',
-        'ShallowRed',
-        'Bovary',
-        'Roonie',
-        'Bagu'
-    ];
+const citadels = function(logins){
 
     /* Create our new game */
-    const game = new Game(test_logins);
+    const game = new Game(logins);
 
     /* The actual game loop */
     while (!game.is_finished) {
@@ -43,5 +29,4 @@ const citadels = () => {
     game.dump();
 };
 
-
-citadels();
+module.exports = citadels;

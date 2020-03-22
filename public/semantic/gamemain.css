@@ -1,0 +1,82 @@
+html {
+  overflow: hidden;
+}
+
+body {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100vh;
+	background: #e9e9e9;
+}
+
+#logwindow, #lobbywindow, #gamewindow {
+  position: absolute;
+  top: 0;
+  left: 0;
+	width: 100%;
+  height: 100vh;
+}
+
+#logwindow {
+  display: block;
+}
+
+#Login_Register, #userName, #Password {
+	box-sizing: border-box;
+	width: 40%;
+	margin: 10vh 30% -5vh;
+	padding: 3vh 10%;
+	display: inline-block;
+}
+
+#userName, #Password {
+  color: #494949;
+  background: #ffffff;
+  border: 2px solid #a0a0a0;
+}
+
+#Login_Register {
+	border-radius: 15px;
+	color: #494949;
+	background: #ffffff;
+	border: 4px solid #494949;
+	transition: all 0.4s ease 0s;
+}
+
+#Login_Register:hover {
+	cursor: pointer;
+	color: #ffffff;
+	background: #494949;
+	transition: all 0.4s ease 0s;
+}
+
+#Login_Register a {
+  font-size: 1.2em;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+#lobbywindow {
+  display: none;
+  background: red;
+}
+
+#startgame {
+  position: relative;
+  width: 5%;
+  height: 5vh;
+  margin: 42.5vh 42.5%;
+}
+
+#gamewindow {
+  display: none;
+  background: green;
+}
+
+#playerlist {
+  background: blue;
+  width: 50%;
+  height: 50vh;
+}
