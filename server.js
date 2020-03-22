@@ -36,44 +36,66 @@ app.get("/", function(request, response) {
 
 const Citadels = require(__dirname + '/utils/citadels');
 var players = {};
-var logins = [
-  'ShallowRed',
-  'Bovary', 
-  'Roonie',
-  'Bagu'
-];
+// var logins = [
+//   'ShallowRed',
+//   'Bovary',
+//   'Roonie',
+//   'Bagu'
+// ];
+var logins = [];
+var isready = [];
 
 //execute on each connection
 io.on('connection', function(socket) {
 
+  //Add the player to lobby unless it's full
   socket.on("login_register", function(userinput) {
-    clog(userinput.username);
-    player = players[socket.id];
-    player = {
-      id: socket.id,
-      username: userinput.username
-    }
-
-    clog("new player : " + player.username);
-    logins.push(player.username);
-
-    socket.emit("logged_in", {
-        username: player.username,
-        logins : logins
-    });
-
-    socket.broadcast.emit("newplayer", player.username);
-
-    socket.on("userstartgame", function() {
-      socket.emit("gamestart", "Game started");
-      launchgame();
-    })
+    if (logins.length < 8) {
+      addplayer(socket, userinput);
+    } else {
+      socket.emit("message", "Sorry, the lobby is full.")
+    };
   });
+
+  //Allow starting when all players are ready
+  socket.on("localready", function(player) {
+    if (player.readyflag == true) {
+      isready.push(player.username);
+    } else {
+      isready.splice(isready.indexOf(player.username), 1);
+    };
+    io.emit("globalready", isready);
+  });
+
+  //Actually start the game when someone press start
+  socket.on("userstartgame", function() {
+    launchgame();
+  })
 
 });
 
+function addplayer(socket, userinput) {
+  let player = players[socket.id] = {
+    id: socket.id,
+    username: userinput.username
+  }
+
+  clog("new player : " + player.username);
+  logins.push(player.username);
+
+
+  socket.emit("logged_in", {
+    username: player.username,
+    logins: logins,
+    isready: isready
+  });
+
+  socket.broadcast.emit("newplayer", player.username);
+}
+
 function launchgame() {
   if (logins.length == 5) {
+    io.emit("message", "Game started");
     Citadels(logins);
   }
 }
