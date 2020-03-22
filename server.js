@@ -28,22 +28,30 @@ app.set("views", path.resolve(__dirname, "views"));
 app.use('/semantic', express.static('public/semantic'));
 app.use('/static', express.static('public/static'));
 app.use('/img', express.static('public/img'));
+var ussers = [];
+//Routes to pages4
 
-//Routes to pages
 app.get("/", function(request, response) {
-  response.render("pages/gameindex.ejs");
+  clog(response);
+  response.render("pages/lobby.ejs");
+});
+
+app.get("/startgame", function(request, response) {
+  response.render("pages/gameindex.ejs", {
+    users: logins
+  });
 });
 
 const Citadels = require(__dirname + '/utils/citadels');
 var players = {};
 
- var logins = [
+var logins = [
   'Bovary',
   'Roonie',
   'Bagu'
 ];
 
- var isready = [
+var isready = [
   'Bovary',
   'Roonie',
   'Bagu'
@@ -51,7 +59,7 @@ var players = {};
 
 // var logins = [];
 // var isready = [];
-
+var ejs = require('ejs');
 //execute on each connection
 io.on('connection', function(socket) {
 
@@ -103,6 +111,7 @@ function addplayer(socket, userinput) {
 function launchgame() {
   if (logins.length > 3) {
     io.emit("message", "Game started");
-    Citadels(logins);
+
+    //Citadels(logins);
   }
 }

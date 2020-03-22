@@ -13,17 +13,3 @@ var lobbywindow = document.getElementById('lobbywindow');
 var gamewindow = document.getElementById('gamewindow');
 var playerlist = document.getElementById('playerlist');
 var players = [];
-
-function newlobby(players) {
-  players.forEach(function(username) {
-    addplayertolobby(username);
-  });
-}
-
-function addplayertolobby(username) {
-  let li = document.createElement('li');
-  playerlist.appendChild(li);
-  li.innerHTML += username;
-  li.style.background="lightpink";
-  li.id = username;
-};
