@@ -38,13 +38,10 @@ const Citadels = require(__dirname + '/utils/citadels');
 var players = {};
 var logins = [
   'ShallowRed',
-  'Bovary',
+  'Bovary', 
   'Roonie',
   'Bagu'
 ];
-
-
-
 
 //execute on each connection
 io.on('connection', function(socket) {
