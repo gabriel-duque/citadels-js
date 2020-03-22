@@ -1,0 +1,71 @@
+
+#logwindow, #lobbywindow {
+  position: relative;
+  width: 40%;
+  margin: 25vh 30%;
+}
+
+#logwindow {
+  display: block;
+}
+
+#login, #userName, #Password {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 3vh 10%;
+  display: inline-block;
+}
+
+#userName, #Password {
+  color: #494949;
+  background: #ffffff;
+  border: 2px solid #a0a0a0;
+  margin-bottom: 2vh;
+}
+
+button {
+  margin-top: 3vh;
+  border-radius: 15px;
+  color: #ffffff;
+  background: #494949;
+  border: none;
+  transition: all 0.4s ease 0s;
+}
+
+button:hover {
+  cursor: pointer;
+  background: #a0a0a0;
+  transition: all 0.4s ease 0s;
+}
+
+#login a {
+  font-size: 1.3em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+#startgame {
+  display: none;
+}
+
+#startgame, #ready {
+  position: relative;
+  width: 15%;
+  height: 5vh;
+  margin: 5vh 13% 0;
+}
+
+#lobbywindow {
+  display: none;
+}
+
+#lobbywindow ul {
+  list-style: none;
+  padding: 0;
+}
+
+#lobbywindow ul li {
+  border: solid 2px black;
+  margin: 3vh 0;
+  padding: 3%;
+}
