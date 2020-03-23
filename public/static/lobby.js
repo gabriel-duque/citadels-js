@@ -1,4 +1,14 @@
-lgr.addEventListener('click', function() {
+var players = [],
+ username,
+ readyflag = false,
+ login = document.getElementById('login'),
+ startgame = document.getElementById('startgame'),
+ ready = document.getElementById('ready'),
+ logwindow = document.getElementById('logwindow'),
+ lobbywindow = document.getElementById('lobbywindow'),
+ playerlist = document.getElementById('playerlist');
+
+login.addEventListener('click', function() {
   username = document.getElementById("userName").value;
   if (username.length > 3) {
     socket.emit("login_register", {
@@ -24,22 +34,10 @@ ready.addEventListener('click', function() {
   });
 });
 
-socket.on("globalready", function(isready) {
-
-  players.forEach(function(player) {
-    document.getElementById(player).style.background = "lightpink";
-  });
-
-  isready.forEach(function(player) {
-    document.getElementById(player).style.background = "lightgreen";
-  });
-
-  if (isready.length > 3 && isready.length >= players.length) {
-    startgame.style.display = "inline-block";
-  } else {
-    startgame.style.display = "none";
-  };
-})
+startgame.addEventListener('click', function() {
+  socket.emit("userstartgame", "start");
+  lobbywindow.style.display = "none";
+});
 
 socket.on("logged_in", function(data) {
 
@@ -66,19 +64,26 @@ socket.on("newplayer", function(username) {
   addplayertolobby(username);
 });
 
-startgame.addEventListener('click', function() {
-  socket.emit("userstartgame", "start");
-  lobbywindow.style.display = "none";
-});
+socket.on("globalready", function(isready) {
+
+  players.forEach(function(player) {
+    document.getElementById(player).style.background = "lightpink";
+  });
+
+  isready.forEach(function(player) {
+    document.getElementById(player).style.background = "lightgreen";
+  });
+
+  if (isready.length > 3 && isready.length >= players.length) {
+    startgame.style.display = "inline-block";
+  } else {
+    startgame.style.display = "none";
+  };
+})
 
 //Receive data needed for initialization
 socket.on('gamestart', function() {
   clog("Game started");
-});
-
-//Receive data from server and do shit (only sent to me)
-socket.on('message', function(data) {
-  clog(data);
 });
 
 function addplayertolobby(username) {

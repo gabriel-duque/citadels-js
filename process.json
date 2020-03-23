@@ -1,7 +1,7 @@
 {
   "script": "server.js",
   "watch": true,
-  "ignore_watch" : ["node_modules", "outputs", "public", "views"],
+  "ignore_watch" : ["node_modules", "public", "views"],
   "watch_options": {
       "followSymlinks": false
   },

@@ -28,15 +28,22 @@ app.set("views", path.resolve(__dirname, "views"));
 app.use('/semantic', express.static('public/semantic'));
 app.use('/static', express.static('public/static'));
 app.use('/img', express.static('public/img'));
-var ussers = [];
+
 //Routes to pages4
 
-app.get("/", function(request, response) {
-  clog(response);
-  response.render("pages/lobby.ejs");
-});
+//for production
+// app.get("/", function(request, response) {
+//   response.render("pages/lobby.ejs");
+// });
 
-app.get("/startgame", function(request, response) {
+// app.get("/startgame", function(request, response) {
+//   response.render("pages/gameindex.ejs", {
+//     users: logins
+//   });
+// });
+
+//for testing
+app.get("/", function(request, response) {
   response.render("pages/gameindex.ejs", {
     users: logins
   });
@@ -59,33 +66,33 @@ var isready = [
 
 // var logins = [];
 // var isready = [];
-var ejs = require('ejs');
+
 //execute on each connection
 io.on('connection', function(socket) {
 
-  //Add the player to lobby unless it's full
-  socket.on("login_register", function(userinput) {
-    if (logins.length < 8) {
-      addplayer(socket, userinput);
-    } else {
-      socket.emit("message", "Sorry, the lobby is full.")
-    };
-  });
-
-  //Allow starting when all players are ready
-  socket.on("localready", function(player) {
-    if (player.readyflag == true) {
-      isready.push(player.username);
-    } else {
-      isready.splice(isready.indexOf(player.username), 1);
-    };
-    io.emit("globalready", isready);
-  });
-
-  //Actually start the game when someone press start
-  socket.on("userstartgame", function() {
-    launchgame();
-  })
+  // //Add the player to lobby unless it's full
+  // socket.on("login_register", function(userinput) {
+  //   if (logins.length < 8) {
+  //     addplayer(socket, userinput);
+  //   } else {
+  //     socket.emit("message", "Sorry, the lobby is full.")
+  //   };
+  // });
+  //
+  // //Allow starting when all players are ready
+  // socket.on("localready", function(player) {
+  //   if (player.readyflag == true) {
+  //     isready.push(player.username);
+  //   } else {
+  //     isready.splice(isready.indexOf(player.username), 1);
+  //   };
+  //   io.emit("globalready", isready);
+  // });
+  //
+  // //Actually start the game when someone press start
+  // socket.on("userstartgame", function() {
+  //   launchgame();
+  // })
 
 });
 
