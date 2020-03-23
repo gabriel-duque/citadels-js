@@ -8,6 +8,8 @@ var players = [],
  lobbywindow = document.getElementById('lobbywindow'),
  playerlist = document.getElementById('playerlist');
 
+socket.emit("userinlobby");
+
 login.addEventListener('click', function() {
   username = document.getElementById("userName").value;
   if (username.length > 3) {
@@ -34,10 +36,9 @@ ready.addEventListener('click', function() {
   });
 });
 
-startgame.addEventListener('click', function() {
-  socket.emit("userstartgame", "start");
-  lobbywindow.style.display = "none";
-});
+socket.on('startallowed', function() {
+  startgame.style.display = "inline-block";
+})
 
 socket.on("logged_in", function(data) {
 
@@ -75,7 +76,6 @@ socket.on("globalready", function(isready) {
   });
 
   if (isready.length > 3 && isready.length >= players.length) {
-    startgame.style.display = "inline-block";
   } else {
     startgame.style.display = "none";
   };

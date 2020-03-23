@@ -14,6 +14,8 @@ var express = require('express'),
   io = socketIO(server),
   port = 100;
 
+const Citadels = require(__dirname + '/utils/citadels');
+
 // Set port and start server.
 app.set('port', port);
 server.listen(port, function() {
@@ -29,27 +31,12 @@ app.use('/semantic', express.static('public/semantic'));
 app.use('/static', express.static('public/static'));
 app.use('/img', express.static('public/img'));
 
-//Routes to pages4
-
-//for production
-// app.get("/", function(request, response) {
-//   response.render("pages/lobby.ejs");
-// });
-
-// app.get("/startgame", function(request, response) {
-//   response.render("pages/gameindex.ejs", {
-//     users: logins
-//   });
-// });
-
-//for testing
+//Route to lobby
 app.get("/", function(request, response) {
-  response.render("pages/gameindex.ejs", {
-    users: logins
-  });
+  response.render("pages/lobby.ejs");
 });
 
-const Citadels = require(__dirname + '/utils/citadels');
+
 var players = {};
 
 var logins = [
@@ -70,31 +57,43 @@ var isready = [
 //execute on each connection
 io.on('connection', function(socket) {
 
-  // //Add the player to lobby unless it's full
-  // socket.on("login_register", function(userinput) {
-  //   if (logins.length < 8) {
-  //     addplayer(socket, userinput);
-  //   } else {
-  //     socket.emit("message", "Sorry, the lobby is full.")
-  //   };
-  // });
-  //
-  // //Allow starting when all players are ready
-  // socket.on("localready", function(player) {
-  //   if (player.readyflag == true) {
-  //     isready.push(player.username);
-  //   } else {
-  //     isready.splice(isready.indexOf(player.username), 1);
-  //   };
-  //   io.emit("globalready", isready);
-  // });
-  //
-  // //Actually start the game when someone press start
-  // socket.on("userstartgame", function() {
-  //   launchgame();
-  // })
-
+  socket.on('userinlobby', function() {
+    setuplobby(socket);
+  });
+  socket.on("userongame", function() {
+    socket.emit("logins", logins);
+  })
 });
+
+function setuplobby(socket) {
+  //Add the player to lobby unless it's full
+  socket.on("login_register", function(userinput) {
+    trylogin(socket, userinput);
+  });
+
+
+
+  //Allow starting when all players are ready
+  socket.on("localready", function(player) {
+    updateready(socket, player);
+  });
+
+  app.get("/startgame", function(request, response) {
+    response.render("pages/gameindex.ejs", {
+      users: logins,
+      user: players[socket.id].username
+    });
+  });
+
+}
+
+function trylogin(socket, userinput) {
+  if (logins.length < 8) {
+    addplayer(socket, userinput);
+  } else {
+    socket.emit("message", "Sorry, the lobby is full.")
+  };
+}
 
 function addplayer(socket, userinput) {
   let player = players[socket.id] = {
@@ -115,10 +114,35 @@ function addplayer(socket, userinput) {
   socket.broadcast.emit("newplayer", player.username);
 }
 
-function launchgame() {
-  if (logins.length > 3) {
-    io.emit("message", "Game started");
+function updateready(socket, player) {
+  if (player.readyflag == true) {
+    isready.push(player.username);
+  } else {
+    isready.splice(isready.indexOf(player.username), 1);
+  };
+  io.emit("globalready", isready);
+  if (isready.length == logins.length) {
+    launchgame(socket);
+  }
+}
 
+function launchgame(socket) {
+  if (logins.length > 3) {
+    shuffle(logins);
+    io.emit("startallowed");
     //Citadels(logins);
   }
+}
+
+function shuffle(array) {
+  var currentIndex = array.length,
+    temporaryValue, randomIndex;
+  while (0 !== currentIndex) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
 }
