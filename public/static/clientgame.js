@@ -1,12 +1,47 @@
 var gamewindow = document.getElementById('gamewindow');
-var player0 = document.getElementById('player0');
+var myplayerwindow = document.getElementById('myplayerwindow');
 var playerswindow = document.querySelectorAll('.playerwindow');
+var span = document.querySelector('span');
+var usrname = span.innerHTML;
+var players;
+span.remove();
 
-for (var i = 1; i < playerswindow.length; i++) {
-  let playerid ='player' + i;
-  playerswindow[i-1].id = playerid;
-  playerid = document.getElementById(playerid);
-};
+socket.emit("userongame");
+
+socket.on("logins", function(logins) {
+
+  let playerpos = logins.indexOf(usrname),
+   beforepos = [],
+   afterpos = [],
+   playerorder = [];
+
+  logins.forEach(function(login) {
+    let diff = playerpos - logins.indexOf(login);
+    if (diff < 0) {
+      beforepos.push(login);
+    } else if (diff > 0) {
+      afterpos.push(login);
+    }
+    playerorder = beforepos.concat(afterpos);
+  });
+
+  for (var i = 1; i < logins.length; i++) {
+    var player = {
+      id: 'player' + i,
+      name: playerorder[i - 1]
+    };
+    playerswindow[i - 1].id = player.id;
+    let playername = document.getElementById(player.id).querySelector('.playername');
+    playername.innerHTML = "<a>" + player.name + "</a>";
+  };
+
+  let mywindow = document.querySelectorAll(".playerwindow:last-child")[0];
+  mywindow.id = 'player0';
+  myplayerwindow.appendChild(mywindow);
+  let myplayername = myplayerwindow.querySelector('.playername');
+  myplayername.innerHTML = "<a>" + usrname + "</a>";
+
+})
 
 function addcard(player) {
   let deck = player.querySelector('.deck')
@@ -36,19 +71,19 @@ function removedistrict(player) {
 
 function newscore(player, amount) {
   let score = player.querySelector('.score');
-  let newscore = parseInt(score.innerHTML.split('>')[1].split('<')[0]) + amount ;
+  let newscore = parseInt(score.innerHTML.split('>')[1].split('<')[0]) + amount;
   score.innerHTML = "<a>" + newscore + "</a>";
 };
 
 function newmoney(player, amount) {
   let money = player.querySelector('.money')
-  let newmoney = parseInt(money.innerHTML.split('>')[1].split('<')[0]) + amount ;
+  let newmoney = parseInt(money.innerHTML.split('>')[1].split('<')[0]) + amount;
   money.innerHTML = "<a>" + newmoney + "</a>";
 };
 
 function revealrole(player) {
   let role = player.querySelector('.prole')
-  role.style.background= "lightgreen";
+  role.style.background = "lightgreen";
 };
 
 ////////////  For testing
