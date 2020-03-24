@@ -1,45 +1,50 @@
 var gamewindow = document.getElementById('gamewindow');
 var myplayerwindow = document.getElementById('myplayerwindow');
 var playerswindow = document.querySelectorAll('.playerwindow');
-var span = document.querySelector('span');
-var usrname = span.innerHTML;
 var players;
-span.remove();
 
 socket.emit("userongame");
 
+//Setup all players window
 socket.on("logins", function(logins) {
 
-  let playerpos = logins.indexOf(usrname),
-   beforepos = [],
-   afterpos = [],
-   playerorder = [];
+  //Order other players in view relatively to active player
+  let beforepos = [],
+    afterpos = [],
+    playerorder = [];
 
   logins.forEach(function(login) {
-    let diff = playerpos - logins.indexOf(login);
-    if (diff < 0) {
+    if (logins.indexOf(username) - logins.indexOf(login) < 0) {
       beforepos.push(login);
-    } else if (diff > 0) {
+    } else if (logins.indexOf(username) - logins.indexOf(login) > 0) {
       afterpos.push(login);
     }
     playerorder = beforepos.concat(afterpos);
   });
 
+  //Set others name on top of each window
   for (var i = 1; i < logins.length; i++) {
-    var player = {
-      id: 'player' + i,
-      name: playerorder[i - 1]
-    };
-    playerswindow[i - 1].id = player.id;
-    let playername = document.getElementById(player.id).querySelector('.playername');
-    playername.innerHTML = "<a>" + player.name + "</a>";
+    playerswindow[i - 1].id = 'player' + i;
+    let playername = document.getElementById('player' + i).querySelector('.playername');
+    playername.innerHTML = "<a>" + playerorder[i - 1] + "</a>";
   };
 
-  let mywindow = document.querySelectorAll(".playerwindow:last-child")[0];
+  //Setup active player window
+  var mywindow = document.querySelector(".playerwindow:last-child");
+  var myplayername = mywindow.querySelector('.playername');
+  var mytop = mywindow.querySelector('.top');
+  var mybottom = mywindow.querySelector('.bottom');
+  var mycity = mywindow.querySelector('.city');
+  var mydeck = mywindow.querySelector('.deck');
+  var mymoney = mywindow.querySelector('.money');
+  var myrole = mywindow.querySelector('.role');
   mywindow.id = 'player0';
+  myplayername.innerHTML = "<a>" + username + "</a>";
   myplayerwindow.appendChild(mywindow);
-  let myplayername = myplayerwindow.querySelector('.playername');
-  myplayername.innerHTML = "<a>" + usrname + "</a>";
+  mytop.appendChild(mycity);
+  mybottom.appendChild(mymoney);
+  mybottom.appendChild(mydeck);
+  mydeck.after(myrole);
 
 })
 
@@ -48,6 +53,13 @@ function addcard(player) {
   let card = document.createElement("div");
   card.className = "card";
   deck.appendChild(card);
+  card.addEventListener('click', function() {
+    let cards = deck.querySelectorAll('.card')
+    cards.forEach(function(card) {
+      card.style.width = "30%";
+    });
+    this.style.width = "100%";
+  })
 };
 
 function removecard(player) {
@@ -57,16 +69,16 @@ function removecard(player) {
 };
 
 function playdistrict(player) {
-  let districts = player.querySelector('.districts')
+  let city = player.querySelector('.city')
   let district = document.createElement("div");
   district.className = "district";
-  districts.append(district);
+  city.append(district);
 };
 
 function removedistrict(player) {
-  let districts = player.querySelector('.districts')
+  let city = player.querySelector('.city')
   let district = document.querySelector(".district");
-  districts.removeChild(district);
+  city.removeChild(district);
 };
 
 function newscore(player, amount) {

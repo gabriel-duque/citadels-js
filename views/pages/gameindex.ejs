@@ -1,16 +1,13 @@
 <%- include('head') -%>
-<span><%= user %></span>
-<div id="gamewindow">
 
+<div id="gamewindow">
   <div id="otherswindow">
     <% users.forEach(function(){ %>
     <%- include('pwindow'); -%>
     <% }); %>
   </div>
-
   <div id="myplayerwindow">
   </div>
-
 </div>
 
 <div id="testbtns">
@@ -23,6 +20,9 @@
   <button id="mytest7">Reveal role</button>
 </div>
 
+<script>
+  var username = <%- JSON.stringify(username) %>;
+</script>
 <script src="static/clientutils.js"></script>
 <script src="static/clientgame.js"></script>
 <%- include('footer') -%>
