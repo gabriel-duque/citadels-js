@@ -1,8 +1,16 @@
 
+h1 {
+	width: 100%;
+  font-size: 4em;
+	text-align: center;
+  margin-top: 20vh;
+    color: #494949;
+}
+
 #logwindow, #lobbywindow {
   position: relative;
-  width: 40%;
-  margin: 25vh 30%;
+  width: 30%;
+  margin: 0 35%;
 }
 
 #logwindow {
@@ -26,8 +34,9 @@
 button {
   margin-top: 3vh;
   border-radius: 15px;
+  text-decoration: none;
   color: #ffffff;
-  background: #494949;
+  background: #888;
   border: none;
   transition: all 0.4s ease 0s;
 }
@@ -66,6 +75,6 @@ button:hover {
 
 #lobbywindow ul li {
   border: solid 2px black;
-  margin: 3vh 0;
-  padding: 3%;
+  margin: 2vh 0;
+  padding: 2%;
 }
