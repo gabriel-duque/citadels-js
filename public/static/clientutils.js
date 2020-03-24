@@ -4,7 +4,10 @@
   console.log(e)
 };
 
-//Receive data from server and do shit (only sent to me)
 socket.on('message', function(data) {
   clog(data);
+});
+
+socket.on('alert', function(data) {
+  alert(data);
 });
