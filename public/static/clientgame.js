@@ -3,12 +3,12 @@ var myplayerwindow = document.getElementById('myplayerwindow');
 var playerswindow = document.querySelectorAll('.playerwindow');
 var players;
 
-socket.emit("userongame");
+socket.emit('userongame');
 
-//Setup all players window
-socket.on("logins", function(logins) {
+// Setup all players window
+socket.on('logins', function(logins) {
 
-  //Order other players in view relatively to active player
+  // Order other players in view relatively to active player
   let beforepos = [],
     afterpos = [],
     playerorder = [];
@@ -22,15 +22,15 @@ socket.on("logins", function(logins) {
     playerorder = beforepos.concat(afterpos);
   });
 
-  //Set others name on top of each window
+  // Set others name on top of each window
   for (var i = 1; i < logins.length; i++) {
     playerswindow[i - 1].id = 'player' + i;
     let playername = document.getElementById('player' + i).querySelector('.playername');
-    playername.innerHTML = "<a>" + playerorder[i - 1] + "</a>";
+    playername.innerHTML = '<a>' + playerorder[i - 1] + '</a>';
   };
 
-  //Setup active player window
-  var mywindow = document.querySelector(".playerwindow:last-child");
+  // Setup active player window
+  var mywindow = document.querySelector('.playerwindow:last-child');
   var myplayername = mywindow.querySelector('.playername');
   var mytop = mywindow.querySelector('.top');
   var mybottom = mywindow.querySelector('.bottom');
@@ -39,7 +39,7 @@ socket.on("logins", function(logins) {
   var mymoney = mywindow.querySelector('.money');
   var myrole = mywindow.querySelector('.role');
   mywindow.id = 'player0';
-  myplayername.innerHTML = "<a>" + username + "</a>";
+  myplayername.innerHTML = '<a>' + username + '</a>';
   myplayerwindow.appendChild(mywindow);
   mytop.appendChild(mycity);
   mybottom.appendChild(mymoney);
@@ -50,52 +50,52 @@ socket.on("logins", function(logins) {
 
 function addcard(player) {
   let deck = player.querySelector('.deck')
-  let card = document.createElement("div");
-  card.className = "card";
+  let card = document.createElement('div');
+  card.className = 'card';
   deck.appendChild(card);
   card.addEventListener('click', function() {
     let cards = deck.querySelectorAll('.card')
     cards.forEach(function(card) {
-      card.style.width = "30%";
+      card.style.width = '30%';
     });
-    this.style.width = "100%";
+    this.style.width = '100%';
   })
 };
 
 function removecard(player) {
   let deck = player.querySelector('.deck')
-  let card = document.querySelector(".card");
+  let card = document.querySelector('.card');
   deck.removeChild(card);
 };
 
 function playdistrict(player) {
   let city = player.querySelector('.city')
-  let district = document.createElement("div");
-  district.className = "district";
+  let district = document.createElement('div');
+  district.className = 'district';
   city.append(district);
 };
 
 function removedistrict(player) {
   let city = player.querySelector('.city')
-  let district = document.querySelector(".district");
+  let district = document.querySelector('.district');
   city.removeChild(district);
 };
 
 function newscore(player, amount) {
   let score = player.querySelector('.score');
   let newscore = parseInt(score.innerHTML.split('>')[1].split('<')[0]) + amount;
-  score.innerHTML = "<a>" + newscore + "</a>";
+  score.innerHTML = '<a>' + newscore + '</a>';
 };
 
 function newmoney(player, amount) {
   let money = player.querySelector('.money')
   let newmoney = parseInt(money.innerHTML.split('>')[1].split('<')[0]) + amount;
-  money.innerHTML = "<a>" + newmoney + "</a>";
+  money.innerHTML = '<a>' + newmoney + '</a>';
 };
 
 function revealrole(player) {
   let role = player.querySelector('.prole')
-  role.style.background = "lightgreen";
+  role.style.background = 'lightgreen';
 };
 
 ////////////  For testing
