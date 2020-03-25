@@ -6,6 +6,8 @@ body {
   width: 100%;
   height: 95vh;
   background: #e9e9e9;
+  margin: 0;
+  padding-top: 2vh;
 }
 
 #gamewindow {
@@ -25,7 +27,7 @@ body {
   max-width: 800px;
   width: 60%;
   height: 55%;
-  margin: 2vh auto;
+  margin: 3vh auto 0;
   display: block;
 }
 
@@ -39,7 +41,7 @@ body {
 }
 
 #otherswindow .playerwindow {
-  margin: 2vh 2%;
+  margin: 2vh 1.5%;
 }
 
 #myplayerwindow .playerwindow {
@@ -56,7 +58,8 @@ body {
 
 .playername a {
   position: absolute;
-  background: #999;
+  background: #ddd;
+  border: solid 2px #999;
   border-radius: 10px;
   padding: 0.5em 1em;
   z-index: 800;
@@ -82,11 +85,12 @@ body {
 /*////////// MONEY & SCORE /////////// */
 .money a {
   background: lightyellow;
-  border-radius: 100%;
+  border-radius: 50%;
 }
 
 .score a {
   background: lightgrey;
+  border-radius: 25%;
 }
 
 .money, .score {
@@ -96,10 +100,10 @@ body {
 }
 
 .money a, .score a {
-  padding: 0.3em;
-  font-size: 1.5em;
-  font-weight: 800;
-  border: solid 2px black;
+  padding: 0.4em;
+  font-size: 1.1em;
+  font-weight: 600;
+  border: solid 1px #222;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -185,7 +189,7 @@ body {
   height: 100%;
   border: solid 2px #555;
   border-radius: 10px;
-  box-shadow: 5px 5px 5px #999;
+  box-shadow: 7px 7px 7px #888;
 }
 
 /*////////// TEST BUTTONS /////////// */
