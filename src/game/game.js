@@ -1,5 +1,9 @@
-import io from 'socket.io-client';
+import 'styles/global.css';
+import 'styles/game.css';
 
+
+import io from 'socket.io-client';
+ 
 const socket = io("/game");
 
 socket.on('redirect', path => {

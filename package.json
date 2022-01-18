@@ -34,6 +34,8 @@
     "last 3 version, > 0.5%, not dead, not ie <= 11"
   ],
   "scripts": {
+    "dev": "cross-env NODE_ENV=dev WP_CONFIG=all webpack --config webpack.config.js",
+    "prod": "cross-env NODE_ENV=prod WP_CONFIG=all webpack --config webpack.config.js",
     "dev:lobby": "cross-env NODE_ENV=dev WP_CONFIG=lobby webpack --config webpack.config.js",
     "prod:lobby": "cross-env WP_CONFIG=lobby webpack --config webpack.config.js",
     "analyse:lobby": "cross-env NODE_ENV=analyse WP_CONFIG=lobby webpack --config webpack.config.js",

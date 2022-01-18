@@ -51,23 +51,18 @@ const CONFIGS = {
   }
 }
 
-const configName = process.env.WP_CONFIG;
+const isDevMode = process.env.NODE_ENV === "dev";
 
-const config = CONFIGS[configName];
-
-
-const nodeEnv = process.env.NODE_ENV;
-
-const isDevMode = nodeEnv === "dev";
-
-const isAnalyseMode = nodeEnv === "analyse";
-
+const isAnalyseMode = process.env.NODE_ENV === "analyse";
 
 console.log(
   "\r\n---------------------------------\r\n\r\n",
-  `Config : ${configName} | mode : ${nodeEnv}`,
+  `            mode : ${process.env.NODE_ENV}`,
   "\r\n\r\n---------------------------------\r\n"
 );
 
-
-export default getWebpackConfig(config, { isAnalyseMode, isDevMode });
+export default process.env.WP_CONFIG === "all" ? Object.values(CONFIGS)
+  .map(c =>
+    getWebpackConfig(c, { isAnalyseMode, isDevMode })
+  ) :
+  getWebpackConfig(CONFIGS[process.env.WP_CONFIG], { isAnalyseMode, isDevMode });

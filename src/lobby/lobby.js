@@ -1,3 +1,6 @@
+import 'styles/global.css';
+import 'styles/lobby.css';
+
 import io from 'socket.io-client';
 
 const socket = io("/lobby");
@@ -5,7 +8,7 @@ const socket = io("/lobby");
 socket.on('redirect', path => {
   window.location = path;
 });
-
+ 
 
 // Try to log player
 const joinRoomBtn = document.querySelector('.join-room');
