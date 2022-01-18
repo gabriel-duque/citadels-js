@@ -51,10 +51,6 @@ socket.on("player_left_lobby", login => {
   players.removeChild(player);
 });
 
-socket.on('start_game', () => {
-  window.location = "./game";
-});
-
 socket.on('redirect', path => {
   window.location = path;
 });

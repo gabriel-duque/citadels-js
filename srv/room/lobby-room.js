@@ -53,6 +53,8 @@ export default class LobbyRoom extends AbstractRoom {
 
       /* Starts the game and redirect clients */
       this.launchGame();
+
+      this.emit('redirect', '/game');
     });
   }
 

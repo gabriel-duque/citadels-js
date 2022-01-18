@@ -55,7 +55,7 @@ export default class Game extends EventEmitter {
     this.firstPlayerToPlayIndex = Math.floor(Math.random() * this.players.length);
     console.log('First player to play: ', this.players[this.firstPlayerToPlayIndex].login);
 
-    // console.log(this);
+    console.log(this);
 
   }
 

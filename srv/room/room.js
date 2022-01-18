@@ -21,8 +21,6 @@ export default class Room {
     this.publicGameState = this.getPublicGameState();
 
     this.bindEvents();
-
-    this.lobbyRoom.emit('start_game');
   }
 
   isGameRunning() {
@@ -32,7 +30,7 @@ export default class Room {
 
   onHandshakeDone(socket) {
 
-    socket.on("start_loop", () => {
+    socket.on("start_loop", () => { // XXX
       console.log("Starting loop");
       this.game.loop();
     });

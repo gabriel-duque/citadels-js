@@ -14,7 +14,7 @@ export default class PlayRoom extends AbstractRoom {
 
   connect(socket) {
 
-    console.log("New game client connected :", socket.id);
+    console.log("New game client connected:", socket.id);
 
     /* If there is no game running, make sure there is no log cookie */
     if (!this.isGameRunning()) {
@@ -34,7 +34,7 @@ export default class PlayRoom extends AbstractRoom {
     /* make sure login is unique (if player refreshes) */
     for (const socketId in this.players) {
       if (this.players[socketId] === login) {
-        console.log("Player left playRoom :", login, socketId);
+        console.log("Player left playRoom:", login, socketId);
         delete this.players[socketId];
       }
     }
@@ -42,7 +42,7 @@ export default class PlayRoom extends AbstractRoom {
     /* Bind socket id with player login */
     this.players[socket.id] = login;
 
-    console.log("Player joined playRoom :", login, socket.id);
+    console.log("Player joined playRoom:", login, socket.id);
 
     ///////////////////////////////////
 

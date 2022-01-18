@@ -25,7 +25,7 @@ export default class AbstractRoom {
 
     save(socket, login) {
 
-      console.log("Saving session for", login);
+      console.log("Saving session for:", login);
 
       socket.request.session.logged = true;
 
