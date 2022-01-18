@@ -38,10 +38,10 @@ export default class LobbyRoom extends ChildRoom {
     }
 
     /* Send already connected players' login to incoming clients */
-    socket.emit("player_joined", Object.values(this.players));
+    socket.emit("player_joined_lobby", Object.values(this.players));
 
     /* Send incoming players' login to already connected clients */
-    socket.on('join_room', login => this.logPlayer(socket, login));
+    socket.on('player_log_attempt', login => this.logPlayer(socket, login));
 
     /* Remove disconnected player from lobby and dispatch info to clients */
     socket.on('disconnect', () => this.disconnect(socket));
@@ -86,7 +86,7 @@ export default class LobbyRoom extends ChildRoom {
     debug("Player joined lobby :", login, socket.id);
 
     /* Inform clients that a player joined the lobby */
-    this.emit('player_joined', [login]);
+    this.emit('player_joined_lobby', [login]);
   }
 
   /* Remove a player from the lobby */

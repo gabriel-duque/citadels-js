@@ -44,21 +44,7 @@ export default class PlayRoom extends ChildRoom {
 
     /* Bind socket id with player login */
     this.players[socket.id] = login;
-
     debug("Player joined playRoom:", login, socket.id);
-
-    ///////////////////////////////////
-
-    /* Send client it's own login */
-    socket.emit("you_join_game", login);
-
-    /* Send incoming players' login to already connected clients */
-    socket.broadcast.emit("player_joined", [login]);
-
-    /* Send already connected players' login to incoming clients */
-    socket.emit("player_joined", Object.values(this.players));
-
-    ///////////////////////////////////
 
     /* Dispatch disconnected player info to clients */
     socket.on('disconnect', () => this.disconnect(login));
