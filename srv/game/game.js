@@ -23,7 +23,7 @@ export default class Game extends EventEmitter {
   hasStarted = false;
 
   isOver = false;
-  
+
   isLastTurn = false;
 
   dead_character = null;
@@ -33,7 +33,7 @@ export default class Game extends EventEmitter {
   /* First player to put an 8th district */
   first_8th = null;
 
-  constructor(players) {
+  constructor(logins) {
 
     super();
 
@@ -43,9 +43,7 @@ export default class Game extends EventEmitter {
     this.deck = new Deck();
 
     /* The players */
-    for (const login in players) {
-      this.players.push(new Player(login, this.deck.draw(4)));
-    }
+    this.players = logins.map(login => new Player(login, this.deck.draw(4)));
 
     this.characters = characters.map(character => new Character(
       character.name,
@@ -56,6 +54,9 @@ export default class Game extends EventEmitter {
     /* Set the initial first player to play */
     this.firstPlayerToPlayIndex = Math.floor(Math.random() * this.players.length);
     console.log('First player to play: ', this.players[this.firstPlayerToPlayIndex].login);
+
+    // console.log(this);
+
   }
 
   loop() {

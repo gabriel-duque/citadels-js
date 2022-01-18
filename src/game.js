@@ -25,3 +25,8 @@ button.addEventListener('click', () => {
 });
 
 document.body.appendChild(button);
+
+socket.on("game_state", state => {
+ console.log("Game state is", state);
+  
+})
