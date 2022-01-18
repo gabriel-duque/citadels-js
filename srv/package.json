@@ -1,0 +1,33 @@
+{
+  "name": "citadels-js-server",
+  "version": "0.0.2",
+  "description": "An implementation of the Citadels card game, server part using Node.js and Socket.io",
+  "main": "index.js",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cross-env": "^7.0.3",
+    "debug": "^4.3.3",
+    "express": "^4.17.2",
+    "express-mysql-session": "^2.1.7",
+    "express-session": "^1.17.2",
+    "socket.io": "^4.4.1"
+  },
+  "type": "module",
+  "scripts": {
+    "serve": "node index.js",
+    "dev": "nodemon index.js --ignore src/ --ignore dist/",
+    "dev:debug": "cross-env DEBUG=citadels:* npm run dev",
+    "dev:debugall": "cross-env DEBUG=* npm run dev",
+    "test:game": "cross-env DEBUG=citadels:* node game/test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zuh0/citadels-js.git"
+  },
+  "author": "Gabriel Duque <gabriel.duque@lse.epita.fr> (zuh0) & Lucas Poulain (ShallowRed)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zuh0/citadels-js/issues"
+  },
+  "homepage": "https://github.com/zuh0/citadels-js#readme"
+}

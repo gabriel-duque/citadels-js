@@ -1,10 +1,16 @@
 import Game from '../game/game.js';
 import LobbyRoom from './lobby-room.js';
 import PlayRoom from './play-room.js';
+import Debug from '../test/debug.js';
+
+const debug = Debug('room');
 
 export default class Room {
 
   constructor(io) {
+
+    debug("\r\nCreating new room");
+
     this.io = io;
     this.lobbyRoom = new LobbyRoom(this.io, this);
     this.playRoom = new PlayRoom(this.io, this);
@@ -12,7 +18,7 @@ export default class Room {
 
   launchGame() {
 
-    console.log("Creating new game");
+    debug("Creating new game");
 
     this.players = Object.values(this.lobbyRoom.players);
 
@@ -30,24 +36,31 @@ export default class Room {
 
   onHandshakeDone(socket) {
 
+    socket.emit("initial_game_state", this.getPrivateGameState(socket));
+
     socket.on("start_loop", () => { // XXX
-      console.log("Starting loop");
+
+      debug("Starting game loop");
+
       this.game.loop();
     });
-
-    socket.emit("game_state", this.getPrivateGameState(socket));
   }
 
+  /* returns the game state only seen by specific player */
   getPrivateGameState(socket) {
 
-    const login = this.playRoom.players[socket.id];
+    const login =  this.playRoom.players[socket.id];
 
-    const player = this.game.players
-      .find(player => player.login === login);
+    const player = this.game.players.find(player => player.login === login);
 
-    return Object.assign({}, this.publicGameState, {
-      hand: player.hand,
-    });
+    return Object.assign({},
+      this.publicGameState, {
+        player: {
+          login,
+          hand: player.hand,
+        }
+      }
+    );
   }
 
   /* returns the game state that can be shared publicly */
@@ -123,7 +136,7 @@ export default class Room {
 
     this.game.on('game_finished', (scores) => {
 
-      console.log(scores, '\n');
+      debug(scores, '\n');
 
       for (const [_, socket] of this.playRoom.sockets) {
 

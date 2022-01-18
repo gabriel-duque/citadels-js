@@ -1,25 +1,53 @@
 {
-  "name": "citadels",
+  "name": "citadels-js-client",
   "version": "0.0.2",
-  "description": "A simple implementation of the Citadels card game in JavaScript",
-  "main": "index.js",
+  "description": "An implementation of the Citadels card game, client part using JavaScript",
+  "main": "src/index.js",
   "dependencies": {
-    "cookie-parser": "^1.4.6",
-    "express": "^4.17.2",
-    "express-mysql-session": "^2.1.7",
-    "express-session": "^1.17.2",
-    "socket.io": "^4.4.1"
+    "core-js": "^3.6.5",
+    "socket.io-client": "^4.4.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.1",
+    "@babel/eslint-parser": "^7.15.4",
+    "@babel/preset-env": "^7.11.0",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^3.6.0",
+    "css-minimizer-webpack-plugin": "^3.0.2",
+    "ejs-loader": "^0.3.7",
+    "eslint": "^7.9.0",
+    "eslint-webpack-plugin": "^3.0.1",
+    "html-webpack-plugin": "^4.3.0",
+    "mini-css-extract-plugin": "^2.1.0",
+    "postcss": "^8.3.6",
+    "postcss-loader": "^6.1.1",
+    "postcss-normalize": "^10.0.0",
+    "postcss-preset-env": "^6.7.0",
+    "terser-webpack-plugin": "^2.3.7",
+    "webpack": "^5.52.0",
+    "webpack-bundle-analyzer": "^4.4.2",
+    "webpack-cli": "^4.7.2"
   },
   "type": "module",
+  "browserslist": [
+    "last 3 version, > 0.5%, not dead, not ie <= 11"
+  ],
   "scripts": {
-    "test": "node srv/game/test/test.js",
-    "start": "nodemon srv/index.js --ignore src/"
+    "dev": "cross-env NODE_ENV=dev WP_CONFIG=all webpack --config webpack.config.js",
+    "prod": "cross-env NODE_ENV=prod WP_CONFIG=all webpack --config webpack.config.js",
+    "dev:lobby": "cross-env NODE_ENV=dev WP_CONFIG=lobby webpack --config webpack.config.js",
+    "prod:lobby": "cross-env WP_CONFIG=lobby webpack --config webpack.config.js",
+    "analyse:lobby": "cross-env NODE_ENV=analyse WP_CONFIG=lobby webpack --config webpack.config.js",
+    "dev:game": "cross-env NODE_ENV=dev WP_CONFIG=game webpack --config webpack.config.js",
+    "prod:game": "cross-env WP_CONFIG=game webpack --config webpack.config.js",
+    "analyse:game": "cross-env NODE_ENV=analyse WP_CONFIG=game webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zuh0/citadels-js.git"
   },
-  "author": "Gabriel Duque <gabriel.duque@lse.epita.fr> (zuh0)",
+  "author": "Lucas Poulain (ShallowRed)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zuh0/citadels-js/issues"
