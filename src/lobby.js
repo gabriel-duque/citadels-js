@@ -29,7 +29,7 @@ socket.on("login_taken", () => {
   loginName.value = '';
 })
 
-socket.on("player_joined_lobby", logins => {
+socket.on("player_joined", logins => {
 
   for (const login of logins) {
 

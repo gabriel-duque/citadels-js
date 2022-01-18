@@ -7,8 +7,6 @@ export default class Room {
 
   sockets = {};
 
-  sessions = {};
-
   constructor(io) {
 
     this.io = io;
@@ -16,78 +14,155 @@ export default class Room {
     /* Bind lobby events to the lobby route */
     this.lobby = this.io.of("/lobby");
 
-    this.lobby.on('connection', socket => this.lobbySocketConnection(socket));
+    this.lobby.on('connection', socket => this.lobbyConnection(socket));
 
     /* Bind game events to the game route */
     this.gameRoom = this.io.of("/game");
 
-    this.gameRoom.on('connection', socket => this.gameSocketConnection.bind(this)(socket));
+    this.gameRoom.on('connection', socket => this.gameConnection.bind(this)(socket));
   }
 
   /* Handle client connections on the lobby route */
-  lobbySocketConnection(socket) {
+  lobbyConnection(socket) {
 
-    console.log("New lobby client connected", this.sockets[socket.id]);
+    console.log("New lobby client connected", socket.id);
 
     /* If the user is already logged in */
     if (socket.request.session.logged) {
 
       if (this.game.hasStarted && !this.game.isOver) {
 
-        console.log("User already logged in, redirecting to game");
-
         /* if game is still running, redirect him to the game */
+        console.log("User already logged in, redirecting to game");
         socket.emit('redirect', '/game');
 
         return;
 
       } else {
 
-        console.log("Remove session data");
-
-        /* if game is not running, remove log cookie */
-        socket.request.session.logged = false;
-        socket.request.session.save();
+        /* If game is not running, remove login cookie */
+        removeSession(socket);
       }
     }
 
-    /* send already connected players' login to incoming clients */
-    const logins = Object.keys(this.players);
+    /* Send already connected players' login to incoming clients */
+    this.sendLogins(socket);
 
-    if (logins.length) {
-
-      socket.emit("player_join", logins);
-    }
-
-    /* send incoming players' login to already connected clients */
-    socket.on('join_room', login => this.addPlayer(socket, login));
+    /* Send incoming players' login to already connected clients */
+    socket.on('join_room', login => this.addPlayerToLobby(socket, login));
 
     /* Remove disconnected player from lobby and dispatch info to clients */
-    socket.on('disconnect', () => {
+    socket.on('disconnect', () => this.disconnectPlayerFromLobby(socket));
 
-      const login = this.sockets[socket.id];
-
-      delete this.players[login];
-
-      delete this.sockets[socket.id];
-
-      console.log("Disconnected player :", login);
-
-      this.lobby.emit('player_left', login);
-    });
-
-    /* Save log cookies, starts the game and redirect clients
-       when amount of desired players is reached */
+    /*  When amount of desired players is reached */
     socket.on('room_complete', () => {
-      this.saveSessions();
+
+      /* Save login cookies */
+      for (const login in this.players) {
+        this.saveSession(login);
+      }
+
+      /* Starts the game and redirect clients */
       this.createGame();
     });
   }
 
-  /* Handle client connections on the game route */
-  gameSocketConnection(socket) {
+  registerSocket(socket, login) {
 
-    console.log("New game client connected", this.sockets[socket.id]);
+    this.players[login] = socket.id;
+
+    this.sockets[socket.id] = login;
+  }
+
+
+  unRegisterSocket(socket, login) {
+
+    delete this.players[login];
+
+    delete this.sockets[socket.id];
+  }
+
+  /* Store login data in cookie to bind lobby and game + survive disconnections */
+  saveSession(login) {
+
+    console.log("Saving session for", login);
+
+    const socket = this.lobby.sockets.get(this.players[login]);
+
+    socket.request.session.logged = true;
+    socket.request.session.login = login;
+    socket.request.session.save();
+  }
+
+  /* Remove login cookie */
+  removeSession(socket) {
+
+    console.log("Remove session data for: ", socket.request.session.login);
+    socket.request.session.logged = false;
+    socket.request.session.save();
+  }
+
+  /* Remove a player from the lobby */
+  disconnectPlayerFromLobby(socket) {
+
+    console.log("Lobby client disconnected", socket.id);
+
+    const login = this.sockets[socket.id];
+
+    if (!login) return;
+
+    console.log("Removing player from lobby :", login);
+
+    this.unRegisterSocket(socket, login);
+
+    this.lobby.emit('player_left_lobby', login);
+  }
+
+  sendLogins(socket) {
+
+    const logins = Object.keys(this.players);
+
+    if (logins.length) {
+
+      console.log("-----------------------------------------");
+      socket.emit("player_joined", logins);
+    }
+  }
+
+  /* Add a player to the lobby */
+  addPlayerToLobby(socket, login) {
+
+    /* make sure login is unique */
+    if (this.players[login]) {
+      socket.emit('login_taken');
+      return;
+    }
+
+    /* remove previous player if same socket id */
+    for (const prevLogin in this.players) {
+
+      if (socket.id === this.players[prevLogin]) {
+
+        console.log("Removing previous player", prevLogin);
+
+        delete this.players[prevLogin];
+
+        this.lobby.emit('player_left_lobby', prevLogin);
+      }
+    }
+
+    /* store player login and socket id */
+    this.registerSocket(socket, login);
+    console.log("New player joined lobby :", login, socket.id);
+
+    /* Inform clients that a player joined the lobby */
+    this.lobby.emit('player_joined', [login]);
+  }
+
+  /* Handle client connections on the game route */
+  gameConnection(socket) {
+
+    console.log("New game client connected :", socket.id);
 
     /* If there is no game running, remove log cookie */
     if (
@@ -111,8 +186,23 @@ export default class Room {
       return;
     }
 
-    /* Send each clients the players logins */
-    socket.emit("join_game", socket.request.session.login);
+    const login = socket.request.session.login;
+
+    this.registerSocket(socket, login);
+    console.log("New player joined gameRoom :", login, socket.id);
+
+    /* Send client it's own login */
+    socket.emit("you_join_game", login);
+
+    /* Send incoming players' login to already connected clients */
+    socket.broadcast.emit("player_joined", [login]);
+
+    /* Send already connected players' login to incoming clients */
+    console.log("-----------------------------------------");
+    this.sendLogins(socket);
+
+    /* Dispatch disconnected player info to clients */
+    socket.on('disconnect', () => this.game.emit('player_left_game', login));
 
     socket.on("start_loop", () => {
       console.log("Starting loop");
@@ -120,62 +210,6 @@ export default class Room {
       this.game.loop();
     })
 
-  }
-
-  /* Add a player to the lobby */
-  addPlayer(socket, login) {
-
-    /* make sure login is unique */
-    if (this.players[login]) {
-      socket.emit('login_taken');
-      return;
-    }
-
-    /* remove previous player if same socket id */
-    for (const prevLogin in this.players) {
-
-      const socketId = this.players[prevLogin];
-
-      if (socket.id === socketId) {
-
-        delete this.players[prevLogin];
-
-        this.lobby.emit('player_left_lobby', prevLogin);
-      }
-    }
-
-    /* store player login and socket id */
-
-    this.players[login] = socket.id;
-
-    this.sockets[socket.id] = login;
-
-
-    /* Inform clients that a player joined the lobby */
-
-    this.lobby.emit('player_joined_lobby', [login]);
-
-    console.log("New player:", login, socket.id);
-  }
-
-  saveSessions() {
-
-    /* Store login data in cookie to bind lobby and game + survive disconnections */
-
-    for (const login in this.players) {
-
-      console.log("Saving session for", login);
-
-      const socketId = this.players[login];
-
-      const socket = this.lobby.sockets.get(socketId);
-
-      socket.request.session.logged = true;
-      socket.request.session.login = login;
-      socket.request.session.save();
-
-      this.sessions[socket.request.sessionId] = login;
-    }
   }
 
   /* Create our game */
@@ -244,6 +278,15 @@ export default class Room {
     this.game.on('game_finished', (scores) => {
       this.gameRoom.emit('game_finished', scores);
       console.log(scores, '\n');
+
+      for (const socket in this.sockets) {
+
+        const login = this.sockets[socket];
+
+        if (!login) continue;
+
+        this.unRegisterSocket(socket, login);
+      }
     });
   }
 }

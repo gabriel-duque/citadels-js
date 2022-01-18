@@ -6,8 +6,12 @@ import {
 
 const socket = io("/game");
 
-socket.on('join_game', login => {
-  console.log(login);
+socket.on('player_joined', logins => {
+  console.log("Connected players are", logins);
+});
+
+socket.on('you_join_game', login => {
+  console.log("you joined", login);
 });
 
 socket.on('redirect', path => {
