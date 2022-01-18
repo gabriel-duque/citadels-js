@@ -1,4 +1,6 @@
-export default class AbstractRoom {
+import Debug from '../test/debug.js';
+
+export default class ChildRoom {
 
   players = {};
 
@@ -25,7 +27,7 @@ export default class AbstractRoom {
 
     save(socket, login) {
 
-      console.log("Saving session for:", login);
+      Debug("session")("Saving session for:", login);
 
       socket.request.session.logged = true;
 
@@ -36,7 +38,7 @@ export default class AbstractRoom {
 
     remove(socket) {
 
-      console.log("Remove session data for: ", socket.request.session.login);
+      Debug("session")("Remove session data for: ", socket.request.session.login);
 
       socket.request.session.logged = false;
 

@@ -1,30 +1,33 @@
-import AbstractRoom from './abstract-room.js';
+import ChildRoom from './child-room.js';
+import Debug from '../test/debug.js';
 
-export default class PlayRoom extends AbstractRoom {
+const debug = Debug('play-room');
 
-  constructor(io, room) {
+export default class PlayRoom extends ChildRoom {
+
+  constructor(io, parentRoom) {
 
     super(io, '/game');
 
-    this.isGameRunning = room.isGameRunning.bind(room);
-    this.onHandshakeDone = room.onHandshakeDone.bind(room);
+    this.isGameRunning = parentRoom.isGameRunning.bind(parentRoom);
+    this.onHandshakeDone = parentRoom.onHandshakeDone.bind(parentRoom);
 
     this.on('connection', socket => this.connect(socket));
   }
 
   connect(socket) {
 
-    console.log("New game client connected:", socket.id);
+    debug("New game client connected:", socket.id);
 
     /* If there is no game running, make sure there is no log cookie */
     if (!this.isGameRunning()) {
-      console.log("No game running, remove login cookie");
+      debug("No game running, remove login cookie");
       this.session.remove(socket);
     }
 
     /* If user is not logged in, redirects player back to lobby */
     if (!socket.request.session.logged || !socket.request.session.login) {
-      console.log("User not logged in, redirecting to lobby");
+      debug("User not logged in, redirecting to lobby");
       socket.emit('redirect', '/');
       return;
     }
@@ -34,7 +37,7 @@ export default class PlayRoom extends AbstractRoom {
     /* make sure login is unique (if player refreshes) */
     for (const socketId in this.players) {
       if (this.players[socketId] === login) {
-        console.log("Player left playRoom:", login, socketId);
+        debug("Player left playRoom:", login, socketId);
         delete this.players[socketId];
       }
     }
@@ -42,7 +45,7 @@ export default class PlayRoom extends AbstractRoom {
     /* Bind socket id with player login */
     this.players[socket.id] = login;
 
-    console.log("Player joined playRoom:", login, socket.id);
+    debug("Player joined playRoom:", login, socket.id);
 
     ///////////////////////////////////
 

@@ -1,3 +1,5 @@
+import Debug from '../test/debug.js';
+
 /* An enumeration for colors */
 export const colors = {
   RED: 'Red',
@@ -22,9 +24,9 @@ export class District {
   render(hidden = false) {
 
     if (hidden)
-      console.log('This is a hidden district.');
+      Debug("game")('This is a hidden district.');
       
     else
-      console.log(this);
+      Debug("game")(this);
   }
 }

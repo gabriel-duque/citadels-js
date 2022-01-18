@@ -1,10 +1,14 @@
 import Game from '../game/game.js';
 import LobbyRoom from './lobby-room.js';
 import PlayRoom from './play-room.js';
+import Debug from '../test/debug.js';
+
+const debug = Debug('room');
 
 export default class Room {
 
   constructor(io) {
+    debug("\r\nCreating new room");
     this.io = io;
     this.lobbyRoom = new LobbyRoom(this.io, this);
     this.playRoom = new PlayRoom(this.io, this);
@@ -12,7 +16,7 @@ export default class Room {
 
   launchGame() {
 
-    console.log("Creating new game");
+    debug("Creating new game");
 
     this.players = Object.values(this.lobbyRoom.players);
 
@@ -31,7 +35,7 @@ export default class Room {
   onHandshakeDone(socket) {
 
     socket.on("start_loop", () => { // XXX
-      console.log("Starting loop");
+      debug("Starting game loop");
       this.game.loop();
     });
 
@@ -123,7 +127,7 @@ export default class Room {
 
     this.game.on('game_finished', (scores) => {
 
-      console.log(scores, '\n');
+      debug(scores, '\n');
 
       for (const [_, socket] of this.playRoom.sockets) {
 

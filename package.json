@@ -2,18 +2,24 @@
   "name": "citadels",
   "version": "0.0.2",
   "description": "A simple implementation of the Citadels card game in JavaScript",
-  "main": "index.js",
+  "main": "srv/index.js",
   "dependencies": {
     "cookie-parser": "^1.4.6",
+    "cross-env": "^7.0.3",
+    "debug": "^4.3.3",
     "express": "^4.17.2",
     "express-mysql-session": "^2.1.7",
     "express-session": "^1.17.2",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "supports-color": "^9.2.1"
   },
   "type": "module",
   "scripts": {
-    "test": "node srv/game/test/test.js",
-    "start": "nodemon srv/index.js --ignore src/"
+    "test:game": "cross-env DEBUG=citadels:* node srv/game/test/test.js",
+    "serve": "node srv/index.js",
+    "dev:server": "nodemon srv/index.js --ignore src/",
+    "debug": "cross-env DEBUG=citadels:* npm run dev:server",
+    "debug:all": "cross-env DEBUG=* npm run dev:server"
   },
   "repository": {
     "type": "git",

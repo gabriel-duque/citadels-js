@@ -1,10 +1,11 @@
-/* Some imports we need */
 import {
   colors
 } from './district.js';
 
+import Debug from '../test/debug.js';
+
 /* A simple AI to test the game functionnality */
-import * as champion from './test/champion.js';
+import * as champion from '../test/champion.js';
 
 /* This class represents a Character card */
 export class Character {
@@ -19,9 +20,9 @@ export class Character {
   render(hidden = false) {
 
     if (hidden) {
-      console.log("This is a hidden character card.");
+      Debug("game")("This is a hidden character card.");
     } else {
-      console.log(this);
+      Debug("game")(this);
     }
   }
 };
@@ -33,12 +34,12 @@ const coin_or_gold = (player, game) => {
 
   if (choice) { // Get gold
 
-    console.log("    gets 2 gold");
+    Debug("game")("    gets 2 gold");
 
     player.gold += 2;
   } else { // Get 2 cards and discard one
 
-    console.log("    draws a card");
+    Debug("game")("    draws a card");
 
     const cards = game.deck.draw(2);
 
@@ -67,7 +68,7 @@ const do_normal_end = (player, game) => {
 
     if (game.first_8th === null) {
 
-      console.log("    has built 8 districts");
+      Debug("game")("    has built 8 districts");
       game.first_8th = player;
     }
 
@@ -85,7 +86,7 @@ const assassin = (player, game) => {
     game.dead_character = game.characters[choice];
   }
 
-  console.log("    kills", game.dead_character && game.dead_character.name);
+  Debug("game")("    kills", game.dead_character && game.dead_character.name);
 
   do_normal_end(player, game);
 };
@@ -104,7 +105,7 @@ const thief = (player, game) => {
 
     game.stolen_character = game.characters[choice];
 
-    console.log("    steals", game.stolen_character.name);
+    Debug("game")("    steals", game.stolen_character.name);
   }
 
   do_normal_end(player, game);
@@ -121,11 +122,11 @@ const magician = (player, game) => {
 
     [player.hand, exchangedPlayer.hand] = [exchangedPlayer.hand, player.hand];
 
-    console.log("   ", player.login, "exchanges with", choice.exchange);
+    Debug("game")("   ", player.login, "exchanges with", choice.exchange);
 
   } else if (choice.discard && choice.discard.length) { // Discard
 
-    console.log("    changes", choice.discard.length, "cards");
+    Debug("game")("    changes", choice.discard.length, "cards");
 
     for (
       const cardToRemoveIndex in choice.discard
@@ -179,7 +180,7 @@ const merchant = (player, game) => {
 /* Architect's turn */
 const architect = (player, game) => {
 
-  console.log("    do turn");
+  Debug("game")("    do turn");
 
   /* Can draw 2 cards */
   player.hand.push(...game.deck.draw(2));
@@ -213,7 +214,7 @@ const warlord = (player, game) => {
 
     if (player.gold >= attackedDistrict.price - 1) {
 
-      console.log("    destroys card", attackedDistrict.name, "of", attackedPlayer.login);
+      Debug("game")("    destroys card", attackedDistrict.name, "of", attackedPlayer.login);
 
       player.gold -= attackedDistrict.price - 1;
 

@@ -1,5 +1,5 @@
 import expressCookieParser from 'cookie-parser';
-import config from '../config.js';
+import { db, cookieSecret} from '../config.js';
 
 import expressSession from 'express-session';
 import expressMySqlSession from 'express-mysql-session';
@@ -8,9 +8,9 @@ import {
   createPool
 } from 'mysql';
 
-const cookieParser = expressCookieParser(config.cookieSecret);
+const cookieParser = expressCookieParser(cookieSecret);
 
-const connection = createPool(config.db);
+const connection = createPool(db);
 
 const MySQLStore = expressMySqlSession(expressSession);
 
@@ -23,7 +23,7 @@ const session = expressSession({
   store: sessionStore,
   resave: false,
   saveUninitialized: true,
-  secret: config.cookieSecret,
+  secret: cookieSecret,
   name: EXPRESS_SID_KEY
 });
 

@@ -1,20 +1,23 @@
-import AbstractRoom from './abstract-room.js';
+import ChildRoom from './child-room.js';
+import Debug from '../test/debug.js';
 
-export default class LobbyRoom extends AbstractRoom {
+const debug = Debug('lobby-room');
 
-  constructor(io, room) {
+export default class LobbyRoom extends ChildRoom {
+
+  constructor(io, parentRoom) {
 
     super(io, '/lobby');
 
-    this.isGameRunning = room.isGameRunning.bind(room);
-    this.launchGame = room.launchGame.bind(room);
+    this.isGameRunning = parentRoom.isGameRunning.bind(parentRoom);
+    this.launchGame = parentRoom.launchGame.bind(parentRoom);
 
     this.on('connection', socket => this.connect(socket));
   }
 
   connect(socket) {
 
-    console.log("New lobby client connected", socket.id);
+    debug("Lobby client connected:", socket.id);
 
     /* If user login is already stored in session */
     if (socket.request.session.logged) {
@@ -22,7 +25,7 @@ export default class LobbyRoom extends AbstractRoom {
       if (this.isGameRunning()) {
 
         /* if game is still running, redirect him to the game */
-        console.log("User already logged in, redirecting to game");
+        debug("User already logged in, redirecting to game");
         socket.emit('redirect', '/game');
 
         return;
@@ -72,7 +75,7 @@ export default class LobbyRoom extends AbstractRoom {
 
       /* make sure socket.id is unique (if player changes name) */
       if (socketId === socket.id) {
-        console.log("Player left lobby :", this.players[socketId], socketId);
+        debug("Player left lobby :", this.players[socketId], socketId);
         this.emit('player_left_lobby', this.players[socketId]);
         delete this.players[socketId];
       }
@@ -80,7 +83,7 @@ export default class LobbyRoom extends AbstractRoom {
 
     /* Bind socket id with player login */
     this.players[socket.id] = login;
-    console.log("Player joined lobby :", login, socket.id);
+    debug("Player joined lobby :", login, socket.id);
 
     /* Inform clients that a player joined the lobby */
     this.emit('player_joined', [login]);
@@ -89,14 +92,14 @@ export default class LobbyRoom extends AbstractRoom {
   /* Remove a player from the lobby */
   disconnect(socket) {
 
-    console.log("Lobby client disconnected", socket.id);
+    debug("Lobby client disconnected", socket.id);
 
     const login = this.players[socket.id];
 
     if (!login) return;
 
     delete this.players[socket.id];
-    console.log("Removing player from lobby :", login);
+    debug("Removing player from lobby :", login);
     this.emit('player_left_lobby', login);
   }
 }

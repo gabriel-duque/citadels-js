@@ -1,5 +1,7 @@
 /* This is a simple AI for Citadels */
 
+import debug from './debug.js';
+
 /* Gold or cards */
 export const get_gold_card = (player) => {
   if (player.hand.length == 0)
@@ -78,11 +80,11 @@ export const get_warlord = (player, players) => {
   const playerToAttackIndex =
     attackablePlayersIndexes[Math.floor(Math.random() * attackablePlayersIndexes.length)];
 
-    console.log("playerToAttackIndex", playerToAttackIndex);
+    debug("game")('playerToAttackIndex', playerToAttackIndex);
     
   const districtToAttackIndex = Math.floor(Math.random() * players[playerToAttackIndex].districts.length);
 
-  console.log("districtToAttackIndex", districtToAttackIndex);
+  debug("game")("districtToAttackIndex", districtToAttackIndex);
   
   return {
     playerIndex: playerToAttackIndex,
