@@ -22,14 +22,14 @@ server.listen(port, () => {
 });
 
 // Handle routes
-app.use(express.static(path.resolve('src/')));
+app.use(express.static(path.resolve('../dist/')));
 
 app.get("/", (_, res) => {
-  res.sendFile(path.resolve("src/lobby.html"))
+  res.sendFile(path.resolve("../dist/lobby.html"))
 });
 
 app.get("/game", (_, res) => {
-  res.sendFile(path.resolve("src/game.html"))
+  res.sendFile(path.resolve("../dist/game.html"))
 });
 
 export {
