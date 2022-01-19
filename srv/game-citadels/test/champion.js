@@ -1,6 +1,6 @@
 /* This is a simple AI for Citadels */
 
-import debug from './debug.js';
+import debug from '../../debug.config.js';
 
 /* Gold or cards */
 export const get_gold_card = (player) => {

@@ -1,4 +1,4 @@
-import Debug from '../test/debug.js';
+import Debug from '../debug.config.js';
 
 /* An enumeration for colors */
 export const colors = {

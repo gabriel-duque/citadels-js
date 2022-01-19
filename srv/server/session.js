@@ -1,80 +1,30 @@
-import expressCookieParser from 'cookie-parser';
-import { db, cookieSecret} from '../config.js';
+import Debug from '../debug.config.js';
 
-import expressSession from 'express-session';
-import expressMySqlSession from 'express-mysql-session';
+const debug = Debug('session');
 
-import {
-  createPool
-} from 'mysql';
+export default {
 
-const cookieParser = expressCookieParser(cookieSecret);
+  save(socket, sessionData) {
 
-const connection = createPool(db);
+    debug("Saving session for:", socket.id, sessionData);
 
-const MySQLStore = expressMySqlSession(expressSession);
+    Object.assign(socket.request.session, sessionData);
 
-const sessionStore = new MySQLStore({}, connection);
-// const sessionStore = new expressSession.MemoryStore();
+    socket.request.session.save();
+  },
 
-const EXPRESS_SID_KEY = 'connect.sid';
+  remove(socket) {
 
-const session = expressSession({
-  store: sessionStore,
-  resave: false,
-  saveUninitialized: true,
-  secret: cookieSecret,
-  name: EXPRESS_SID_KEY
-});
+    debug("Remove session data for: ", socket.id);
 
-const wrap = middleware => (socket, next) =>
-  middleware(socket, {}, next);
+    for (const key in socket.request.session) {
 
-export default (app, io) => {
+      if (key !== 'cookie') {
 
-  app.use(cookieParser);
-  app.use(session);
+        delete socket.request.session[key];
+      }
+    }
 
-  io.of("/lobby").use(wrap(sessionMiddleware));
-  io.of("/game").use(wrap(sessionMiddleware));
-
-  function sessionMiddleware(socket, {}, next) {
-    const req = socket.request;
-
-    if (!req.headers.cookie)
-      return next(new Error('No cookie transmitted.'));
-
-    cookieParser(req, {}, parseErr => {
-
-      if (parseErr)
-        return next(new Error('Error parsing cookies.'));
-
-      const sidCookie = getSessionId(req);
-
-      sessionStore.load(sidCookie, (err, session) => {
-
-        if (err)
-          return next(err);
-
-        else if (!session)
-          return next(new Error('Session load failed '));
-
-        req.session = session;
-        req.sessionId = sidCookie;
-
-        return next();
-      });
-    });
-  };
-};
-
-const getSessionId = req => (
-    req.secureCookies &&
-    req.secureCookies[EXPRESS_SID_KEY]) ||
-  (
-    req.signedCookies &&
-    req.signedCookies[EXPRESS_SID_KEY]) ||
-  (
-    req.cookies &&
-    req.cookies[EXPRESS_SID_KEY]
-  );
+    socket.request.session.save();
+  }
+}

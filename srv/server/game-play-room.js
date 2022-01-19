@@ -1,28 +1,27 @@
-import ChildRoom from './child-room.js';
-import Debug from '../test/debug.js';
+import GameChildRoom from './game-child-room.js';
+import session from './session.js';
+
+import Debug from '../debug.config.js';
 
 const debug = Debug('play-room');
 
-export default class PlayRoom extends ChildRoom {
+export default class GamePlayRoom extends GameChildRoom {
 
-  constructor(io, parentRoom) {
 
-    super(io, '/game');
+  constructor(parentRoom, { nameSpace = '/game' } = {}) {
 
-    this.isGameRunning = parentRoom.isGameRunning.bind(parentRoom);
-    this.onHandshakeDone = parentRoom.onHandshakeDone.bind(parentRoom);
-
-    this.on('connection', socket => this.connect(socket));
+    super(parentRoom, nameSpace);
   }
+
 
   connect(socket) {
 
     debug("New game client connected:", socket.id);
 
     /* If there is no game running, make sure there is no log cookie */
-    if (!this.isGameRunning()) {
+    if (!this.parentRoom.isGameRunning()) {
       debug("No game running, remove login cookie");
-      this.session.remove(socket);
+      session.remove(socket);
     }
 
     /* If user is not logged in, redirects player back to lobby */
@@ -49,10 +48,13 @@ export default class PlayRoom extends ChildRoom {
     /* Dispatch disconnected player info to clients */
     socket.on('disconnect', () => this.disconnect(login));
 
-    this.onHandshakeDone(socket)
+    this.parentRoom.onHandshakeDone(socket)
   }
 
+
   disconnect(login) {
+
     this.emit('player_left_game', login)
   }
+
 }

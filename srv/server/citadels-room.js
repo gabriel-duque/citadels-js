@@ -1,38 +1,25 @@
-import Game from '../game/game.js';
-import LobbyRoom from './lobby-room.js';
-import PlayRoom from './play-room.js';
-import Debug from '../test/debug.js';
+import GameRoom from './game-room.js';
+import CitadelsGame from '../game-citadels/game.js';
+import session from './session.js';
 
+import Debug from '../debug.config.js';
 const debug = Debug('room');
 
-export default class Room {
+
+export default class CitadelsRoom extends GameRoom {
+
 
   constructor(io) {
 
-    debug("\r\nCreating new room");
-
-    this.io = io;
-    this.lobbyRoom = new LobbyRoom(this.io, this);
-    this.playRoom = new PlayRoom(this.io, this);
+      super(io, CitadelsGame);
   }
 
-  launchGame() {
-
-    debug("Creating new game");
-
-    this.players = Object.values(this.lobbyRoom.players);
-
-    this.game = new Game(this.players);
-
-    this.publicGameState = this.getPublicGameState();
-
-    this.bindEvents();
-  }
 
   isGameRunning() {
 
     return this.game && this.game.hasStarted && !this.game.isOver
   }
+
 
   onHandshakeDone(socket) {
 
@@ -46,10 +33,11 @@ export default class Room {
     });
   }
 
-  /* returns the game state only seen by specific player */
-  getPrivateGameState(socket) {
 
-    const login =  this.playRoom.players[socket.id];
+  /* returns the game state only seen by specific player */
+  getInitialPrivateGameState(socket) {
+
+    const login = this.playRoom.players[socket.id];
 
     const player = this.game.players.find(player => player.login === login);
 
@@ -63,8 +51,9 @@ export default class Room {
     );
   }
 
+
   /* returns the game state that can be shared publicly */
-  getPublicGameState() {
+  getInitialPublicGameState() {
 
     return {
       isLastTurn: this.game.isLastTurn,
@@ -82,6 +71,7 @@ export default class Room {
       })
     };
   }
+
 
   /* Bind server game events to client connections */
   bindEvents() {
@@ -140,7 +130,7 @@ export default class Room {
 
       for (const [_, socket] of this.playRoom.sockets) {
 
-        this.playRoom.session.remove(socket);
+        session.remove(socket);
 
         socket.emit('game_finished', scores);
       }

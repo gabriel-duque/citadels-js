@@ -1,18 +1,15 @@
-import ChildRoom from './child-room.js';
-import Debug from '../test/debug.js';
+import GameChildRoom from './game-child-room.js';
+import session from './session.js';
+
+import Debug from '../debug.config.js';
 
 const debug = Debug('lobby-room');
 
-export default class LobbyRoom extends ChildRoom {
+export default class GameLobbyRoom extends GameChildRoom {
 
-  constructor(io, parentRoom) {
+  constructor(parentRoom, { nameSpace = '/lobby' } = {}) {
 
-    super(io, '/lobby');
-
-    this.isGameRunning = parentRoom.isGameRunning.bind(parentRoom);
-    this.launchGame = parentRoom.launchGame.bind(parentRoom);
-
-    this.on('connection', socket => this.connect(socket));
+    super(parentRoom, nameSpace);
   }
 
   connect(socket) {
@@ -22,7 +19,7 @@ export default class LobbyRoom extends ChildRoom {
     /* If user login is already stored in session */
     if (socket.request.session.logged) {
 
-      if (this.isGameRunning()) {
+      if (this.parentRoom.isGameRunning()) {
 
         /* if game is still running, redirect him to the game */
         debug("User already logged in, redirecting to game");
@@ -33,7 +30,7 @@ export default class LobbyRoom extends ChildRoom {
       } else {
 
         /* If game is not running, remove login cookie */
-        this.session.remove(socket);
+        session.remove(socket);
       }
     }
 
@@ -51,11 +48,14 @@ export default class LobbyRoom extends ChildRoom {
 
       /* Save login cookies */
       for (const [id, socket] of this.sockets) {
-        this.session.save(socket, this.players[id]);
+        session.save(socket, {
+          logged: true,
+          login: this.players[id]
+        });
       }
 
       /* Starts the game and redirect clients */
-      this.launchGame();
+      this.parentRoom.launchGame();
 
       this.emit('redirect', '/game');
     });

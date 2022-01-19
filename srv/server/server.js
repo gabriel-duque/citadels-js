@@ -3,11 +3,13 @@ import http from 'http';
 import express from 'express';
 import { Server } from "socket.io";
 
-import Debug from '../test/debug.js';
-import setSession from './session.js';
-import { port } from '../config.js';
+import Debug from '../debug.config.js';
+
+import { port } from '../server.config.js';
+import { cookieParser, session, sessionMiddleware, } from './session-store.js';
 
 const debug = Debug('server');
+
 
 const app = express();
 
@@ -15,24 +17,38 @@ const server = http.createServer(app);
 
 const io = new Server(server);
 
-setSession(app, io);
 
-server.listen(port, () => {
-  debug(`Server listening on port ${port}`);
-});
+server.listen(port, () => debug(`Server listening on port ${port}`));
 
-// Handle routes
-app.use(express.static(path.resolve('../dist/')));
+const publicFolder = path.resolve('../dist');
 
-app.get("/", (_, res) => {
-  res.sendFile(path.resolve("../dist/lobby.html"))
-});
+app.use(express.static(publicFolder));
 
-app.get("/game", (_, res) => {
-  res.sendFile(path.resolve("../dist/game.html"))
-});
 
-export {
+app.use(cookieParser);
+
+app.use(session);
+
+
+export default {
+
   io,
-  server
-};
+
+  /**
+   * @param {{ publicPath: string; fileName: string; ioNamespace: string; }[]} routes
+   */
+  set routes(routes) {
+
+    for (const { publicPath, fileName, ioNamespace } of routes) {
+
+      app.get(publicPath, (_, res) => {
+        res.sendFile(`${publicFolder}/${fileName}`)
+      });
+
+      io.of(ioNamespace)
+        .use((socket, next) =>
+          sessionMiddleware(socket, {}, next)
+        );
+    }
+  }
+}

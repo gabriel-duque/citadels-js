@@ -2,10 +2,10 @@ import {
   colors
 } from './district.js';
 
-import Debug from '../test/debug.js';
+import Debug from '../debug.config.js';
 
 /* A simple AI to test the game functionnality */
-import * as champion from '../test/champion.js';
+import * as champion from './test/champion.js';
 
 /* This class represents a Character card */
 export class Character {

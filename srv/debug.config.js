@@ -19,8 +19,11 @@ Debug.selectColor = (name) => {
   for (const colorSpace of colors) {
 
     const nameSpace = Object.keys(colorSpace)[0];
-    
-    if (!!name.match(`citadels:${nameSpace}`)) return colorSpace[nameSpace];
+
+    if (!!name.match(`citadels:${nameSpace}`)) {
+
+      return colorSpace[nameSpace];
+    }
   }
 
   return 9;

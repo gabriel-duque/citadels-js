@@ -18,7 +18,7 @@
     "dev": "nodemon index.js --ignore src/ --ignore dist/",
     "dev:debug": "cross-env DEBUG=citadels:* npm run dev",
     "dev:debugall": "cross-env DEBUG=* npm run dev",
-    "test:game": "cross-env DEBUG=citadels:* node game/test/test.js"
+    "test:game": "cross-env DEBUG=citadels:* node game-citadels/test/test.js"
   },
   "repository": {
     "type": "git",

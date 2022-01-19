@@ -1,4 +1,4 @@
-import debug from '../test/debug.js';
+import debug from '../debug.config.js';
 
 /* This is a class to represent a player */
 export default class Player {

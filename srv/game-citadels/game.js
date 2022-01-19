@@ -14,10 +14,12 @@ import {
 import Deck from './deck.js';
 import Player from './player.js';
 import EventEmitter from 'events';
-import Debug from '../test/debug.js';
+import Debug from '../debug.config.js';
 
 /* This class represents a game */
 export default class Game extends EventEmitter {
+
+  static name = "Citadels";
 
   players = [];
 
