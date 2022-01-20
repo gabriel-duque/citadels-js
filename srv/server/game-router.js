@@ -1,5 +1,7 @@
 import Debug from '../debug.config.js';
 
+import { serverConfig } from '../../routes.config.js';
+
 export default class GameRouter {
 
   static rooms = {};
@@ -11,6 +13,9 @@ export default class GameRouter {
     this.name = gameName;
 
     this.GameRoom = GameRoom;
+
+    this.GameRoom.routes = serverConfig(gameName).routes;
+
   }
 
   get room() {

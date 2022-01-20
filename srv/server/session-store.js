@@ -16,7 +16,7 @@ const sessionStore = new MySQLStore({}, dbConnection);
 
 const EXPRESS_SID_KEY = 'connect.sid';
 
-export const session = expressSession({
+export const expressSessionStore = expressSession({
   store: sessionStore,
   resave: false,
   saveUninitialized: true,

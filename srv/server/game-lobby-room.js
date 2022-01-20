@@ -1,6 +1,4 @@
 import GameChildRoom from './game-child-room.js';
-import session from './session.js';
-
 
 export default class GameLobbyRoom extends GameChildRoom {
 
@@ -48,7 +46,7 @@ export default class GameLobbyRoom extends GameChildRoom {
 
     for (const [id, socket] of this.sockets) {
 
-      session.save(socket, {
+      this.session.save(socket, {
         logged: true,
         login: this.players[id]
       });
@@ -111,7 +109,7 @@ export default class GameLobbyRoom extends GameChildRoom {
     }
 
     /* If game is not running, remove unwanted login cookie */
-    session.remove(socket);
+    this.session.remove(socket);
   }
 
 

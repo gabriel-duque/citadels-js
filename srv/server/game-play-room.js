@@ -1,6 +1,4 @@
 import GameChildRoom from './game-child-room.js';
-import session from './session.js';
-
 
 export default class GamePlayRoom extends GameChildRoom {
 
@@ -16,7 +14,7 @@ export default class GamePlayRoom extends GameChildRoom {
     /* If no game is running, log player out */
     if (!this.isGameRunning) {
 
-      session.remove(socket);
+      this.session.remove(socket);
     }
 
     /* If user is not logged in, redirects to lobby */

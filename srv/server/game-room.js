@@ -13,14 +13,16 @@ export default class GameRoom {
     debug("\r\nCreating new room of game:", Game.name);
 
     this.io = io;
+    this.session = io.session;
     this.Game = Game;
-    this.routes = routes;
+    
+    this.routes =  routes;
 
-    this.lobbyRoom = new GameLobbyRoom(this, routes.lobby.ioNamespace);
-    this.playRoom = new GamePlayRoom(this, routes.play.ioNamespace);
+    this.lobbyRoom = new GameLobbyRoom(this, this.routes.lobby.ioNamespace);
+    this.playRoom = new GamePlayRoom(this, this.routes.play.ioNamespace);
 
-    this.lobbyPath = routes.lobby.publicPath;
-    this.playPath = routes.play.publicPath;
+    this.lobbyPath = this.routes.lobby.publicPath;
+    this.playPath = this.routes.play.publicPath;
   }
 
 

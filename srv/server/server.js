@@ -3,7 +3,8 @@ import express from 'express';
 import { Server } from "socket.io";
 
 import { port } from '../server.config.js';
-import { cookieParser, session, sessionMiddleware } from './session-store.js';
+import { cookieParser, expressSessionStore, sessionMiddleware } from './session-store.js';
+import socketSession from './socket-session.js';
 
 import Debug from '../debug.config.js';
 const debug = Debug('server');
@@ -14,6 +15,8 @@ export const app = express();
 const httpServer = http.createServer(app);
 
 export const io = new Server(httpServer);
+
+io.session = socketSession;
 
 io.initNamespace = function(name) {
 
@@ -32,4 +35,4 @@ httpServer.listen(port, () => debug(`Server listening on port ${port}`));
 
 app.use(cookieParser);
 
-app.use(session);
+app.use(expressSessionStore);

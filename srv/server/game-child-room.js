@@ -12,6 +12,8 @@ export default class GameChildRoom {
 
     this.nameSpace = parentRoom.io.of(nameSpace);
 
+    this.session = parentRoom.io.session;
+
     this.debug = Debug(`${nameSpace.split('/')[1]}-room`);
 
     this.on = (message, callback) =>

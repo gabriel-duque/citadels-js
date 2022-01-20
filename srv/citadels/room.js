@@ -1,16 +1,11 @@
 import GameRoom from '../server/game-room.js';
-import session from '../server/session.js';
-import { serverConfig } from '../../routes.config.js';
-
 import CitadelsGame from './game.js';
 
 import Debug from '../debug.config.js';
-const debug = Debug('room');
+const debug = Debug('citadels:room');
 
 
 export default class CitadelsRoom extends GameRoom {
-
-  static routes = serverConfig(CitadelsGame.name).routes;
 
   constructor(io) {
 
@@ -133,7 +128,7 @@ export default class CitadelsRoom extends GameRoom {
 
       for (const [_, socket] of this.playRoom.sockets) {
 
-        session.remove(socket);
+        this.session.remove(socket);
 
         socket.emit('game_finished', scores);
       }

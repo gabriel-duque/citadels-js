@@ -1,9 +1,7 @@
 import { app, io } from './server/server.js';
 import Router from './server/router.js';
-
 import GameRooms from './games.js';
 import GameRouter from './server/game-router.js';
-
 
 app.get('/', Router.askForFile('home'));
 
@@ -12,16 +10,14 @@ app.use(Router.getPublicPath('home'));
 
 for (const gameName in GameRooms) {
 
-  const GameRoom = GameRooms[gameName];
-
-  const gameRouter = new GameRouter(gameName, GameRoom, io);
+  const gameRouter = new GameRouter(gameName, GameRooms[gameName], io);
 
   app.get(`/${gameName}`,
     gameRouter.createRoomIfNotExists.bind(gameRouter),
     gameRouter.redirectToLobby.bind(gameRouter)
   );
 
-  for (const route of Object.values(GameRoom.routes)) {
+  for (const route of Object.values(gameRouter.GameRoom.routes)) {
 
     io.initNamespace(route.ioNamespace);
 
