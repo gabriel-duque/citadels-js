@@ -13,7 +13,6 @@ export default class GameChildRoom {
     this.nameSpace = parentRoom.io.of(nameSpace);
 
     this.session = parentRoom.io.session;
-    
 
     this.debug = Debug(`room:${nameSpace.split('/')[1]}`);
 
@@ -28,6 +27,8 @@ export default class GameChildRoom {
 
 
     this.on('connection', socket => {
+
+      socket.join("test");
 
       this.debug(`New client connected at ${this.nameSpace.name}: ${socket.id}`);
 
@@ -72,7 +73,7 @@ export default class GameChildRoom {
 
     const login = this.players[socketId];
 
-    if (!login) return; 
+    if (!login) return;
 
     delete this.players[socketId];
 

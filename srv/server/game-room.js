@@ -45,7 +45,7 @@ export default class GameRoom {
   }
 
 
-  onHandshakeDone(socket) {
+  onHandshakeDone() {
     throw new Error("onHandshakeDone Method not implemented.");
   }
 
@@ -57,7 +57,7 @@ export default class GameRoom {
 
 
   /* returns the game state only seen by specific player */
-  getInitialPrivateGameState(socket) {
+  getInitialPrivateGameState() {
     throw new Error("getInitialPrivateGameState Method not implemented.");
   }
 
