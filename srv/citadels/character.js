@@ -1,8 +1,7 @@
-import {
-  colors
-} from './district.js';
+import { colors } from './district.js';
 
 import Debug from '../debug.config.js';
+const debug = Debug("game:citadels");
 
 /* A simple AI to test the game functionnality */
 import * as champion from './test/champion.js';
@@ -20,9 +19,9 @@ export class Character {
   render(hidden = false) {
 
     if (hidden) {
-      Debug("game")("This is a hidden character card.");
+      debug("This is a hidden character card.");
     } else {
-      Debug("game")(this);
+      debug(this);
     }
   }
 };
@@ -34,12 +33,12 @@ const coin_or_gold = (player, game) => {
 
   if (choice) { // Get gold
 
-    Debug("game")("    gets 2 gold");
+    debug("    gets 2 gold");
 
     player.gold += 2;
   } else { // Get 2 cards and discard one
 
-    Debug("game")("    draws a card");
+    debug("    draws a card");
 
     const cards = game.deck.draw(2);
 
@@ -68,7 +67,7 @@ const do_normal_end = (player, game) => {
 
     if (game.first_8th === null) {
 
-      Debug("game")("    has built 8 districts");
+      debug("    has built 8 districts");
       game.first_8th = player;
     }
 
@@ -86,7 +85,7 @@ const assassin = (player, game) => {
     game.dead_character = game.characters[choice];
   }
 
-  Debug("game")("    kills", game.dead_character && game.dead_character.name);
+  debug("    kills", game.dead_character && game.dead_character.name);
 
   do_normal_end(player, game);
 };
@@ -105,7 +104,7 @@ const thief = (player, game) => {
 
     game.stolen_character = game.characters[choice];
 
-    Debug("game")("    steals", game.stolen_character.name);
+    debug("    steals", game.stolen_character.name);
   }
 
   do_normal_end(player, game);
@@ -122,11 +121,11 @@ const magician = (player, game) => {
 
     [player.hand, exchangedPlayer.hand] = [exchangedPlayer.hand, player.hand];
 
-    Debug("game")("   ", player.login, "exchanges with", choice.exchange);
+    debug("   ", player.login, "exchanges with", choice.exchange);
 
   } else if (choice.discard && choice.discard.length) { // Discard
 
-    Debug("game")("    changes", choice.discard.length, "cards");
+    debug("    changes", choice.discard.length, "cards");
 
     for (
       const cardToRemoveIndex in choice.discard
@@ -180,7 +179,7 @@ const merchant = (player, game) => {
 /* Architect's turn */
 const architect = (player, game) => {
 
-  Debug("game")("    do turn");
+  debug("    do turn");
 
   /* Can draw 2 cards */
   player.hand.push(...game.deck.draw(2));
@@ -214,7 +213,7 @@ const warlord = (player, game) => {
 
     if (player.gold >= attackedDistrict.price - 1) {
 
-      Debug("game")("    destroys card", attackedDistrict.name, "of", attackedPlayer.login);
+      debug("    destroys card", attackedDistrict.name, "of", attackedPlayer.login);
 
       player.gold -= attackedDistrict.price - 1;
 

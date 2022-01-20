@@ -1,4 +1,5 @@
-import debug from '../debug.config.js';
+import Debug from '../debug.config.js';
+const debug = Debug('game:citadels');
 
 /* This is a class to represent a player */
 export default class Player {
@@ -13,7 +14,7 @@ export default class Player {
   }
 
   render() {
-    debug("game")(this);
+    debug(this);
   }
 
   buildDistrict(choiceIndex) {
@@ -26,7 +27,7 @@ export default class Player {
 
       this.gold -= this.hand[choiceIndex].price;
 
-      debug("game")("    builds", this.hand[choiceIndex].name);
+      debug("    builds", this.hand[choiceIndex].name);
 
       this.districts.push(...this.hand.splice(choiceIndex, 1));
     }

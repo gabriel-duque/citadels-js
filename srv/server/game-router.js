@@ -2,9 +2,12 @@ import Debug from '../debug.config.js';
 
 import { serverConfig } from '../../routes.config.js';
 
+
 export default class GameRouter {
 
+
   static rooms = {};
+
 
   constructor(gameName, GameRoom, io) {
 
@@ -16,15 +19,21 @@ export default class GameRouter {
 
     this.GameRoom.routes = serverConfig(gameName).routes;
 
+    this.debug = Debug(`router:${gameName}`);
+
   }
 
+
   get room() {
+
     return GameRouter.rooms[this.name];
   }
 
   set room(room) {
+
     GameRouter.rooms[this.name] = room;
   }
+
 
   /* Create room if it doesn't exists */
   createRoomIfNotExists(_, __, next) {
@@ -33,11 +42,12 @@ export default class GameRouter {
 
       this.room = new this.GameRoom(this.io);
 
-      Debug(`router:${this.name}`)(`Created room of ${this.name}`);
+      this.debug(`Created game room of ${this.name}`);
     }
 
     next();
   }
+
 
   /* Redirect to game lobby */
   redirectToLobby(req, res) {
@@ -46,15 +56,16 @@ export default class GameRouter {
 
     res.redirect(lobbyPath);
 
-    Debug(`router:${this.name}`)(`Redirect ${req.url} to ${lobbyPath}`);
+    this.debug(`Redirect ${req.url} to ${lobbyPath}`);
   }
 
+  
   /* handle get request at route /${gameName}-${nameSpace} */
   makeSureRoomExists(_, res, next) {
 
     if (!this.room) {
 
-      Debug(`router:${this.name}`)(`No ${this.name} game room found, redirecting`);
+      this.debug(`No ${this.name} game room found, redirecting`);
 
       res.redirect('/');
 

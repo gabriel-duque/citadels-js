@@ -1,4 +1,5 @@
 import Debug from '../debug.config.js';
+const debug = Debug('game:citadels');
 
 /* An enumeration for colors */
 export const colors = {
@@ -24,9 +25,9 @@ export class District {
   render(hidden = false) {
 
     if (hidden)
-      Debug("game")('This is a hidden district.');
+      debug('This is a hidden district.');
       
     else
-      Debug("game")(this);
+    debug(this);
   }
 }

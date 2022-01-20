@@ -4,9 +4,8 @@ import { db, cookieSecret } from '../server.config.js';
 import expressSession from 'express-session';
 import expressMySqlSessionStore from 'express-mysql-session';
 
-import {
-  createPool
-} from 'mysql';
+import { createPool } from 'mysql';
+
 
 const dbConnection = createPool(db);
 
@@ -16,6 +15,7 @@ const sessionStore = new MySQLStore({}, dbConnection);
 
 const EXPRESS_SID_KEY = 'connect.sid';
 
+
 export const expressSessionStore = expressSession({
   store: sessionStore,
   resave: false,
@@ -24,20 +24,22 @@ export const expressSessionStore = expressSession({
   name: EXPRESS_SID_KEY
 });
 
+
 export const cookieParser = expressCookieParser(cookieSecret);
+
 
 export function sessionMiddleware(socket, {}, next) {
 
   if (!socket.request.headers.cookie) {
 
-    return next(new Error('No cookie transmitted.'));
+    return next(new Error('No cookie transmitted'));
   }
 
   cookieParser(socket.request, {}, parseError => {
 
     if (parseError) {
 
-      return next(new Error('Error parsing cookies.'));
+      return next(new Error('Error parsing cookies'));
     }
 
     const sessionIdCookie = getSessionIdCookie(socket.request);
@@ -50,7 +52,7 @@ export function sessionMiddleware(socket, {}, next) {
 
       } else if (!session) {
 
-        return next(new Error('Session load failed '));
+        return next(new Error('Session load failed'));
       }
 
       socket.request.session = session;
@@ -60,6 +62,7 @@ export function sessionMiddleware(socket, {}, next) {
     });
   });
 };
+
 
 function getSessionIdCookie(request) {
 

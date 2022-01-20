@@ -6,15 +6,13 @@
  *
  */
 
-/* Import what we need from other files */
-import {
-  characters,
-  Character
-} from './character.js';
+import { characters, Character } from './character.js';
 import Deck from './deck.js';
 import Player from './player.js';
 import EventEmitter from 'events';
+
 import Debug from '../debug.config.js';
+const debug = Debug('game:citadels');
 
 /* This class represents a game */
 export default class Game extends EventEmitter {
@@ -56,9 +54,9 @@ export default class Game extends EventEmitter {
 
     /* Set the initial first player to play */
     this.firstPlayerToPlayIndex = Math.floor(Math.random() * this.players.length);
-    Debug("game")('First player to play: ', this.players[this.firstPlayerToPlayIndex].login);
+    debug('First player to play: ', this.players[this.firstPlayerToPlayIndex].login);
 
-    Debug("game")(this);
+    debug(this);
 
   }
 
@@ -88,7 +86,7 @@ export default class Game extends EventEmitter {
       character.player = null;
     });
 
-    Debug("game")(`
+    debug(`
           \n-----------------------------------------
           \n    New turn, distributing characters   
           \n-----------------------------------------
@@ -97,7 +95,7 @@ export default class Game extends EventEmitter {
     /* Get the index of the card ignored this turn */
     const ignoredIndex = Math.floor(Math.random() * this.characters.length);
 
-    Debug("game")('Ignoring character: ', this.characters[ignoredIndex].name, '\n');
+    debug('Ignoring character: ', this.characters[ignoredIndex].name, '\n');
 
     /* Get the list of available characters */
     const remaining_characters = this.characters.filter((_, i) => i !== ignoredIndex);
@@ -112,7 +110,7 @@ export default class Game extends EventEmitter {
 
       remaining_characters[character].player = this.players[player];
 
-      Debug("game")(this.players[player].login + ' chose ' + remaining_characters[character].name);
+      debug(this.players[player].login + ' chose ' + remaining_characters[character].name);
 
       /* Remove the character from the remaining characters array */
       remaining_characters.splice(character, 1);
@@ -122,19 +120,19 @@ export default class Game extends EventEmitter {
   /* Reveal characters and actually play turns */
   reveal_characters() {
 
-    Debug("game")("\n----------------------");
-    Debug("game")(" Revealing characters");
-    Debug("game")("----------------------\n");
+    debug("\n----------------------");
+    debug(" Revealing characters");
+    debug("----------------------\n");
 
     for (let i = 0; i < this.characters.length; ++i) {
 
       const character = this.characters[i];
 
-      Debug("game")("-", character.name, ":");
+      debug("-", character.name, ":");
 
       if (!character.player) {
 
-        Debug("game")('    is not used');
+        debug('    is not used');
 
         continue
       };
@@ -146,7 +144,7 @@ export default class Game extends EventEmitter {
 
         if (this.stolen_character && this.stolen_character.player && character.player.login === this.stolen_character.player.login) {
 
-          Debug("game")("    got stolen");
+          debug("    got stolen");
 
           this.characters[1].player.gold += character.player.gold;
 
@@ -156,7 +154,7 @@ export default class Game extends EventEmitter {
         character.do_turn(character.player, this);
 
       } else {
-        Debug("game")('    is dead and doesnt play');
+        debug('    is dead and doesnt play');
       }
     }
 
@@ -167,11 +165,11 @@ export default class Game extends EventEmitter {
   /* Count points and dump scores */
   dump() {
 
-    Debug("game")("\n------------------------------------------");
-    Debug("game")("------------------------------------------");
-    Debug("game")("||        Game finished, scores :       ||");
-    Debug("game")("------------------------------------------");
-    Debug("game")("------------------------------------------\n");
+    debug("\n------------------------------------------");
+    debug("------------------------------------------");
+    debug("||        Game finished, scores :       ||");
+    debug("------------------------------------------");
+    debug("------------------------------------------\n");
 
     return this.players.map(({
         districts,

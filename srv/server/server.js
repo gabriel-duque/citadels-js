@@ -12,7 +12,15 @@ const debug = Debug('server');
 
 export const app = express();
 
+app.use(cookieParser);
+
+app.use(expressSessionStore);
+
+
 const httpServer = http.createServer(app);
+
+httpServer.listen(port, () => debug(`Server listening on port ${port}`));
+
 
 export const io = new Server(httpServer);
 
@@ -20,19 +28,13 @@ io.session = socketSession;
 
 io.initNamespace = function(name) {
 
-  if (!io._nsps.has(name)) {
+  if (!this._nsps.has(name)) {
 
     debug(`Initializing namespace: ${name}`);
 
-    io.of(name)
+    this.of(name)
       .use((socket, next) =>
         sessionMiddleware(socket, {}, next)
       );
   }
-}
-
-httpServer.listen(port, () => debug(`Server listening on port ${port}`));
-
-app.use(cookieParser);
-
-app.use(expressSessionStore);
+};

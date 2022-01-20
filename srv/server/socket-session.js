@@ -4,6 +4,7 @@ const debug = Debug('session');
 
 export default {
 
+
   save(socket, sessionData) {
 
     debug("Saving session for:", socket.id, sessionData);
@@ -12,6 +13,7 @@ export default {
 
     socket.request.session.save();
   },
+
 
   remove(socket) {
 
@@ -27,4 +29,5 @@ export default {
 
     socket.request.session.save();
   }
+  
 }

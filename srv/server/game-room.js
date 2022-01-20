@@ -3,20 +3,20 @@ import GamePlayRoom from './game-play-room.js';
 
 import Debug from '../debug.config.js';
 
-const debug = Debug('game-room');
 
 export default class GameRoom {
 
 
   constructor(io, Game, routes) {
 
-    debug("\r\nCreating new room of game:", Game.name);
-
     this.io = io;
     this.session = io.session;
     this.Game = Game;
-    
     this.routes =  routes;
+
+    this.debug = Debug(`room:${this.Game.name}`);
+
+    this.debug("\r\nCreating new room of game:", Game.name);
 
     this.lobbyRoom = new GameLobbyRoom(this, this.routes.lobby.ioNamespace);
     this.playRoom = new GamePlayRoom(this, this.routes.play.ioNamespace);
@@ -28,7 +28,7 @@ export default class GameRoom {
 
   launchGame() {
 
-    debug("Creating new game of:", this.Game.name);
+    this.debug("Creating new game of:", this.Game.name);
 
     this.players = Object.values(this.lobbyRoom.players);
 
