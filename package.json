@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "dependencies": {
     "core-js": "^3.6.5",
+    "serve-static": "^1.14.2",
     "socket.io-client": "^4.4.1"
   },
   "devDependencies": {
@@ -34,14 +35,14 @@
     "last 3 version, > 0.5%, not dead, not ie <= 11"
   ],
   "scripts": {
-    "dev": "cross-env NODE_ENV=dev WP_CONFIG=all webpack --config webpack.config.js",
-    "prod": "cross-env NODE_ENV=prod WP_CONFIG=all webpack --config webpack.config.js",
-    "dev:lobby": "cross-env NODE_ENV=dev WP_CONFIG=lobby webpack --config webpack.config.js",
-    "prod:lobby": "cross-env WP_CONFIG=lobby webpack --config webpack.config.js",
-    "analyse:lobby": "cross-env NODE_ENV=analyse WP_CONFIG=lobby webpack --config webpack.config.js",
-    "dev:game": "cross-env NODE_ENV=dev WP_CONFIG=game webpack --config webpack.config.js",
-    "prod:game": "cross-env WP_CONFIG=game webpack --config webpack.config.js",
-    "analyse:game": "cross-env NODE_ENV=analyse WP_CONFIG=game webpack --config webpack.config.js"
+    "dev": "cross-env NODE_ENV=dev GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js",
+    "prod": "cross-env NODE_ENV=prod GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js",
+    "dev:lobby": "cross-env NODE_ENV=dev GAME_NAME=citadels WP_CONFIG=lobby webpack --config webpack.config.js",
+    "prod:lobby": "cross-env GAME_NAME=citadels WP_CONFIG=lobby webpack --config webpack.config.js",
+    "analyse:lobby": "cross-env NODE_ENV=analyse GAME_NAME=citadels WP_CONFIG=lobby webpack --config webpack.config.js",
+    "dev:play": "cross-env NODE_ENV=dev GAME_NAME=citadels WP_CONFIG=play webpack --config webpack.config.js",
+    "prod:play": "cross-env GAME_NAME=citadels WP_CONFIG=play webpack --config webpack.config.js",
+    "analyse:play": "cross-env NODE_ENV=analyse GAME_NAME=citadels WP_CONFIG=play webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",

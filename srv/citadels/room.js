@@ -1,6 +1,8 @@
-import GameRoom from './game-room.js';
-import CitadelsGame from '../game-citadels/game.js';
-import session from './session.js';
+import GameRoom from '../server/game-room.js';
+import session from '../server/session.js';
+import { serverConfig } from '../../routes.config.js';
+
+import CitadelsGame from './game.js';
 
 import Debug from '../debug.config.js';
 const debug = Debug('room');
@@ -8,10 +10,11 @@ const debug = Debug('room');
 
 export default class CitadelsRoom extends GameRoom {
 
+  static routes = serverConfig(CitadelsGame.name).routes;
 
   constructor(io) {
 
-      super(io, CitadelsGame);
+    super(io, CitadelsGame, CitadelsRoom.routes);
   }
 
 
@@ -23,7 +26,7 @@ export default class CitadelsRoom extends GameRoom {
 
   onHandshakeDone(socket) {
 
-    socket.emit("initial_game_state", this.getPrivateGameState(socket));
+    socket.emit("initial_game_state", this.getInitialPrivateGameState(socket));
 
     socket.on("start_loop", () => { // XXX
 
@@ -140,7 +143,7 @@ export default class CitadelsRoom extends GameRoom {
 
       for (const [_, socket] of this.playRoom.sockets) {
 
-        socket.emit('redirect', '/');
+        socket.emit('redirect', this.lobbyPath);
       }
     });
   }

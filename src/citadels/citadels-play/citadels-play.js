@@ -4,7 +4,7 @@ import 'styles/game.css';
 
 import io from 'socket.io-client';
  
-const socket = io("/game");
+const socket = io("/citadels-play");
 
 socket.on('redirect', path => {
   window.location = path;

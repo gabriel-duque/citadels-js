@@ -19,7 +19,7 @@ import Debug from '../debug.config.js';
 /* This class represents a game */
 export default class Game extends EventEmitter {
 
-  static name = "Citadels";
+  static name = "citadels";
 
   players = [];
 

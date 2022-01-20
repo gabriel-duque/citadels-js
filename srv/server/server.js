@@ -1,54 +1,35 @@
-import path from 'path';
 import http from 'http';
 import express from 'express';
 import { Server } from "socket.io";
 
-import Debug from '../debug.config.js';
-
 import { port } from '../server.config.js';
-import { cookieParser, session, sessionMiddleware, } from './session-store.js';
+import { cookieParser, session, sessionMiddleware } from './session-store.js';
 
+import Debug from '../debug.config.js';
 const debug = Debug('server');
 
 
-const app = express();
+export const app = express();
 
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 
-const io = new Server(server);
+export const io = new Server(httpServer);
 
+io.initNamespace = function(name) {
 
-server.listen(port, () => debug(`Server listening on port ${port}`));
+  if (!io._nsps.has(name)) {
 
-const publicFolder = path.resolve('../dist');
+    debug(`Initializing namespace: ${name}`);
 
-app.use(express.static(publicFolder));
+    io.of(name)
+      .use((socket, next) =>
+        sessionMiddleware(socket, {}, next)
+      );
+  }
+}
 
+httpServer.listen(port, () => debug(`Server listening on port ${port}`));
 
 app.use(cookieParser);
 
 app.use(session);
-
-
-export default {
-
-  io,
-
-  /**
-   * @param {{ publicPath: string; fileName: string; ioNamespace: string; }[]} routes
-   */
-  set routes(routes) {
-
-    for (const { publicPath, fileName, ioNamespace } of routes) {
-
-      app.get(publicPath, (_, res) => {
-        res.sendFile(`${publicFolder}/${fileName}`)
-      });
-
-      io.of(ioNamespace)
-        .use((socket, next) =>
-          sessionMiddleware(socket, {}, next)
-        );
-    }
-  }
-}

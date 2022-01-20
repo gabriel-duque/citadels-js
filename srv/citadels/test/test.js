@@ -1,4 +1,4 @@
-import Game from '../game-citadels/game.js';
+import Game from '../game-citadels/citadels-game.js';
 import debug from './debug.js';
 
 const logins = ["player1", "player2", "player3", "player4", "player5", "player6"];
