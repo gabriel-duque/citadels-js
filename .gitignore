@@ -1,3 +1,4 @@
 node_modules/
 dist/
 srv/server.config.js
+.DS_Store

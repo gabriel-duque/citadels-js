@@ -8,23 +8,13 @@ const debug = Debug('main');
 
 app.use(Router.getPublicPath(''));
 
-app.get("/", (_, res) => {
+app.get("/", Router.render("home", { games: Object.keys(GameRooms) }));
 
-  debug("Rendering page home");
+app.get(/\/\w+-lobby/, Router.render("lobby", url => {
 
-  res.render('pages/home', { games: Object.keys(GameRooms) });
-});
+  return { gameName: url.match(/(?<=\/)(\w*)(?=-lobby)/)[0] };
+}));
 
-app.get(/\/\w+-lobby/, (req, res, next) => {
-
-  const [gameName] = req.url.match(/(?<=\/)(\w*)(?=-lobby)/);
-
-  debug("Rendering lobby page for game", gameName);
-
-  res.render('pages/lobby', { gameName });
-
-  // next();
-});
 
 for (const gameName in GameRooms) {
 

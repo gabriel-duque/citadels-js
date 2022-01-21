@@ -9,6 +9,7 @@ const PUBLIC_FOLDER = path.resolve('../dist');
 
 const SERVE_STATIC_OPTIONS = { index: false, extensions: ['html'], }
 
+const SSR_FOLDER = 'pages';
 
 export default {
 
@@ -32,6 +33,21 @@ export default {
       req.url = fileName;
 
       next();
+    }
+  },
+
+  render(fileName, locals) {
+
+    return (req, res) => {
+
+      if (typeof locals === 'function') {
+        
+        locals = locals(req.url);
+      }
+
+      debug("Rendering page", fileName);
+
+      res.render(`${SSR_FOLDER}/${fileName}`, locals);
     }
   },
 
