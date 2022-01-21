@@ -33,12 +33,13 @@ const coin_or_gold = (player, game) => {
 
   if (choice) { // Get gold
 
-    debug("    gets 2 gold");
+    debug("gets 2 gold");
 
     player.gold += 2;
+
   } else { // Get 2 cards and discard one
 
-    debug("    draws a card");
+    debug("draws a card");
 
     const cards = game.deck.draw(2);
 
@@ -67,7 +68,7 @@ const do_normal_end = (player, game) => {
 
     if (game.first_8th === null) {
 
-      debug("    has built 8 districts");
+      debug("has built 8 districts");
       game.first_8th = player;
     }
 
@@ -85,7 +86,7 @@ const assassin = (player, game) => {
     game.dead_character = game.characters[choice];
   }
 
-  debug("    kills", game.dead_character && game.dead_character.name);
+  debug("kills", game.dead_character && game.dead_character.name);
 
   do_normal_end(player, game);
 };
@@ -104,7 +105,7 @@ const thief = (player, game) => {
 
     game.stolen_character = game.characters[choice];
 
-    debug("    steals", game.stolen_character.name);
+    debug("steals", game.stolen_character.name);
   }
 
   do_normal_end(player, game);
@@ -125,7 +126,7 @@ const magician = (player, game) => {
 
   } else if (choice.discard && choice.discard.length) { // Discard
 
-    debug("    changes", choice.discard.length, "cards");
+    debug("changes", choice.discard.length, "cards");
 
     for (
       const cardToRemoveIndex in choice.discard
@@ -179,7 +180,7 @@ const merchant = (player, game) => {
 /* Architect's turn */
 const architect = (player, game) => {
 
-  debug("    do turn");
+  debug("do turn");
 
   /* Can draw 2 cards */
   player.hand.push(...game.deck.draw(2));
@@ -213,7 +214,7 @@ const warlord = (player, game) => {
 
     if (player.gold >= attackedDistrict.price - 1) {
 
-      debug("    destroys card", attackedDistrict.name, "of", attackedPlayer.login);
+      debug("destroys card", attackedDistrict.name, "of", attackedPlayer.login);
 
       player.gold -= attackedDistrict.price - 1;
 

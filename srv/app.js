@@ -21,7 +21,7 @@ app.use(Router.getPublicPath('styles'));
 
 app.get("/lobby", (_, res) => {
 
-  debug("Rendering page test");
+  debug("Rendering lobby page test");
 
   res.render('pages/lobby', { gameName: "test" });
 });

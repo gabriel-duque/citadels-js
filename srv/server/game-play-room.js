@@ -32,13 +32,11 @@ export default class GamePlayRoom extends GameChildRoom {
     this.parentRoom.onHandshakeDone(socket)
   }
 
-  /*
-    Inform players that someone left,
-    !! do not unregister player as he might reconnect
-  */
+  /* Inform players that someone left, do not unregister player as he might reconnect */
   onDisconnection(socket) {
 
-    this.emit('player_left_game', socket.id);
+    this.nameSpace.to(this.nameSpace.name)
+      .emit('player_left_game', socket.id);
   }
 
 
@@ -46,6 +44,14 @@ export default class GamePlayRoom extends GameChildRoom {
   register(socket, login) {
 
     /* make sure login is unique (eg. if player refreshes) */
+    this.makeSureLoginIsUnique(login);
+
+    super.register(socket, login);
+  }
+
+
+  makeSureLoginIsUnique(login) {
+
     for (const socketId in this.players) {
 
       if (this.players[socketId] === login) {
@@ -53,8 +59,6 @@ export default class GamePlayRoom extends GameChildRoom {
         this.unRegister(socketId);
       }
     }
-
-    super.register(socket, login);
   }
 
 }

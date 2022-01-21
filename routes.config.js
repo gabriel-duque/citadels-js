@@ -24,7 +24,7 @@ export const frontConfig = gameName => ({
     input: {
       folder: path.resolve("src/home"),
       entry: `home.js`,
-      template: `home.ejs`,
+      // template: `home.ejs`,
       alias: {
         styles: "styles",
         lobby: "home"
@@ -34,7 +34,7 @@ export const frontConfig = gameName => ({
     output: {
       folder: path.resolve(`dist/home`),
       publicPath: `/`,
-      html: `home.html`,
+      // html: `home.html`,
       js: `home-bundle.js`,
       css: `home-styles.css`
       // js: `[name].[hash].js`,

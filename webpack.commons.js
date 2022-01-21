@@ -102,7 +102,7 @@ export default (config, {
       filename: config.output.css,
     }),
 
-    new HtmlWebpackPlugin({
+    config.input.template && new HtmlWebpackPlugin({
       filename: config.output.html,
       inject: config.output.inject ?? true,
       template: `${config.input.folder}/${config.input.template}`,

@@ -7,4 +7,4 @@ const game = new Game(logins);
 
 game.loop();
 
-debug("test")(game.scores);
+debug(this.nameSpace.namegame.scores);

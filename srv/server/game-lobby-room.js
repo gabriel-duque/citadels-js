@@ -10,10 +10,11 @@ export default class GameLobbyRoom extends GameChildRoom {
 
   onConnection(socket) {
 
-    /* Chek if player login is already stored in session */
+    /* Check if player login is already stored in session */
     if (this.checkExistingSession(socket)) return;
 
     /* Send already connected clients login to incoming one */
+    // socket.emit("player_joined_lobby", Object.values(this.players));
     socket.emit("player_joined_lobby", Object.values(this.players));
 
     /* Send incoming client login to connected ones */
@@ -22,14 +23,7 @@ export default class GameLobbyRoom extends GameChildRoom {
     /*  Launch game when amount of desired players is reached */
     socket.on('room_complete', () => {
 
-      /* Save login cookies */
-      this.saveLoginsInCookie();
-
-      /* Starts the game */
-      this.parentRoom.launchGame();
-
-      /* Redirects all players to the game */
-      this.redirectAll(this.parentRoom.playPath);
+      this.moveOnToGame();
     });
   }
 
@@ -38,6 +32,20 @@ export default class GameLobbyRoom extends GameChildRoom {
   onDisconnection(socket) {
 
     this.unRegister(socket.id);
+  }
+
+
+  /*  Launch game when amount of desired players is reached */
+  moveOnToGame() {
+
+    /* Save login cookies */
+    this.saveLoginsInCookie();
+
+    /* Starts the game */
+    this.parentRoom.launchGame();
+
+    /* Redirects all players to the game */
+    this.redirectAll(this.parentRoom.playPath);
   }
 
 
@@ -58,29 +66,12 @@ export default class GameLobbyRoom extends GameChildRoom {
   register(socket, login) {
 
     /* Make sure logins and sockets ids are unique */
-    for (const socketId in this.players) {
-
-      if (this.players[socketId] === login) {
-
-        /* Prevent user from using someone else's login */
-        if (socketId !== socket.id) {
-          socket.emit('login_taken');
-        }
-
-        /* Do nothing if same player used same name */
-        return;
-      }
-
-      /* Handle player changing name */
-      if (socketId === socket.id) {
-        this.unRegister(socketId);
-      }
-    }
+    if (!this.makeSureCredsAreUnique(socket, login)) return;
 
     super.register(socket, login);
 
     /* Inform clients that a player joined the lobby */
-    this.emit('player_joined_lobby', [login]);
+    this.nameSpace.to(this.nameSpace.name).emit('player_joined_lobby', [login]);
   }
 
 
@@ -89,7 +80,7 @@ export default class GameLobbyRoom extends GameChildRoom {
 
     if (!this.players[socketId]) return;
 
-    this.emit('player_left_lobby', this.players[socketId]);
+    this.nameSpace.to(this.nameSpace.name).emit('player_left_lobby', this.players[socketId]);
 
     super.unRegister(socketId);
   }
@@ -112,5 +103,29 @@ export default class GameLobbyRoom extends GameChildRoom {
     this.session.remove(socket);
   }
 
+  makeSureCredsAreUnique(socket, login) {
+
+    for (const socketId in this.players) {
+
+      if (this.players[socketId] === login) {
+
+        /* Prevent user from using someone else's login */
+        if (socketId !== socket.id) {
+          socket.emit('login_taken');
+        }
+
+        /* Do nothing if same player used same name */
+        return;
+      }
+
+      /* Handle player changing name */
+      if (socketId === socket.id) {
+
+        this.unRegister(socketId);
+      }
+    }
+
+    return true;
+  }
 
 }

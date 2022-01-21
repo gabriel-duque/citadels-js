@@ -27,7 +27,7 @@ export default class Player {
 
       this.gold -= this.hand[choiceIndex].price;
 
-      debug("    builds", this.hand[choiceIndex].name);
+      debug("builds", this.hand[choiceIndex].name);
 
       this.districts.push(...this.hand.splice(choiceIndex, 1));
     }

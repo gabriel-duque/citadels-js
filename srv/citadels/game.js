@@ -132,7 +132,7 @@ export default class Game extends EventEmitter {
 
       if (!character.player) {
 
-        debug('    is not used');
+        debug("is not used");
 
         continue
       };
@@ -144,7 +144,7 @@ export default class Game extends EventEmitter {
 
         if (this.stolen_character && this.stolen_character.player && character.player.login === this.stolen_character.player.login) {
 
-          debug("    got stolen");
+          debug("got stolen");
 
           this.characters[1].player.gold += character.player.gold;
 

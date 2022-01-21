@@ -5,6 +5,11 @@ export default class GameChildRoom {
 
   players = {};
 
+  // get emit() {
+
+  //   return this.nameSpace.to(this.nameSpace.name).emit;
+  // }
+
 
   constructor(parentRoom, nameSpace) {
 
@@ -17,18 +22,18 @@ export default class GameChildRoom {
     this.debug = Debug(`room:${nameSpace.split('/')[1]}`);
 
 
-    this.on = (message, callback) =>
-      this.nameSpace
-      .on(message, callback);
+    // this.on = (message, callback) =>
+    //   this.nameSpace
+    //   .on(message, callback);
 
-    this.emit = (message, data) =>
-      this.nameSpace
-      .emit(message, data);
+    // this.emit = (message, data) =>
+    //   this.nameSpace
+    //   .emit(message, data);
 
 
-    this.on('connection', socket => {
+    this.nameSpace.on('connection', socket => {
 
-      socket.join("test");
+      socket.join(this.nameSpace.name); // XXX
 
       this.debug(`New client connected at ${this.nameSpace.name}: ${socket.id}`);
 
@@ -61,12 +66,14 @@ export default class GameChildRoom {
     return this.nameSpace.sockets;
   }
 
+
   register(socket, login) {
 
     this.players[socket.id] = login;
 
     this.debug(`Client registered at ${this.nameSpace.name}:`, login, socket.id);
   }
+
 
   /* Remove socket id from players */
   unRegister(socketId) {
@@ -80,6 +87,7 @@ export default class GameChildRoom {
     this.debug(`Client unregistered from ${this.nameSpace.name}:`, login, socketId);
   }
 
+
   redirect(socket, path) {
 
     this.debug(`Redirecting ${socket.id} to ${path}`);
@@ -87,9 +95,10 @@ export default class GameChildRoom {
     socket.emit('redirect', path);
   }
 
+
   redirectAll(path) {
 
-    this.emit('redirect', path);
+    this.nameSpace.to(this.nameSpace.name).emit('redirect', path);
   }
 
 
