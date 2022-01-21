@@ -16,9 +16,9 @@
   "type": "module",
   "scripts": {
     "serve": "node app.js",
-    "dev": "nodemon app.js --ignore src/ --ignore dist/",
-    "dev:debug": "cross-env DEBUG=app:* npm run dev",
-    "dev:debugall": "cross-env DEBUG=* npm run dev",
+    "dev:server": "nodemon app.js --ignore src/ --ignore dist/",
+    "dev:server:debug:app": "cross-env DEBUG=app:* npm run dev:server",
+    "dev:server:debug:all": "cross-env DEBUG=* npm run dev:server",
     "test:citadels": "cross-env DEBUG=app:* node game-citadels/test/test.js"
   },
   "repository": {

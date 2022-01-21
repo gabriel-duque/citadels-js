@@ -2,24 +2,36 @@ import './lobby.css';
 
 import io from 'socket.io-client';
 
-const gameName = document.querySelector('meta[name="game-name"]').content;
+
+const gameName = document.querySelector('meta[name="game-name"]')
+  .content;
 
 const socket = io(`/${gameName}-lobby`);
+
 
 socket.on('redirect', path => {
   window.location = path;
 });
- 
-// Try to log player
+
+
+/* Try to log player */
 const joinRoomBtn = document.querySelector('.join-room');
 const loginName = document.querySelector('.login-name');
 
 joinRoomBtn.addEventListener('click', () => {
 
-  if (!loginName.value.length) loginName.value = 'player' + Math.round(Math.random() * 100);
+  if (!loginName.value.length) {
+
+    loginName.value = getRandomName();
+  }
 
   socket.emit('player_log_attempt', loginName.value);
 });
+
+function getRandomName() {
+
+  return 'player' + Math.round(Math.random() * 100);
+}
 
 socket.on("login_taken", () => {
 
@@ -29,17 +41,19 @@ socket.on("login_taken", () => {
 })
 
 
-// Test : starting game
+/* Test : starting game */
 
 const startGameBtn = document.querySelector('.start-game');
 
 startGameBtn.addEventListener('click', () => {
 
+  socket.emit("player_ready");
+
   socket.emit("room_complete");
 });
 
 
-// Rendering lobby
+/* Rendering lobby */
 
 const players = document.querySelector('.players');
 

@@ -49,8 +49,8 @@ export const frontConfig = gameName => ({
       publicPath: `/`,
       js: `lobby-bundle.js`,
       css: `lobby-styles.css`
-      // js: `[name].[hash].js`,
-      // css: `[name].[hash].css`
+      // js: `lobby-bundle.[hash].js`,
+      // css: `lobby-styles.[hash].css`
     }
   },
 

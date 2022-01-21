@@ -2,135 +2,40 @@
 
 An implementation of the game of citadels in Node.js and JavaScript
 
-## TL;DR
-
-##### Install:
-```bash
-npm install
-cd srv && npm install
-```
-
-##### Dev:
-
-```bash
-npm run dev 
-```
-```bash
-cd srv && npm run dev:debug 
-```
-
-##### Prod:
-```bash
-cd srv && npm run prod 
-```
-
 ## Installation
 
 ### 1. Install client dependencies:
-
 ```bash
 npm install
 ```
 
 ### 2. Install server dependencies:
-
 ```bash
-cd srv/
-npm install
+cd srv && npm install
 ```
 
-## Dev client
+## Development
 
-### Build every page in development mode:
-
+### 1. Bundle client in dev mode
 ```bash
-npm run dev
+npm run dev:client
 ```
 
-### Build lobby page in development mode:
-
+### 2. Launch server (watch mode + debug info)
 ```bash
-npm run dev:lobby
+cd srv && npm run dev:server:debug:app 
 ```
 
-### Analyse lobby page's size:
-
+### 1. Bundle client in prod mode
 ```bash
-npm run analyse:lobby
+npm run prod:client
 ```
 
-### Build game page in development mode:
-
+### 2. Launch server in watch mode with debug info
 ```bash
-npm run dev:game
+cd srv && npm run serve
 ```
-
-### Analyse game page's size:
-
+or 
 ```bash
-npm run analyse:game
+node srv/app.js
 ```
-
-## Prod client
-
-### Build every page in production mode:
-
-```bash
-npm run dev
-```
-
-
-### Build lobby page in production mode:
-
-```bash
-npm run prod:lobby
-```
-
-### Build game page in production mode:
-
-```bash
-npm run prod:game
-```
-
-## Prod server
-
-### Launch the server:
-
-```bash
-cd srv
-npm run serve
-```
-
-## Dev server
-
-### Dev server in watch mode with no logs:
-
-```bash
-cd srv
-npm run dev
-```
-
-### Dev server in watch mode with citadels related logs (recommended):
-
-```bash
-cd srv
-npm run dev:debug
-```
-
-### Dev server in watch mode with a bunch of logs from third parties: 
-
-```bash
-cd srv
-npm run dev:debugall
-```
-
-### Simply test game logic: 
-
-```bash
-cd srv
-npm run test:game
-```
-
-
-
-
