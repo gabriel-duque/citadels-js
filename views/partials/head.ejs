@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title><%= locals.title %></title>
+
+  <% if (locals.tags) {  %>
+    <% for (const tag of tags) {  %>
+    <<%= tag.type %> <% if (tag.attributes) { for (const key in tag.attributes) { %> <%= key %>="<%= tag.attributes[key] %>" <% }} %>>
+      <% } %>
+      <% } %>
+
+</head>
+
+<body>

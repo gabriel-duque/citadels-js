@@ -6,6 +6,7 @@ import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import postCssNormalize from "postcss-normalize";
 import postCssPresetEnv from "postcss-preset-env";
+import path from 'path';
 
 const babelLoader = {
   test: /\.js$/,
@@ -18,7 +19,8 @@ const ejsLoader = {
   use: [{
     loader: "ejs-loader",
     options: {
-      esModule: false
+      variable: 'locals',
+      // esModule: false
     }
   }]
 };
@@ -104,21 +106,28 @@ export default (config, {
 
     config.input.template && new HtmlWebpackPlugin({
       filename: config.output.html,
-      inject: config.output.inject ?? true,
+      inject: config.output.inject || true,
       template: `${config.input.folder}/${config.input.template}`,
     })
 
   ].filter(Boolean),
 });
 
-function getAliases(config, output = {}) {
+function getAliases(config) {
 
-  Object.entries(config.input.alias)
-    .forEach(([key, value]) => {
-      Object.assign(output, {
-        [key]: `${config.input.folder}/${value}/`
+  const output = {
+    views: path.resolve("views"),
+  }
+
+  if (config.input.alias) {
+
+    Object.entries(config.input.alias)
+      .forEach(([key, value]) => {
+        Object.assign(output, {
+          [key]: `${config.input.folder}/${value}/`
+        });
       });
-    });
+  }
 
   return output
 }

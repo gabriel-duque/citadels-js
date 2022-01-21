@@ -1,15 +1,15 @@
-import 'styles/global.css';
-import 'styles/lobby.css';
+import './lobby.css';
 
 import io from 'socket.io-client';
 
-const socket = io("/citadels-lobby");
+const gameName = document.querySelector('meta[name="game-name"]').content;
+
+const socket = io(`/${gameName}-lobby`);
 
 socket.on('redirect', path => {
   window.location = path;
 });
  
-
 // Try to log player
 const joinRoomBtn = document.querySelector('.join-room');
 const loginName = document.querySelector('.login-name');

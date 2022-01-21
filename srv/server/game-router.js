@@ -62,7 +62,6 @@ export default class GameRouter {
   
   /* handle get request at route /${gameName}-${nameSpace} */
   makeSureRoomExists(_, res, next) {
-
     if (!this.room) {
 
       this.debug(`No ${this.name} game room found, redirecting`);

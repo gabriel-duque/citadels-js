@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<%- include('../partials/head', {
+  title: "Lobby - " + gameName,
+  tags: [{
+      type: "meta",
+      attributes: {
+        name: "game-name",
+        content: gameName
+      }
+    }, {
+      type: "link",
+      attributes: {
+        rel: "stylesheet",
+        content: "lobby-styles.css"
+      }
+    }
+  ]
+}); %>
+
+<h1>
+  <%= gameName %>
+</h1>
+
+<input type="text" class="login-name">
+<button class="join-room">Join room</button>
+<button class="start-game">Start game</button>
+
+<div class="players"></div>
+
+<script src="lobby-bundle.js"></script>
+
+<%- include('../partials/footer'); %>

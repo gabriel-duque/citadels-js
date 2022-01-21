@@ -1,0 +1,23 @@
+<%- include('../partials/head', {
+  title: "Home",
+  tags: [{
+      type: "link",
+      attributes: {
+        rel: "stylesheet",
+        content: "home-styles.css"
+      }
+    }
+  ]
+}); %>
+
+<% for (const gameName of games) { %>
+
+<button>
+  <a href="/<%= gameName %>">
+    Play <%= gameName %>
+  </a>
+</button>
+
+<% } %>
+
+<%- include('../partials/footer'); %>

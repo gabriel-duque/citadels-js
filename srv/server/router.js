@@ -13,9 +13,9 @@ const SERVE_STATIC_OPTIONS = { index: false, extensions: ['html'], }
 export default {
 
 
-  getPublicPath(folder) {
+  getPublicPath(publicPath) {
 
-    folder = `${PUBLIC_FOLDER}/${folder}`;
+    const folder = path.resolve(PUBLIC_FOLDER, publicPath);
 
     debug('Serving static folder:', folder);
 

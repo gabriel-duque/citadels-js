@@ -5,7 +5,7 @@ export const serverConfig = gameName => ({
   routes: {
     lobby: {
       publicPath: `/${gameName}-lobby`,
-      fileName: `${gameName}-lobby`,
+      fileName: `lobby`,
       ioNamespace: `/${gameName}-lobby`,
     },
 
@@ -22,44 +22,33 @@ export const frontConfig = gameName => ({
   home: {
 
     input: {
-      folder: path.resolve("src/home"),
-      entry: `home.js`,
-      // template: `home.ejs`,
-      alias: {
-        styles: "styles",
-        lobby: "home"
-      }
+      folder: path.resolve("src"),
+      entry: `home.css`,
     },
 
     output: {
-      folder: path.resolve(`dist/home`),
+      folder: path.resolve(`dist`),
       publicPath: `/`,
-      // html: `home.html`,
       js: `home-bundle.js`,
       css: `home-styles.css`
-      // js: `[name].[hash].js`,
-      // css: `[name].[hash].css`
+      // js: `home-bundle.[hash].js`,
+      // css: `home-styles.[hash].css`
+
     }
   },
 
   lobby: {
 
     input: {
-      folder: path.resolve(`src/${gameName}`),
-      entry: `${gameName}-lobby/${gameName}-lobby.js`,
-      template: `${gameName}-lobby/${gameName}-lobby.ejs`,
-      alias: {
-        styles: "styles",
-        lobby: "lobby"
-      }
+      folder: path.resolve(`src`),
+      entry: `lobby.js`,
     },
 
     output: {
-      folder: path.resolve(`dist/${gameName}`),
+      folder: path.resolve(`dist`),
       publicPath: `/`,
-      html: `${gameName}-lobby.html`,
-      js: `${gameName}-lobby-bundle.js`,
-      css: `${gameName}-lobby-styles.css`
+      js: `lobby-bundle.js`,
+      css: `lobby-styles.css`
       // js: `[name].[hash].js`,
       // css: `[name].[hash].css`
     }
@@ -69,20 +58,20 @@ export const frontConfig = gameName => ({
 
     input: {
       folder: path.resolve(`src/${gameName}`),
-      entry: `${gameName}-play/${gameName}-play.js`,
-      template: `${gameName}-play/${gameName}-play.ejs`,
-      alias: {
-        styles: "styles",
-        play: "play"
-      }
+      entry: `${gameName}.js`,
+      template: `${gameName}.ejs`,
+      // alias: {
+      //   styles: "styles",
+      //   play: "play"
+      // }
     },
 
     output: {
       folder: path.resolve(`dist/${gameName}`),
       publicPath: `/`,
       html: `${gameName}-play.html`,
-      js: `${gameName}-play-bundle.js`,
-      css: `${gameName}-play-styles.css`
+      js: `${gameName}-bundle.js`,
+      css: `${gameName}-styles.css`
       // js: `vvmap.[hash].js`,
       // css: `vvmap.[hash].css`
     }

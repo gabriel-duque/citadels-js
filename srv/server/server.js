@@ -13,6 +13,7 @@ const debug = Debug('server');
 export const app = express();
 
 app.set('view engine', 'ejs');
+app.set('views', '../views');
 
 app.use(cookieParser);
 

@@ -1,6 +1,4 @@
-import 'styles/global.css';
-import 'styles/game.css';
-
+import './citadels.css';
 
 import io from 'socket.io-client';
  
