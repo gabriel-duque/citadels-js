@@ -76,7 +76,7 @@ export default (config, {
   output: {
     filename: config.output.js,
     path: config.output.folder,
-    publicPath: config.output.publicPath
+    publicPath: config.output.publicPath || "/"
   },
 
   optimization: {
@@ -102,7 +102,7 @@ export default (config, {
       analyzerPort: "auto"
     }),
 
-    new MiniCssExtractPlugin({
+    config.output.css && new MiniCssExtractPlugin({
       filename: config.output.css,
     }),
 

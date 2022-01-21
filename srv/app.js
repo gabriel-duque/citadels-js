@@ -11,10 +11,22 @@ app.use(Router.getPublicPath(''));
 
 app.get("/", Router.render("home", { games: Object.keys(GameRooms) }));
 
+app.get(/\/\w+-lobbies/, Router.render("lobbies", url => {
+
+  return { gameName: url.match(/(?<=\/)(\w*)(?=-lobbies)/)[0] };
+}));
+
 app.get(/\/\w+-lobby/, Router.render("lobby", url => {
 
   return { gameName: url.match(/(?<=\/)(\w*)(?=-lobby)/)[0] };
 }));
+
+app.post("/lobbies", (req, res) => {
+  const lobby = uuid();
+  debug('lobby created', lobby);
+  res.send(JSON.stringify({ lobby }));
+});
+
 
 
 for (const gameName in GameRooms) {
