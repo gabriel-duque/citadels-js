@@ -1,8 +1,5 @@
 import Debug from '../debug.config.js';
 
-import { serverConfig } from '../../routes.config.js';
-
-
 export default class GameRouter {
 
 
@@ -16,8 +13,6 @@ export default class GameRouter {
     this.name = gameName;
 
     this.GameRoom = GameRoom;
-
-    this.GameRoom.routes = serverConfig(gameName).routes;
 
     this.debug = Debug(`router:${gameName}`);
 
@@ -52,14 +47,14 @@ export default class GameRouter {
   /* Redirect to game lobby */
   redirectToLobby(req, res) {
 
-    const lobbyPath = this.GameRoom.routes.lobby.publicPath;
+    const lobbyPath = `/${this.name}-lobby`;
 
     res.redirect(lobbyPath);
 
     this.debug(`Redirect ${req.url} to ${lobbyPath}`);
   }
 
-  
+
   /* handle get request at route /${gameName}-${nameSpace} */
   makeSureRoomExists(_, res, next) {
     if (!this.room) {

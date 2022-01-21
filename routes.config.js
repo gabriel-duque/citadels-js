@@ -1,22 +1,5 @@
 import path from "path";
 
-export const serverConfig = gameName => ({
-
-  routes: {
-    lobby: {
-      publicPath: `/${gameName}-lobby`,
-      fileName: `lobby`,
-      ioNamespace: `/${gameName}-lobby`,
-    },
-
-    play: {
-      publicPath: `/${gameName}-play`,
-      fileName: `${gameName}-play`,
-      ioNamespace: `/${gameName}-play`,
-    }
-  }
-});
-
 export const frontConfig = gameName => ({
 
   home: {

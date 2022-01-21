@@ -6,7 +6,8 @@ import io from 'socket.io-client';
 const gameName = document.querySelector('meta[name="game-name"]')
   .content;
 
-const socket = io(`/${gameName}-lobby`);
+// const socket = io(`/${gameName}-lobby`);
+const socket = io(`/${gameName}`);
 
 
 socket.on('redirect', path => {

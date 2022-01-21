@@ -98,7 +98,9 @@ export default (config, {
       emitWarning: true,
     }),
 
-    isAnalyseMode && new BundleAnalyzerPlugin(),
+    isAnalyseMode && new BundleAnalyzerPlugin({
+      analyzerPort: "auto"
+    }),
 
     new MiniCssExtractPlugin({
       filename: config.output.css,

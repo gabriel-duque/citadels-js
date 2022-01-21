@@ -1,14 +1,24 @@
+import debug from 'debug';
 import GameChildRoom from './game-child-room.js';
 
 export default class GameLobbyRoom extends GameChildRoom {
 
 
-  constructor(parentRoom, ioNamespace) {
+  type = "lobby";
 
-    super(parentRoom, ioNamespace);
+  constructor(parentRoom) {
+
+    super(parentRoom, "lobby");
   }
 
   onConnection(socket) {
+
+
+    if (socket.rooms.has("play")) {
+
+      return;
+    }
+    
 
     /* Check if player login is already stored in session */
     if (this.checkExistingSession(socket)) return;
@@ -54,6 +64,10 @@ export default class GameLobbyRoom extends GameChildRoom {
 
     for (const [id, socket] of this.sockets) {
 
+      console.log("-----------------------------------------");
+      console.log(socket.request.session);
+      
+
       this.session.save(socket, {
         logged: true,
         login: this.players[id]
@@ -71,7 +85,7 @@ export default class GameLobbyRoom extends GameChildRoom {
     super.register(socket, login);
 
     /* Inform clients that a player joined the lobby */
-    this.nameSpace.to(this.nameSpace.name).emit('player_joined_lobby', [login]);
+    this.nameSpace.to(this.type).emit('player_joined_lobby', [login]);
   }
 
 
@@ -80,7 +94,7 @@ export default class GameLobbyRoom extends GameChildRoom {
 
     if (!this.players[socketId]) return;
 
-    this.nameSpace.to(this.nameSpace.name).emit('player_left_lobby', this.players[socketId]);
+    this.nameSpace.to(this.type).emit('player_left_lobby', this.players[socketId]);
 
     super.unRegister(socketId);
   }

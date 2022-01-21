@@ -5,35 +5,22 @@ export default class GameChildRoom {
 
   players = {};
 
-  // get emit() {
 
-  //   return this.nameSpace.to(this.nameSpace.name).emit;
-  // }
-
-
-  constructor(parentRoom, nameSpace) {
+  constructor(parentRoom, type) {
 
     this.parentRoom = parentRoom;
 
-    this.nameSpace = parentRoom.io.of(nameSpace);
+    this.nameSpace = parentRoom.io;
 
-    this.session = parentRoom.io.session;
+    this.session = parentRoom.session;
 
-    this.debug = Debug(`room:${nameSpace.split('/')[1]}`);
-
-
-    // this.on = (message, callback) =>
-    //   this.nameSpace
-    //   .on(message, callback);
-
-    // this.emit = (message, data) =>
-    //   this.nameSpace
-    //   .emit(message, data);
-
+    this.debug = Debug(`room:${parentRoom.Game.name}:${type}`);
 
     this.nameSpace.on('connection', socket => {
 
-      socket.join(this.nameSpace.name); // XXX
+      const url = socket.request.headers.referer.split("citadels-")[1];
+
+      socket.join(url);
 
       this.debug(`New client connected at ${this.nameSpace.name}: ${socket.id}`);
 
@@ -98,7 +85,8 @@ export default class GameChildRoom {
 
   redirectAll(path) {
 
-    this.nameSpace.to(this.nameSpace.name).emit('redirect', path);
+    this.nameSpace.to(this.type)
+      .emit('redirect', path);
   }
 
 

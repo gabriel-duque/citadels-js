@@ -2,7 +2,7 @@ import './citadels.css';
 
 import io from 'socket.io-client';
  
-const socket = io("/citadels-play");
+const socket = io("/citadels");
 
 socket.on('redirect', path => {
   window.location = path;

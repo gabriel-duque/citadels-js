@@ -9,7 +9,7 @@ export default class CitadelsRoom extends GameRoom {
 
   constructor(io) {
 
-    super(io, CitadelsGame, CitadelsRoom.routes);
+    super(io, CitadelsGame);
   }
 
 

@@ -7,22 +7,23 @@ import Debug from '../debug.config.js';
 export default class GameRoom {
 
 
-  constructor(io, Game, routes) {
+  constructor(io, Game) {
 
-    this.io = io;
+    this.io = io.of(Game.name);
+
     this.session = io.session;
+    
     this.Game = Game;
-    this.routes =  routes;
 
     this.debug = Debug(`room:${this.Game.name}`);
 
     this.debug("\r\nCreating new room of game:", Game.name);
 
-    this.lobbyRoom = new GameLobbyRoom(this, this.routes.lobby.ioNamespace);
-    this.playRoom = new GamePlayRoom(this, this.routes.play.ioNamespace);
+    this.lobbyRoom = new GameLobbyRoom(this);
+    this.playRoom = new GamePlayRoom(this);
 
-    this.lobbyPath = this.routes.lobby.publicPath;
-    this.playPath = this.routes.play.publicPath;
+    this.lobbyPath = `/${Game.name}-lobby`;
+    this.playPath = `/${Game.name}-play`;
   }
 
 

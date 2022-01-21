@@ -3,13 +3,20 @@ import GameChildRoom from './game-child-room.js';
 export default class GamePlayRoom extends GameChildRoom {
 
 
-  constructor(parentRoom, ioNamespace) {
+  type = "play";
 
-    super(parentRoom, ioNamespace);
+  constructor(parentRoom) {
+
+    super(parentRoom, "play");
   }
 
 
   onConnection(socket) {
+
+    if (!socket.rooms.has("play")) {
+
+      return;
+    }
 
     /* If no game is running, log player out */
     if (!this.isGameRunning) {
@@ -35,7 +42,7 @@ export default class GamePlayRoom extends GameChildRoom {
   /* Inform players that someone left, do not unregister player as he might reconnect */
   onDisconnection(socket) {
 
-    this.nameSpace.to(this.nameSpace.name)
+    this.nameSpace.to(this.type)
       .emit('player_left_game', socket.id);
   }
 

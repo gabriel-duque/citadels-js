@@ -2,7 +2,7 @@
 <html lang="fr">
 
 <%- include('../partials/head', {
-  title: gameName + " lobby",
+  title: gameName + " lobbies",
   tags: [{
       type: "meta",
       attributes: {
@@ -20,15 +20,7 @@
 }); %>
 
 <h1>
-  <%= gameName %>
+  Lobbies for: <%= gameName %>
 </h1>
 
-<input type="text" class="login-name">
-<button class="join-room">Join room</button>
-<button class="start-game">Start game</button>
-
-<div class="players"></div>
-
-<script src="lobby-bundle.js"></script>
-
-<%- include('../partials/footer'); %>
+<%- include('../partials/footer'); %></input>
