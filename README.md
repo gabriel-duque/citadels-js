@@ -18,17 +18,17 @@ cd srv && npm install
 
 ### 1. Bundle client in dev mode
 ```bash
-npm run dev:client
+npm run dev
 ```
 
 ### 2. Launch server (watch mode + debug info)
 ```bash
-cd srv && npm run dev:server:debug:app 
+cd srv && npm run debug:app 
 ```
 
 ### 1. Bundle client in prod mode
 ```bash
-npm run prod:client
+npm run prod
 ```
 
 ### 2. Launch server in watch mode with debug info

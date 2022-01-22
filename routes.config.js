@@ -31,7 +31,7 @@ export const frontConfig = gameName => ({
   play: {
 
     input: {
-      folder: path.resolve(`src/${gameName}`),
+      folder: path.resolve(`${gameName}/client`),
       entry: `${gameName}.js`,
       template: `${gameName}.ejs`,
       // alias: {

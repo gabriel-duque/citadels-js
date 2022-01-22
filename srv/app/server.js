@@ -2,12 +2,12 @@ import http from 'http';
 import express from 'express';
 import { Server } from "socket.io";
 
-import { port } from '../server.config.js';
+import { port } from './server.config.js';
 import { cookieParser, expressSessionStore, sessionMiddleware } from './session-store.js';
 import socketSession from './socket-session.js';
 
-import Debug from '../debug.config.js';
-const debug = Debug('server');
+import Debug from 'debug';
+const debug = Debug('app:server');
 
 
 export const app = express();

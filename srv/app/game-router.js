@@ -1,4 +1,4 @@
-import Debug from '../debug.config.js';
+import Debug from 'debug';
 
 export default class GameRouter {
 
@@ -14,7 +14,7 @@ export default class GameRouter {
 
     this.GameRoom = GameRoom;
 
-    this.debug = Debug(`router:${gameName}`);
+    this.debug = Debug(`app:router:${gameName}`);
 
   }
 

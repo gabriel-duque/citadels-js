@@ -1,4 +1,3 @@
-import debug from 'debug';
 import GameChildRoom from './game-child-room.js';
 
 export default class GameLobbyRoom extends GameChildRoom {
@@ -12,7 +11,7 @@ export default class GameLobbyRoom extends GameChildRoom {
   }
 
   onConnection(socket) {
-
+ 
 
     if (socket.rooms.has("play")) {
 

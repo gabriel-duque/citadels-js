@@ -11,8 +11,8 @@ import Deck from './deck.js';
 import Player from './player.js';
 import EventEmitter from 'events';
 
-import Debug from '../debug.config.js';
-const debug = Debug('game:citadels');
+import Debug from 'debug';
+const debug = Debug('citadels:game');
 
 /* This class represents a game */
 export default class Game extends EventEmitter {

@@ -1,7 +1,7 @@
 import GameLobbyRoom from './game-lobby-room.js';
 import GamePlayRoom from './game-play-room.js';
 
-import Debug from '../debug.config.js';
+import Debug from 'debug';
 
 
 export default class GameRoom {
@@ -15,7 +15,7 @@ export default class GameRoom {
     
     this.Game = Game;
 
-    this.debug = Debug(`room:${this.Game.name}`);
+    this.debug = Debug(`app:room:${this.Game.name}`);
 
     this.debug("\r\nCreating new room of game:", Game.name);
 

@@ -1,0 +1,16 @@
+{
+  "name": "citadels",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "room": "file:../../srv/app/game-room"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

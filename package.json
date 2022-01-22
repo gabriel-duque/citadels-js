@@ -35,9 +35,9 @@
     "last 3 version, > 0.5%, not dead, not ie <= 11"
   ],
   "scripts": {
-    "dev:client": "cross-env NODE_ENV=dev GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js",
-    "prod:client": "cross-env NODE_ENV=prod GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js",
-    "analyse:client": "cross-env NODE_ENV=analyse GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js"
+    "dev": "cross-env NODE_ENV=dev GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js",
+    "prod": "cross-env NODE_ENV=prod GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js",
+    "analyse": "cross-env NODE_ENV=analyse GAME_NAME=citadels WP_CONFIG=all webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",

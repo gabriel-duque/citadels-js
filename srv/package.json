@@ -3,6 +3,9 @@
   "version": "0.0.2",
   "description": "An implementation of the Citadels card game, server part using Node.js and Socket.io",
   "main": "app.js",
+  "exports": {
+    "room": "./app/game-room.js"
+  },
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",
@@ -17,10 +20,9 @@
   "type": "module",
   "scripts": {
     "serve": "node app.js",
-    "dev:server": "nodemon app.js --ignore src/ --ignore dist/",
-    "dev:server:debug:app": "cross-env DEBUG=app:* npm run dev:server",
-    "dev:server:debug:all": "cross-env DEBUG=* npm run dev:server",
-    "test:citadels": "cross-env DEBUG=app:* node game-citadels/test/test.js"
+    "dev": "nodemon app.js --ignore src/ --ignore dist/",
+    "debug:app": "cross-env DEBUG=app:* npm run dev",
+    "debug:all": "cross-env DEBUG=* npm run dev"
   },
   "repository": {
     "type": "git",

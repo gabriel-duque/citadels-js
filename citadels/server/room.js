@@ -1,7 +1,7 @@
-import GameRoom from '../server/game-room.js';
+import GameRoom from '../../srv/app/game-room.js'; // XXX
 import CitadelsGame from './game.js';
 
-import Debug from '../debug.config.js';
+import Debug from 'debug';
 const debug = Debug('citadels:room');
 
 
@@ -11,7 +11,6 @@ export default class CitadelsRoom extends GameRoom {
 
     super(io, CitadelsGame);
   }
-
 
   isGameRunning() {
 

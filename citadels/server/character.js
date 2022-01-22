@@ -1,7 +1,7 @@
 import { colors } from './district.js';
 
-import Debug from '../debug.config.js';
-const debug = Debug("game:citadels");
+import Debug from 'debug';
+const debug = Debug("citadels:character");
 
 /* A simple AI to test the game functionnality */
 import * as champion from './test/champion.js';

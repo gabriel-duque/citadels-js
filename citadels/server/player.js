@@ -1,5 +1,5 @@
-import Debug from '../debug.config.js';
-const debug = Debug('game:citadels');
+import Debug from 'debug';
+const debug = Debug('citadels:players');
 
 /* This is a class to represent a player */
 export default class Player {

@@ -1,8 +1,8 @@
 import path from 'path';
 import serveStatic from 'serve-static';
 
-import Debug from '../debug.config.js';
-const debug = Debug('router');
+import Debug from 'debug';
+const debug = Debug('app:router');
 
 
 const PUBLIC_FOLDER = path.resolve('../dist');

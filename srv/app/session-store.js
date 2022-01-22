@@ -1,5 +1,5 @@
 import expressCookieParser from 'cookie-parser';
-import { db, cookieSecret } from '../server.config.js';
+import { db, cookieSecret } from './server.config.js';
 
 import expressSession from 'express-session';
 import expressMySqlSessionStore from 'express-mysql-session';

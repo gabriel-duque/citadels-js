@@ -1,6 +1,6 @@
-import Debug from '../debug.config.js';
+import Debug from 'debug';
 
-const debug = Debug('session');
+const debug = Debug('app:session');
 
 export default {
 

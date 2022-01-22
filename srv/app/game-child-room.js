@@ -1,10 +1,10 @@
-import Debug from '../debug.config.js';
+import Debug from 'debug';
 
 export default class GameChildRoom {
 
 
   players = {};
-
+ 
 
   constructor(parentRoom, type) {
 
@@ -14,7 +14,7 @@ export default class GameChildRoom {
 
     this.session = parentRoom.session;
 
-    this.debug = Debug(`room:${parentRoom.Game.name}:${type}`);
+    this.debug = Debug(`app:room:${parentRoom.Game.name}:${type}`);
 
     this.nameSpace.on('connection', socket => {
 
