@@ -13,7 +13,7 @@
       type: "link",
       attributes: {
         rel: "stylesheet",
-        content: "lobby-styles.css"
+        href: "lobby-styles.css"
       }
     }
   ]
@@ -26,6 +26,13 @@
 <button class='create-lobby'>
   Create lobby of <%= gameName %>
 </button>
+
+<% for (const lobbyId in lobbies) { %>
+<div class="lobby">
+  <p><%= lobbyId %></p>
+  <button id="<%= lobbyId %>">Join lobby</button>
+</div>
+<% } %>
 
 <script src="lobbies-bundle.js"></script>
 
