@@ -2,34 +2,33 @@ import GameLobbyRoom from './game-lobby-room.js';
 import GamePlayRoom from './game-play-room.js';
 
 import Debug from 'debug';
-
+const debug = Debug('app:game-room');
 
 export default class GameRoom {
 
 
-  constructor(io, Game) {
+  constructor(io, id, Game) {
 
-    this.io = io.of(Game.name);
+    this.io = io;
 
-    this.session = io.session;
+    this.id = id;
     
     this.Game = Game;
 
-    this.debug = Debug(`app:room:${this.Game.name}`);
+    this.session = io.session;
 
-    this.debug("\r\nCreating new room of game:", Game.name);
+    this.lobbyRoom = new GameLobbyRoom(this, id);
+    this.playRoom = new GamePlayRoom(this, id);
 
-    this.lobbyRoom = new GameLobbyRoom(this);
-    this.playRoom = new GamePlayRoom(this);
-
-    this.lobbyPath = `/${Game.name}-lobby`;
-    this.playPath = `/${Game.name}-play`;
+    this.lobbyPath = `/${Game.name}/${this.id}`;
+    this.playPath = `/${Game.name}/${this.id}/play`;
   }
+  
 
 
   launchGame() {
 
-    this.debug("Creating new game of:", this.Game.name);
+    debug("Creating new game of:", this.Game.name);
 
     this.players = Object.values(this.lobbyRoom.players);
 

@@ -1,6 +1,5 @@
 import io from 'socket.io-client';
 
-
 const gameName = document.querySelector('meta[name="game-name"]')
   .content;
 

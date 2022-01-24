@@ -1,4 +1,4 @@
-import './lobby.css';
+import 'styles/lobby.css';
 
 const gameName = document.querySelector('meta[name="game-name"]')
   .content;
@@ -12,7 +12,7 @@ const createLobbyButton = document.querySelector('.create-lobby');
 
 createLobbyButton.addEventListener('click', () => {
 
-  postRequest('/create-lobby/' + gameName, response => {
+  postRequest(`./`, response => {
     renderLobby(response)
   })
 });
@@ -34,16 +34,16 @@ function postRequest(route, onload) {
 function renderLobby(lobby) {
 
   const lobbyElement = document.createElement('div');
-  const lobbyId = document.createElement("p");
+  const roomId = document.createElement("p");
   const joinButton = document.createElement("button");
 
   lobbyElement.classList.add('lobby');
 
-  lobbyId.innerHTML = lobby.lobbyId;
+  roomId.innerHTML = lobby.roomId;
   joinButton.innerHTML = "Join lobby";
-  joinButton.id = lobby.lobbyId;
+  joinButton.id = lobby.roomId;
 
-  lobbyElement.appendChild(lobbyId);
+  lobbyElement.appendChild(roomId);
   lobbyElement.appendChild(joinButton);
   document.body.appendChild(lobbyElement);
 
@@ -58,6 +58,6 @@ function attachListener(lobbyElement) {
 
   button.addEventListener('click', () => {
 
-    window.location = `/${gameName}-lobby-${button.id}`;
+    window.location = `/${gameName}/${button.id}`;
   });
 }

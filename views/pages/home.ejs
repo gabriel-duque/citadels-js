@@ -4,7 +4,7 @@
       type: "link",
       attributes: {
         rel: "stylesheet",
-        content: "lobby-styles.css"
+        href: "/lobby-styles.css"
       }
     }
   ]
@@ -12,11 +12,14 @@
 
 <% for (const gameName of games) { %>
 
-<button>
-  <a href="/<%= gameName %>">
-    Play <%= gameName %>
-  </a>
-</button>
+<div class="lobby">
+  <p><%= gameName %></p>
+  <button>
+    <a href="/<%= gameName %>">
+      Play
+    </a>
+  </button>
+</div>
 
 <% } %>
 

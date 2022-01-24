@@ -5,9 +5,9 @@ export default class GamePlayRoom extends GameChildRoom {
 
   type = "play";
 
-  constructor(parentRoom) {
+  constructor(parentRoom, id) {
 
-    super(parentRoom, "play");
+    super(parentRoom, id, "play");
   }
 
 

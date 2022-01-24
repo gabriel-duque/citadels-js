@@ -38,11 +38,11 @@ export default {
 
   render(fileName, locals) {
 
-    return (req, res) => {
+    return (req, res, next) => {
 
       if (typeof locals === 'function') {
-        
-        locals = locals(req.url);
+
+        locals = locals(req);
       }
 
       debug("Rendering page", fileName);

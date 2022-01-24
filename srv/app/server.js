@@ -33,11 +33,13 @@ io.initNamespace = function(name) {
 
   if (!this._nsps.has(name)) {
 
-    debug(`Initializing namespace: ${name}`);
+    debug(`Initializing socket.io namespace: ${name}`);
 
     this.of(name)
       .use((socket, next) =>
         sessionMiddleware(socket, {}, next)
       );
+
+    this.of(name).session = socketSession;
   }
 };

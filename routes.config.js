@@ -3,28 +3,32 @@ import path from "path";
 export const frontConfig = gameName => ({
 
 
-  lobbies: {
+  gameLobby: {
     input: {
-      folder: path.resolve("src"),
-      entry: "lobbies.js"
+      folder: path.resolve("views"),
+      entry: "scripts/game-lobby.js",
+      alias: {
+        styles: "styles"
+      }
     },
     output: {
-      js: `lobbies-bundle.js`,
+      js: `game-lobby-bundle.js`,
       css: `lobby-styles.css`
-      // js: `lobbies-bundle.[hash].js`,
+      // js: `game-lobby-bundle.[hash].js`,
       // css: `lobby-styles.[hash].css`
     }
   },
 
 
-  lobby: {
+  gameRoom: {
     input: {
-      folder: path.resolve("src"),
-      entry: "lobby.js"
+      folder: path.resolve("views"),
+      entry: "scripts/game-room.js",
+      styles: "styles"
     },
     output: {
-      js: `lobby-bundle.js`,
-      // js: `lobby-bundle.[hash].js`,
+      js: `game-room-bundle.js`,
+      // js: `game-room-bundle.[hash].js`,
     }
   },
 
@@ -45,8 +49,8 @@ export const frontConfig = gameName => ({
       html: `${gameName}-play.html`,
       js: `${gameName}-bundle.js`,
       css: `${gameName}-styles.css`
-      // js: `vvmap.[hash].js`,
-      // css: `vvmap.[hash].css`
+      // js: `${gameName}-bundle.[hash].js`,
+      // css: `${gameName}-styles.[hash].css`
     }
   }
 })

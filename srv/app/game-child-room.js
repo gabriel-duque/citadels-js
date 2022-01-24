@@ -4,7 +4,7 @@ export default class GameChildRoom {
 
 
   players = {};
- 
+
 
   constructor(parentRoom, type) {
 
@@ -18,9 +18,7 @@ export default class GameChildRoom {
 
     this.nameSpace.on('connection', socket => {
 
-      const url = socket.request.headers.referer.split("citadels-")[1];
-
-      socket.join(url);
+      socket.join(this.id);
 
       this.debug(`New client connected at ${this.nameSpace.name}: ${socket.id}`);
 
@@ -82,10 +80,11 @@ export default class GameChildRoom {
     socket.emit('redirect', path);
   }
 
-
   redirectAll(path) {
 
-    this.nameSpace.to(this.type)
+    this.nameSpace
+      .to(this.id)
+      .to(this.type)
       .emit('redirect', path);
   }
 
