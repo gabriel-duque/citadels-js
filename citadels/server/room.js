@@ -7,9 +7,9 @@ const debug = Debug('citadels:room');
 
 export default class CitadelsRoom extends GameRoom {
 
-  constructor(io, id) {
+  constructor(...args) {
 
-    super(io, id, CitadelsGame);
+    super(CitadelsGame, ...args);
   }
 
   isGameRunning() {

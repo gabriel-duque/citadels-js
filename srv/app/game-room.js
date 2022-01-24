@@ -4,10 +4,14 @@ import GamePlayRoom from './game-play-room.js';
 import Debug from 'debug';
 const debug = Debug('app:game-room');
 
+// export function connect(io, id, Game) {
+//   return new GameRoom(io, id, Game);
+// }
+
 export default class GameRoom {
 
 
-  constructor(io, id, Game) {
+  constructor(Game, io, id) {
 
     this.io = io;
 

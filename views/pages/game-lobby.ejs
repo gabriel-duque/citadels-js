@@ -17,17 +17,17 @@
 }); %>
 
 <h1>
-  Lobbies for: <%= gameName %>
+  Lobby - <%= gameName %>
 </h1>
 
-<button class='create-lobby'>
-  Create lobby of <%= gameName %>
+<button class='create-room'>
+  Create room of <%= gameName %>
 </button>
 
 <% for (const id of ids) { %>
 <div class="lobby">
   <p><%= id %></p>
-  <button id="<%= id %>">Join lobby</button>
+  <button id="<%= id %>">Join room</button>
 </div>
 <% } %>
 

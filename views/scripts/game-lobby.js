@@ -8,7 +8,7 @@ document.querySelectorAll('.lobby').forEach(lobbyElement => {
   attachListener(lobbyElement);
 });
 
-const createLobbyButton = document.querySelector('.create-lobby');
+const createLobbyButton = document.querySelector('.create-room');
 
 createLobbyButton.addEventListener('click', () => {
 
@@ -40,7 +40,7 @@ function renderLobby(lobby) {
   lobbyElement.classList.add('lobby');
 
   roomId.innerHTML = lobby.roomId;
-  joinButton.innerHTML = "Join lobby";
+  joinButton.innerHTML = "Join room";
   joinButton.id = lobby.roomId;
 
   lobbyElement.appendChild(roomId);

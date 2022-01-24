@@ -3,7 +3,7 @@ import path from "path";
 export const frontConfig = gameName => ({
 
 
-  gameLobby: {
+  lobby: {
     input: {
       folder: path.resolve("views"),
       entry: "scripts/game-lobby.js",
@@ -20,7 +20,7 @@ export const frontConfig = gameName => ({
   },
 
 
-  gameRoom: {
+  room: {
     input: {
       folder: path.resolve("views"),
       entry: "scripts/game-room.js",

@@ -17,7 +17,7 @@ export default class GameLobby {
     this.name = gameName;
 
     this.GameRoom = GameRoom;
-    
+
     io.initNamespace(`/${gameName}`);
 
     this.io = io.of(`/${gameName}`);
@@ -28,6 +28,7 @@ export default class GameLobby {
   createRoom() {
 
     debug(`Creating new room of game: ${this.name}`);
+
     const roomId = uuid();
 
     this.rooms[roomId] = new this.GameRoom(this.io, roomId);;
