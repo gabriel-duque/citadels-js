@@ -40,11 +40,11 @@ export default class CitadelsRoom extends GameRoom {
 
     return Object.assign({},
       this.publicGameState, {
-        player: {
-          login,
-          hand: player.hand,
-        }
+      player: {
+        login,
+        hand: player.hand,
       }
+    }
     );
   }
 

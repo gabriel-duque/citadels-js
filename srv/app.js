@@ -11,7 +11,6 @@ app.use(Router.getPublicPath(''));
 
 app.get('/', Router.render("home", { games: Object.keys(GAME_ROOMS) }));
 
-
 for (const gameName in GAME_ROOMS) {
 
   app.use(`/${gameName}`, new GameRouter(gameName, GAME_ROOMS[gameName], io));

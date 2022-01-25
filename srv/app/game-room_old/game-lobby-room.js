@@ -23,7 +23,6 @@ export default class GameLobbyRoom extends GameChildRoom {
     if (this.checkExistingSession(socket)) return;
 
     /* Send already connected clients login to incoming one */
-    // socket.emit("player_joined_lobby", Object.values(this.players));
     socket.emit("player_joined_lobby", Object.values(this.players));
 
     /* Send incoming client login to connected ones */

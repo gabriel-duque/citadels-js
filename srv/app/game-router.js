@@ -1,6 +1,6 @@
 import express from 'express';
+import { v4 as uuid } from 'uuid';
 
-import GameLobby from './game-lobby.js';
 import Router from './router.js';
 
 import Debug from 'debug';
@@ -12,7 +12,15 @@ export default class GameRouter {
 
   static createLobby(gameName, GameRoom, io) {
 
-    this.lobbies[gameName] = new GameLobby(gameName, GameRoom, io);
+    debug(`Creating lobby for game: ${gameName}`);
+
+    io.initNamespace(`/${gameName}`);
+
+    this.lobbies[gameName] = {
+      rooms: {},
+      GameRoom,
+      io: io.of(`/${gameName}`)
+    }
   }
 
   static getLobby(gameName) {
@@ -21,21 +29,25 @@ export default class GameRouter {
 
   static createRoom(gameName) {
 
-    return this.getLobby(gameName)
-      .createRoom()
+    debug(`Creating new room of game: ${this.name}`);
+
+    const roomId = uuid();
+
+    const lobby = this.getLobby(gameName);
+
+    lobby.rooms[roomId] = new lobby.GameRoom(lobby.io, roomId);
+
+    return roomId;
   }
 
   static getRooms(gameName) {
 
-    return this.getLobby(gameName) &&
-      this.getLobby(gameName)
-      .rooms
+    return this.getLobby(gameName)?.rooms;
   }
 
   static getRoom(gameName, roomId) {
 
-    return this.getRooms(gameName) &&
-      this.getRooms(gameName)[roomId];
+    return this.getRooms(gameName)?.[roomId];
   }
 
   constructor(gameName, GameRoom, io) {
@@ -87,7 +99,7 @@ export default class GameRouter {
 
   renderLobby(req, res, next) {
 
-    return Router.render("game-room", (req, res, next) => ({
+    return Router.render("game-room", (req) => ({
       gameName: this.gameName,
       roomId: req.params.roomId
     }))(req, res, next)
@@ -102,7 +114,7 @@ export default class GameRouter {
     if (!GameRouter.getRoom(this.gameName, roomId)) {
 
       debug(`No ${this.gameName} room found for this id, redirecting`);
-      
+
       res.redirect('/');
       return;
     }

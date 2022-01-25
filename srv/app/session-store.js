@@ -1,5 +1,5 @@
 import expressCookieParser from 'cookie-parser';
-import { db, cookieSecret } from './server.config.js';
+import { db, cookieSecret } from '../server.config.js';
 
 import expressSession from 'express-session';
 import expressMySqlSessionStore from 'express-mysql-session';
@@ -63,6 +63,36 @@ export function sessionMiddleware(socket, {}, next) {
   });
 };
 
+
+export const socketSession = {
+
+
+  save(socket, sessionData) {
+
+    debug("Saving session for:", socket.id, sessionData);
+
+    Object.assign(socket.request.session, sessionData);
+
+    socket.request.session.save();
+  },
+
+
+  remove(socket) {
+
+    debug("Remove session data for: ", socket.id);
+
+    for (const key in socket.request.session) {
+
+      if (key !== 'cookie') {
+
+        delete socket.request.session[key];
+      }
+    }
+
+    socket.request.session.save();
+  }
+  
+}
 
 function getSessionIdCookie(request) {
 
