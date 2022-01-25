@@ -55,7 +55,7 @@ startGameBtn.addEventListener('click', () => {
 
 const players = document.querySelector('.players');
 
-socket.on("player_joined", logins => {
+socket.on("player_joined_lobby", logins => {
 
   for (const login of logins) {
 
@@ -70,7 +70,7 @@ socket.on("player_joined", logins => {
 
 });
 
-socket.on("player_left", login => {
+socket.on("player_left_lobby", login => {
 
   const player = document.querySelector(`[data-login="${login}"]`);
 

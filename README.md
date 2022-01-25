@@ -26,12 +26,14 @@ npm run dev
 cd srv && npm run debug:app 
 ```
 
+## Production
+
 ### 1. Bundle client in prod mode
 ```bash
 npm run prod
 ```
 
-### 2. Launch server in watch mode with debug info
+### 2. Launch server
 ```bash
 cd srv && npm run serve
 ```
@@ -39,3 +41,4 @@ or
 ```bash
 node srv/app.js
 ```
+

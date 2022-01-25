@@ -26,7 +26,7 @@ export default class GameLobbyRoom extends GameChildRoom {
     socket.emit("player_joined_lobby", Object.values(this.players));
 
     /* Send incoming client login to connected ones */
-    socket.on('player_log_attempt', login => this.register(socket, login));
+    socket.on('log_attempt', login => this.register(socket, login));
 
     /*  Launch game when amount of desired players is reached */
     socket.on('room_complete', () => {

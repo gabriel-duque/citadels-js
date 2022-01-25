@@ -26,6 +26,8 @@ httpServer.listen(port, () => debug(`Server listening on port ${port}`));
 
 export const io = new Server(httpServer);
 
+io.session = socketSession;
+
 io.initNamespace = function(name) {
 
   if (!this._nsps.has(name)) {
@@ -40,5 +42,3 @@ io.initNamespace = function(name) {
     this.of(name).session = socketSession;
   }
 };
-
-io.session = socketSession;
