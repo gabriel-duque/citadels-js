@@ -6,4 +6,44 @@
   &>* {
     display: inline-block;
   }
+
+  &.player {
+    background: #ffd07a;
+  
+    &.ready {
+      background: lightgreen;
+    }
+  }
+}
+
+input {
+  margin: 0.5rem;
+  padding: 0.5rem;
+}
+
+
+button {
+  background-color: blue;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #003366;    
+  }
+
+  &:active {
+    background-color: darkblue;
+  }
+
+  & a {
+    text-decoration: none;
+    color: white;
+  }
 }

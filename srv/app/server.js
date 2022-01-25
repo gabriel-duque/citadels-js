@@ -9,36 +9,34 @@ import Debug from 'debug';
 const debug = Debug('app:server');
 
 
-export const app = express();
-
-app.set('view engine', 'ejs');
-app.set('views', '../views');
-
-app.use(cookieParser);
-
-app.use(expressSessionStore);
+export const app = express()
+  .set('view engine', 'ejs')
+  .set('views', '../views')
+  .use(cookieParser)
+  .use(expressSessionStore);
 
 
-const httpServer = http.createServer(app);
-
-httpServer.listen(port, () => debug(`Server listening on port ${port}`));
+const httpServer = http
+  .createServer(app)
+  .listen(port, () =>
+    debug(`Server listening on port ${port}`)
+  );
 
 
 export const io = new Server(httpServer);
 
-io.session = socketSession;
 
-io.initNamespace = function(name) {
+io.initNamespace = function (name) {
 
-  if (!this._nsps.has(name)) {
+  if (this._nsps.has(name)) return;
 
-    debug(`Initializing socket.io namespace: ${name}`);
+  debug(`Initializing socket.io namespace: ${name}`);
 
-    this.of(name)
-      .use((socket, next) =>
-        sessionMiddleware(socket, {}, next)
-      );
+  this.of(name)
+    .use((socket, next) =>
+      sessionMiddleware(socket, {}, next)
+    );
 
-    this.of(name).session = socketSession;
-  }
+  this.of(name).session = socketSession;
+
 };

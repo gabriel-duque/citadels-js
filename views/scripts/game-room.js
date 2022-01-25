@@ -3,7 +3,6 @@ import io from 'socket.io-client';
 const gameName = document.querySelector('meta[name="game-name"]')
   .content;
 
-// const socket = io(`/${gameName}-lobby`);
 const socket = io(`/${gameName}`);
 
 
@@ -60,6 +59,8 @@ socket.on("player_joined", logins => {
   for (const login of logins) {
 
     const player = document.createElement('div');
+
+    player.className = 'lobby player';
 
     player.setAttribute("data-login", login);
 
