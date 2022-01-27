@@ -9,11 +9,10 @@ import Debug from 'debug';
 const debug = Debug('app:session-store');
 
 const dbConnection = createPool(db);
-
 const MySQLStore = expressMySqlSessionStore(expressSession);
 
-const sessionStore = new MySQLStore({}, dbConnection);
-
+// const sessionStore = new MySQLStore({}, dbConnection);
+const sessionStore = new expressSession.MemoryStore();
 const EXPRESS_SID_KEY = 'connect.sid';
 
 

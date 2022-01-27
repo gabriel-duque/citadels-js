@@ -40,19 +40,30 @@ socket.on("login_taken", () => {
 
 /* Test : starting game */
 
-const startGameBtn = document.querySelector('.start-game');
+const readyStateBtn = document.querySelector('.toggle-readystate');
 
-startGameBtn.addEventListener('click', () => {
+let ready = false;
 
-  socket.emit("player_ready");
+readyStateBtn.addEventListener('click', () => {
 
-  // socket.emit("room_complete");
+  ready = !ready;
+
+  socket.emit("toggle_ready_state", ready);
+
+  socket.emit("room_complete");
 });
 
+const players = document.querySelector('.players');
+
+socket.on("toggle_ready_state", ({ login, ready }) => {
+
+  const player = players.querySelector(`[data-login=${login}]`);
+
+  player.className = "lobby player" + (ready ? " ready" : "");
+})
 
 /* Rendering lobby */
 
-const players = document.querySelector('.players');
 
 socket.on("player_joined", logins => {
 

@@ -29,7 +29,7 @@ export default class GameRouter {
 
   static createRoom(gameName) {
 
-    debug(`Creating new room of game: ${this.name}`);
+    debug(`Creating new room of game: ${gameName}`);
 
     const roomId = uuid();
 

@@ -13,11 +13,16 @@ export default class GameRoom {
 
         this.id = id;
 
-
         this.lobbyPath = `/${Game.name}/${id}`;
         this.playPath = `/${Game.name}/${id}/play`;
 
         this.init();
+    }
+
+    get room() {
+        
+        return this.io
+            .to(this.id);
     }
 
     init() {
@@ -28,20 +33,47 @@ export default class GameRoom {
 
             socket.join(this.id);
 
-            debug(`New client connected at ${this.io.name} room ${this.id}: ${socket.id}`);
+            const type = socket.handshake.headers.referer.match(/\/play/) ? "play" : "lobby";
 
-            this.onConnection(socket);
+            debug(`New client ${socket.id} connected at ${this.io.name} room ${this.id} /${type}`);
+
+            if (type === "lobby") {
+                this.onLobbyConnection(socket);
+            } else {
+                this.onPlayConnection(socket);
+            }
 
             socket.on('disconnect', () => {
 
-                debug(`Client disconnected from ${this.io.name}: ${socket.id}`);
+                debug(`Client ${socket.id} disconnected from ${this.io.name} room ${this.id} /${type}`);
 
-                this.onDisconnection(socket);
+                if (type === "lobby") {
+                    this.onLobbyDisconnection(socket);
+                } else {
+                    this.onPlayDisconnection(socket);
+                }
             });
         });
     }
 
-    onConnection(socket) {
+    onLobbyConnection(socket) {
+
+        /* Handle existing session */
+        if (this.isUserLoggedIn(socket)) {
+
+            if (this.isGameRunning) {
+
+                /* If game is still running, redirect to the game */
+                this.redirect(socket, this.playPath);
+
+                return;
+
+            } else {
+
+                /* If game is not running, remove unwanted login cookie */
+                this.io.session.remove(socket);
+            }
+        }
 
         /* Send already connected clients login to incoming one */
         socket.emit("player_joined", Object.values(this.players));
@@ -60,41 +92,50 @@ export default class GameRoom {
 
                     return;
                 }
-
-                /* Handle player changing name */
-                if (socketId === socket.id) {
-
-                    this.unRegister(socket);
-                }
             }
 
-            this.register(socket, login);
+            this.players[socket.id] = login;
 
             /* Send incoming client login to connected ones */
-            this.io
-                .to(this.id)
-                .emit('player_joined', [login]);
+            this.room.emit('player_joined', [login]);
         });
 
+        socket.on("toggle_ready_state", ready => {
+
+            // this.players[socket.id].ready = ready;
+
+            this.room.emit('toggle_ready_state', {
+                login: this.players[socket.id],
+                ready
+            });
+        });
+
+        /*  Launch game when amount of desired players is reached */
+        socket.on('room_complete', () => {
+
+            for (const [id, socket] of this.io.sockets) {
+
+                this.io.session.save(socket, {
+                    login: this.players[id]
+                });
+            }
+
+            /* Starts the game */
+
+            debug("Creating new game of:", this.Game.name);
+            this.game = new this.Game(Object.values(this.players));
+
+            this.publicGameState = this.getInitialPublicGameState();
+
+            this.bindEvents();
+
+            /* Redirects all players to the game */
+            this.redirectAll(this.playPath);
+        });
     }
 
     /* Remove a player from the lobby */
-    onDisconnection(socket) {
-
-        // this.unRegister(socket.id);
-    }
-
-
-    register(socket, login) {
-
-        this.players[socket.id] = login;
-
-        this.io.session.save(socket, { login });
-
-        debug(`Client registered in room ${this.id}:`, login, socket.id);
-    }
-
-    unRegister(socket) {
+    onLobbyDisconnection(socket) {
 
         const login = this.players[socket.id];
 
@@ -102,13 +143,60 @@ export default class GameRoom {
 
         delete this.players[socket.id];
 
-        this.io.session.remove(socket);
+        socket.to(this.id).emit('player_left', login);
+    }
 
-        debug(`Client unregistered from ${this.id}:`, login, socket.id);
+    onPlayConnection(socket) {
 
-        this.io
-            .to(this.id)
-            .emit('player_left', login);
+        /* If no game is running, log player out */
+        if (!this.isGameRunning) {
+
+            this.io.session.remove(socket);
+        }
+
+        /* If user is not logged in, redirects to lobby */
+        if (!this.isUserLoggedIn(socket)) {
+
+            this.redirect(socket, this.lobbyPath);
+
+            return;
+        }
+
+
+        /* Bind socket id with player login */
+        this.players[socket.id] = socket.session.login;
+
+        socket.to(this.id).emit('player_joined', socket.session.login);
+
+        /* This player is ready to playi*/
+        this.onHandshakeDone(socket)
+    }
+
+    onPlayDisconnection(socket) {
+
+        socket.to(this.id).emit('player_left', socket.session.login);
+    }
+
+    /* Check if user is logged in */
+    isUserLoggedIn(socket) {
+
+        const logged = socket?.session?.login
+
+        debug(`Client at ${this.Game.name} is ${logged ? "" : "not "}logged in: ${socket.id}`);
+
+        return logged;
+    }
+
+    redirect(socket, path) {
+
+        debug(`Redirecting ${socket.id} to ${path}`);
+
+        socket.emit('redirect', path);
+    }
+
+    redirectAll(path) {
+
+        this.room.emit('redirect', path);
     }
 
 }

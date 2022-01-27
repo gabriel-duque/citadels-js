@@ -12,7 +12,7 @@ export default class CitadelsRoom extends GameRoom {
     super(CitadelsGame, ...args);
   }
 
-  isGameRunning() {
+  get isGameRunning() {
 
     return this.game && this.game.hasStarted && !this.game.isOver
   }
@@ -34,7 +34,7 @@ export default class CitadelsRoom extends GameRoom {
   /* returns the game state only seen by specific player */
   getInitialPrivateGameState(socket) {
 
-    const login = this.playRoom.players[socket.id];
+    const login = this.players[socket.id];
 
     const player = this.game.players.find(player => player.login === login);
 
@@ -125,17 +125,17 @@ export default class CitadelsRoom extends GameRoom {
 
       debug(scores, '\n');
 
-      for (const [_, socket] of this.playRoom.sockets) {
+      for (const [_, socket] of this.io.sockets) {
 
-        this.session.remove(socket);
+        this.io.session.remove(socket);
 
         socket.emit('game_finished', scores);
       }
 
       this.game = null;
-      this.playRoom.players = {};
+      this.players = {};
 
-      for (const [_, socket] of this.playRoom.sockets) {
+      for (const [_, socket] of this.io.sockets) {
 
         socket.emit('redirect', this.lobbyPath);
       }

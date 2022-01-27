@@ -21,7 +21,7 @@
   "scripts": {
     "serve": "node app.js",
     "dev": "nodemon app.js --ignore src/ --ignore dist/",
-    "debug:app": "cross-env DEBUG=app:* npm run dev",
+    "debug:app": "cross-env DEBUG=app:*,citadels:* npm run dev",
     "debug:all": "cross-env DEBUG=* npm run dev"
   },
   "repository": {
