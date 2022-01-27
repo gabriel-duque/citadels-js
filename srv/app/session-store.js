@@ -1,20 +1,25 @@
 import expressSession from 'express-session';
-import { createPool } from 'mysql';
-import expressMySqlSessionStore from 'express-mysql-session';
 import expressCookieParser from 'cookie-parser';
-
-import { db, cookieSecret } from '../server.config.js';
 
 import Debug from 'debug';
 const debug = Debug('app:session-store');
 
-const dbConnection = createPool(db);
-const MySQLStore = expressMySqlSessionStore(expressSession);
-
+/* WITH MYSQL */
+// import { createPool } from 'mysql';
+// import expressMySqlSessionStore from 'express-mysql-session';
+// import { db, cookieSecret } from '../server.config.js';
+// const dbConnection = createPool(db);
+// const MySQLStore = expressMySqlSessionStore(expressSession);
 // const sessionStore = new MySQLStore({}, dbConnection);
-const sessionStore = new expressSession.MemoryStore();
-const EXPRESS_SID_KEY = 'connect.sid';
+/* -------- */
 
+/* WITHOUT MYSQL */
+import { cookieSecret } from '../server.config.template.js';
+const sessionStore = new expressSession.MemoryStore();
+/* -------- */
+
+
+const EXPRESS_SID_KEY = 'connect.sid';
 
 export const expressSessionStore = expressSession({
   store: sessionStore,
@@ -61,10 +66,10 @@ export function sessionMiddleware(socket, { }, next) {
 function getSessionIdCookie(request) {
 
   return (
-      request.secureCookies?.[EXPRESS_SID_KEY] ||
-      request.signedCookies?.[EXPRESS_SID_KEY] ||
-      request.cookies?.[EXPRESS_SID_KEY]
-    );
+    request.secureCookies?.[EXPRESS_SID_KEY] ||
+    request.signedCookies?.[EXPRESS_SID_KEY] ||
+    request.cookies?.[EXPRESS_SID_KEY]
+  );
 }
 
 export const socketSession = {
