@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: citadels-js
+  namespace: games
+spec:
+  selector:
+    app: citadels-js
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
