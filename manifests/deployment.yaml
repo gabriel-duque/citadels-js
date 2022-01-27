@@ -1,5 +1,5 @@
 ---
-# Simple deployment for our image at docker.io/gduque96/citadels.js:latest
+# Simple deployment for our image at docker.io/gduque96/citadels-js:latest
 apiVersion: apps/v1
 kind: Deployment
 metadata:
