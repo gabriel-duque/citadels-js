@@ -20,7 +20,7 @@ export default class GameRoom {
     }
 
     get room() {
-        
+
         return this.io
             .to(this.id);
     }
@@ -29,13 +29,15 @@ export default class GameRoom {
 
         this.io.on('connection', socket => {
 
+            debug(socket.id)
+
             if (socket.rooms.size > 1) return;
 
             socket.join(this.id);
 
             const type = socket.handshake.headers.referer.match(/\/play/) ? "play" : "lobby";
 
-            debug(`New client ${socket.id} connected at ${this.io.name} room ${this.id} /${type}`);
+            debug(`New client ${socket.id} joined room ${this.id} of ${this.io.name} /${type}`);
 
             if (type === "lobby") {
                 this.onLobbyConnection(socket);
@@ -45,7 +47,7 @@ export default class GameRoom {
 
             socket.on('disconnect', () => {
 
-                debug(`Client ${socket.id} disconnected from ${this.io.name} room ${this.id} /${type}`);
+                debug(`Client ${socket.id} left room ${this.id} of ${this.io.name} /${type}`);
 
                 if (type === "lobby") {
                     this.onLobbyDisconnection(socket);
@@ -92,8 +94,14 @@ export default class GameRoom {
 
                     return;
                 }
+
+                if (socket.id === socketId) {
+
+                    this.room.emit("player_left", this.players[socketId]);
+                }
             }
 
+            debug(`Binding login ${login} to client ${socket.id}`);
             this.players[socket.id] = login;
 
             /* Send incoming client login to connected ones */
@@ -104,10 +112,11 @@ export default class GameRoom {
 
             // this.players[socket.id].ready = ready;
 
-            this.room.emit('toggle_ready_state', {
-                login: this.players[socket.id],
-                ready
-            });
+            const login = this.players[socket.id];
+
+            debug(`Player ${login} is ${ready ? "" : "not "}ready to play`);
+
+            this.room.emit('toggle_ready_state', { login, ready });
         });
 
         /*  Launch game when amount of desired players is reached */
@@ -122,7 +131,7 @@ export default class GameRoom {
 
             /* Starts the game */
 
-            debug("Creating new game of:", this.Game.name);
+            debug(`Starting game of ${this.Game.name} for room ${this.id}`);
             this.game = new this.Game(Object.values(this.players));
 
             this.publicGameState = this.getInitialPublicGameState();
@@ -140,6 +149,8 @@ export default class GameRoom {
         const login = this.players[socket.id];
 
         if (!login) return;
+
+        debug(`Unbinding login ${login} to client ${socket.id}`);
 
         delete this.players[socket.id];
 
@@ -163,10 +174,23 @@ export default class GameRoom {
         }
 
 
-        /* Bind socket id with player login */
-        this.players[socket.id] = socket.session.login;
+        const { login } = socket.session;
 
-        socket.to(this.id).emit('player_joined', socket.session.login);
+        for (const socketId in this.players) {
+
+            if (this.players[socketId] === login) {
+
+                debug(`Unbinding login ${login} to client ${socketId}`);
+
+                delete this.players[socketId];
+            }
+        }
+
+        /* Bind socket id with player login */
+        debug(`Binding login ${login} to client ${socket.id}`);
+        this.players[socket.id] = login;
+
+        socket.to(this.id).emit('player_joined', login);
 
         /* This player is ready to playi*/
         this.onHandshakeDone(socket)
@@ -195,6 +219,8 @@ export default class GameRoom {
     }
 
     redirectAll(path) {
+
+        debug(`Redirecting every socket to ${path}`);
 
         this.room.emit('redirect', path);
     }
