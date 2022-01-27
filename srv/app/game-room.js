@@ -225,4 +225,19 @@ export default class GameRoom {
         this.room.emit('redirect', path);
     }
 
+    get isGameRunning() {
+        throw new Error("isGameRunning Method not implemented.");
+    }
+
+    onHandshakeDone() {
+        throw new Error("onHandshakeDone Method not implemented.");
+    }
+
+    getInitialPublicGameState() {
+        throw new Error("getInitialPublicGameState Method not implemented.");
+    }
+
+    bindEvents() {
+        throw new Error("bindEvents Method not implemented.");
+    }
 }

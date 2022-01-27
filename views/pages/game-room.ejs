@@ -1,31 +1,16 @@
-<%- include('../partials/head', {
-  title: gameName + " lobby",
-  tags: [{
-      type: "meta",
-      attributes: {
-        name: "game-name",
-        content: gameName
-      }
-    }, {
-      type: "link",
-      attributes: {
-        rel: "stylesheet",
-        href: "/lobby-styles.css"
-      }
-    }
-  ]
-}); %>
+<%- include('../partials/head', { title: gameName + " lobby" , tags: [{ type: "meta" , attributes: { name: "game-name" ,
+  content: gameName } }, { type: "link" , attributes: { rel: "stylesheet" , href: "/global-styles.css" } } ] }); %>
 
-<h1>
-  <%= gameName %>
-</h1>
+  <h1>
+    <%= gameName %>
+  </h1>
 
-<input type="text" class="login-name">
-<button class="join-room">Join room</button>
-<button class="toggle-readystate">Start game</button>
+  <input type="text" class="login-name">
+  <button class="join-room">Join room</button>
+  <button class="toggle-readystate">Start game</button>
 
-<div class="players"></div>
+  <div class="players"></div>
 
-<script src="/game-room-bundle.js"></script>
+  <script src="/game-room-bundle.js"></script>
 
-<%- include('../partials/footer'); %>
+  <%- include('../partials/footer'); %>

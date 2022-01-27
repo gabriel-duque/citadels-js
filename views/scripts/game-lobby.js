@@ -1,4 +1,4 @@
-import 'styles/lobby.css';
+import 'styles/global.css';
 
 const gameName = document.querySelector('meta[name="game-name"]')
   .content;

@@ -13,9 +13,9 @@ export const frontConfig = gameName => ({
     },
     output: {
       js: `game-lobby-bundle.js`,
-      css: `lobby-styles.css`
+      css: `global-styles.css`
       // js: `game-lobby-bundle.[hash].js`,
-      // css: `lobby-styles.[hash].css`
+      // css: `global-styles.[hash].css`
     }
   },
 
