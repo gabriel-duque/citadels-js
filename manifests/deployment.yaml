@@ -1,0 +1,22 @@
+---
+# Simple deployment for our image at docker.io/gduque96/citadels.js:latest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: citadels-js
+  namespace: games
+spec:
+  selector:
+    matchLabels:
+      app: citadels-js
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: citadels-js
+    spec:
+      containers:
+      - name: citadels-js
+        image: docker.io/gduque96/citadels-js:latest
+        ports:
+        - containerPort: 3000
