@@ -39,8 +39,6 @@ export default {
 
 	render(fileName, locals) {
 
-		debug("invoking render", fileName);
-
 		return (req, res) => {
 
 			if (typeof locals === 'function') {

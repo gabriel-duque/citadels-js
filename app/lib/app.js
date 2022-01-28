@@ -1,12 +1,21 @@
-import { app, io } from './server.js';
 import Router from './router.js';
 import { createLobby, createRouter } from './game-router.js';
+import createServer from './server.js';
 
+/* V2 */
+// import createSessionStore from './session-store.js';
 
-export function init(GAME_ROOMS) {
+/* V1 */
+import * as store from './session-store.js';
 
+export function init(GAME_ROOMS, SERVER_CONFIG) {
 
-    app.get('/favicon.ico', (req, res) => res.status(204));
+    /* V2 */
+    // const store = createSessionStore(SERVER_CONFIG);
+    
+    const { app, io } = createServer(SERVER_CONFIG, store);
+
+    app.get('/favicon.ico', (_, res) => res.status(204));
 
 
     app.use(Router.getPublicPath());
@@ -22,7 +31,7 @@ export function init(GAME_ROOMS) {
 
         app.use(Router.getPublicPath(gameName));
     }
-    
+
 
     app.use(Router.redirectAtRoot);
 }

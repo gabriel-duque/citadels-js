@@ -89,8 +89,6 @@ function renderRoom(gameName) {
 
 function getRoomsIds(gameName) {
 
-	debug("_________getRoomsIds");
-
 	return Object.keys(lobbies[gameName]?.rooms);
 }
 

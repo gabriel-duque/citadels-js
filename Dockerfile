@@ -6,9 +6,9 @@ WORKDIR /src
 
 RUN npm install && \
     npm install --global cross-env && \
-    npm install --prefix srv && \
+    npm install --prefix app && \
     npm run prod && \
-    cp srv/server.config.template.js srv/server.config.js
+    cp app/server.config.template.js app/server.config.js
 
-ENTRYPOINT ["npm", "--prefix", "srv", "run", "serve"]
+ENTRYPOINT ["npm", "--prefix", "app", "run", "serve"]
 

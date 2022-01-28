@@ -11,7 +11,7 @@ npm install
 
 ### 2. Install server dependencies:
 ```bash
-cd srv && npm install
+cd app && npm install
 ```
 
 ## Development
@@ -23,7 +23,7 @@ npm run dev
 
 ### 2. Launch server (watch mode + debug info)
 ```bash
-cd srv && npm run debug:app 
+cd app && npm run debug:app 
 ```
 
 ## Production
@@ -35,10 +35,10 @@ npm run prod
 
 ### 2. Launch server
 ```bash
-cd srv && npm run serve
+cd app && npm run serve
 ```
 or 
 ```bash
-node srv/index.js
+node app/index.js
 ```
 
