@@ -3,133 +3,125 @@ import TerserPlugin from "terser-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
-import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import postCssNormalize from "postcss-normalize";
 import postCssPresetEnv from "postcss-preset-env";
-import path from 'path';
+import { resolve } from 'path';
 
 const babelLoader = {
-  test: /\.js$/,
-  exclude: /node_modules/,
-  use: "babel-loader"
+	test: /\.js$/,
+	exclude: /node_modules/,
+	use: "babel-loader"
 };
 
 const ejsLoader = {
-  test: /\.ejs$/,
-  use: [{
-    loader: "ejs-loader",
-    options: {
-      variable: 'locals',
-      // esModule: false
-    }
-  }]
+	test: /\.ejs$/,
+	use: [{
+		loader: "ejs-loader",
+		options: {
+			variable: 'locals',
+			// esModule: false
+		}
+	}]
 };
 
 const cssLoaders = {
-  test: /\.css$/,
-  use: [{
-      loader: MiniCssExtractPlugin.loader,
-    },
-    {
-      loader: "css-loader",
-      options: {
-        importLoaders: 1
-      }
-    },
-    {
-      loader: "postcss-loader",
-      options: {
-        postcssOptions: {
-          ident: "postcss",
-          plugins: [
-            postCssNormalize(),
-            postCssPresetEnv({
-              stage: 3,
-              features: {
-                "nesting-rules": true
-              }
-            })
-          ]
-        }
-      }
-    }
-  ]
+	test: /\.css$/,
+	use: [{
+		loader: MiniCssExtractPlugin.loader,
+	},
+	{
+		loader: "css-loader",
+		options: {
+			importLoaders: 1
+		}
+	},
+	{
+		loader: "postcss-loader",
+		options: {
+			postcssOptions: {
+				ident: "postcss",
+				plugins: [
+					postCssNormalize(),
+					postCssPresetEnv({
+						stage: 3,
+						features: {
+							"nesting-rules": true
+						}
+					})
+				]
+			}
+		}
+	}
+	]
 }
 
-export default (config, {
-  isAnalyseMode,
-  isDevMode
-}) => ({
+export default isDevMode => ({ input, output }) => ({
 
-  target: "web",
+	target: "web",
 
-  mode: isDevMode ? "development" : "production",
+	mode: isDevMode ? "development" : "production",
 
-  watch: isDevMode,
+	watch: isDevMode,
 
-  entry: `${config.input.folder}/${config.input.entry}`,
+	entry: `${input.folder}/${input.entry}`,
 
-  resolve: {
-    alias: getAliases(config)
-  },
+	resolve: {
+		alias: getAliases(input)
+	},
 
-  output: {
-    filename: config.output.js,
-    path: config.output.folder,
-    publicPath: config.output.publicPath || "/"
-  },
+	output: {
+		filename: output.js,
+		path: output.folder,
+		publicPath: output.publicPath || "/"
+	},
 
-  optimization: {
-    minimize: !isDevMode,
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
-  },
+	optimization: {
+		minimize: !isDevMode,
+		minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+	},
 
-  module: {
-    rules: [
-      !isDevMode && babelLoader,
-      ejsLoader,
-      cssLoaders
-    ].filter(Boolean)
-  },
+	module: {
+		rules: [
+			!isDevMode && babelLoader,
+			ejsLoader,
+			cssLoaders
+		].filter(Boolean)
+	},
 
-  plugins: [
+	plugins: [
 
-    isDevMode && new ESLintPlugin({
-      emitWarning: true,
-    }),
+		isDevMode && new ESLintPlugin({
+			emitWarning: true,
+		}),
 
-    isAnalyseMode && new BundleAnalyzerPlugin({
-      analyzerPort: "auto"
-    }),
+		output.css && new MiniCssExtractPlugin({
+			filename: output.css,
+		}),
 
-    config.output.css && new MiniCssExtractPlugin({
-      filename: config.output.css,
-    }),
+		input.template && new HtmlWebpackPlugin({
+			filename: output.html,
+			inject: output.inject || true,
+			template: `${input.folder}/${input.template}`,
+		})
 
-    config.input.template && new HtmlWebpackPlugin({
-      filename: config.output.html,
-      inject: config.output.inject || true,
-      template: `${config.input.folder}/${config.input.template}`,
-    })
-
-  ].filter(Boolean),
+	].filter(Boolean),
 });
 
-function getAliases(config) {
+function getAliases(input) {
 
-  const output = {
-    views: path.resolve("views"),
-  }
+	const output = {
+		views: resolve("views"),
+	}
 
-  if (config.input.alias) {
+	if (input.alias) {
 
-    Object.entries(config.input.alias)
-      .forEach(([key, value]) => {
-        Object.assign(output, {
-          [key]: `${config.input.folder}/${value}/`
-        });
-      });
-  }
+		Object.entries(input.alias)
+			.forEach(([key, value]) => {
+				Object.assign(output, {
+					[key]: `${input.folder}/${value}/`
+				});
+			});
+	}
 
-  return output
+	return output
 }

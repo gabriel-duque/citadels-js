@@ -86,16 +86,12 @@ export default class Game extends EventEmitter {
       character.player = null;
     });
 
-    debug(`
-          \n-----------------------------------------
-          \n    New turn, distributing characters   
-          \n-----------------------------------------
-    `);
+    debug("----------------\nNew turn, distributing characters");
 
     /* Get the index of the card ignored this turn */
     const ignoredIndex = Math.floor(Math.random() * this.characters.length);
 
-    debug('Ignoring character: ', this.characters[ignoredIndex].name, '\n');
+    debug('Ignoring character: ', this.characters[ignoredIndex].name);
 
     /* Get the list of available characters */
     const remaining_characters = this.characters.filter((_, i) => i !== ignoredIndex);
@@ -120,9 +116,7 @@ export default class Game extends EventEmitter {
   /* Reveal characters and actually play turns */
   reveal_characters() {
 
-    debug("\n----------------------");
-    debug(" Revealing characters");
-    debug("----------------------\n");
+    debug("--------\nRevealing characters");
 
     for (let i = 0; i < this.characters.length; ++i) {
 
@@ -154,7 +148,7 @@ export default class Game extends EventEmitter {
         character.do_turn(character.player, this);
 
       } else {
-        debug('    is dead and doesnt play');
+        debug('is dead and doesnt play');
       }
     }
 
@@ -165,11 +159,7 @@ export default class Game extends EventEmitter {
   /* Count points and dump scores */
   dump() {
 
-    debug("\n------------------------------------------");
-    debug("------------------------------------------");
-    debug("||        Game finished, scores :       ||");
-    debug("------------------------------------------");
-    debug("------------------------------------------\n");
+    debug("============\n Game finished, scores:");
 
     return this.players.map(({
         districts,

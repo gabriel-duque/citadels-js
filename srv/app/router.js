@@ -1,11 +1,11 @@
-import path from 'path';
 import serveStatic from 'serve-static';
+import { resolve } from 'path';
 
 import Debug from 'debug';
 const debug = Debug('app:router');
 
 
-const PUBLIC_FOLDER = path.resolve('../dist');
+const PUBLIC_FOLDER = resolve('../dist');
 
 const SERVE_STATIC_OPTIONS = { index: false, extensions: ['html'], }
 
@@ -15,9 +15,9 @@ const SSR_FOLDER = 'pages';
 export default {
 
 
-	getPublicPath(publicPath) {
+	getPublicPath(path = "") {
 
-		const folder = path.resolve(PUBLIC_FOLDER, publicPath);
+		const folder = resolve(PUBLIC_FOLDER, path);
 
 		debug('Serving static folder:', folder);
 
@@ -30,14 +30,16 @@ export default {
 		return (req, _, next) => {
 
 			debug("Sending file", fileName, "on get request:", req.url);
-
-			req.url = fileName;
+			
+			req.url = fileName || "";
 
 			next();
 		}
 	},
 
 	render(fileName, locals) {
+
+		debug("invoking render", fileName);
 
 		return (req, res) => {
 

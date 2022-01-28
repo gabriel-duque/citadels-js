@@ -13,25 +13,23 @@ export function createRouter(gameName) {
 	const router = express.Router();
 
 	router.route('/')
-		.get(Router.render("lobby", {
-			gameName,
-			ids: getRoomsIds(gameName)
-		}))
-		.post(createRoom(gameName));
+		.get(
+			renderLobby(gameName)
+		)
+		.post(
+			createRoom(gameName)
+		);
 
 	router.route('/:roomId')
 		.get(
 			checkRoomExists(gameName),
-			Router.render("room", ({ params: roomId }) => ({
-				gameName,
-				roomId
-			}))
+			renderRoom(gameName)
 		);
 
 	router.route('/:roomId/play')
 		.get(
 			checkRoomExists(gameName),
-			Router.askForFile(`-play`)
+			Router.askForFile()
 		);
 
 	return router;
@@ -54,6 +52,16 @@ export function createLobby(gameName, GameRoom, io) {
 	};
 }
 
+function renderLobby(gameName) {
+
+	return (req, res, next) =>
+
+		Router.render("lobby", {
+			gameName,
+			ids: getRoomsIds(gameName)
+		})(req, res, next)
+}
+
 
 function createRoom(gameName) {
 
@@ -71,7 +79,17 @@ function createRoom(gameName) {
 	}
 }
 
+function renderRoom(gameName) {
+
+	return Router.render("room", ({ params: { roomId } }) => ({
+		gameName,
+		roomId
+	}));
+}
+
 function getRoomsIds(gameName) {
+
+	debug("_________getRoomsIds");
 
 	return Object.keys(lobbies[gameName]?.rooms);
 }
@@ -79,7 +97,7 @@ function getRoomsIds(gameName) {
 
 function checkRoomExists(gameName) {
 
-	return ({ params: roomId }, res, next) => {
+	return ({ params: { roomId } }, res, next) => {
 
 		debug(`Checking if room exists: ${roomId}`);
 

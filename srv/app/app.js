@@ -9,7 +9,7 @@ export function init(GAME_ROOMS) {
     app.get('/favicon.ico', (req, res) => res.status(204));
 
 
-    app.use(Router.getPublicPath(''));
+    app.use(Router.getPublicPath());
 
     app.get('/', Router.render("home", { games: Object.keys(GAME_ROOMS) }));
 

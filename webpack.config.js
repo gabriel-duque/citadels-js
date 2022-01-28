@@ -1,26 +1,18 @@
 import getWebpackCommons from "./webpack.commons.js";
 
-import { frontConfig } from "./routes.config.js";
+import { appConfig, getGameConfig } from "./webpack.routes.js";
 
-const isDevMode = process.env.NODE_ENV === "dev";
-
-const isAnalyseMode = process.env.NODE_ENV === "analyse";
-
-console.log(
-  `\r\n---------------------------------\r\n\r\n
-              mode : ${process.env.NODE_ENV}
-  \r\n\r\n---------------------------------\r\n`
-);
+console.log("mode", process.env.NODE_ENV);
 
 const wpConfig = process.env.WP_CONFIG;
+const gameName = process.env.GAME_NAME;
 
-const gameConfig = frontConfig(process.env.GAME_NAME);
+export default (
 
-const configs =
-  wpConfig === "all" ?
-  Object.values(gameConfig) : [gameConfig[wpConfig]];
+	wpConfig === "all" ?
+		[...Object.values(appConfig), getGameConfig(gameName)] :
+		[appConfig[wpConfig] || getGameConfig(gameName)]
 
-
-export default configs.map(config =>
-  getWebpackCommons(config, { isAnalyseMode, isDevMode })
+).map(
+	getWebpackCommons(process.env.NODE_ENV === "dev")
 );
