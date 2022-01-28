@@ -1,16 +1,26 @@
-import GameRoom from '../../srv/app/game-room.js'; // XXX
 import CitadelsGame from './game.js';
 
 import Debug from 'debug';
 const debug = Debug('citadels:room');
 
 
-export default class CitadelsRoom extends GameRoom {
+export default class CitadelsRoom {
 
-  constructor(...args) {
+  static name = 'citadels';
 
-    super(CitadelsGame, ...args);
+  constructor(io, id, players) {
+
+    this.io = io;
+
+    this.id = id;
+
+    this.players = players;
+
+    this.game = new CitadelsGame( Object.values(this.players));
+
+    this.bindEvents();
   }
+
 
   get isGameRunning() {
 
@@ -19,6 +29,8 @@ export default class CitadelsRoom extends GameRoom {
 
 
   onHandshakeDone(socket) {
+
+    this.publicGameState = this.getInitialPublicGameState();
 
     socket.emit("initial_game_state", this.getInitialPrivateGameState(socket));
 

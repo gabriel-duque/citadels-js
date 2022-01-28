@@ -6,11 +6,11 @@ if (isPassenger) {
   });
 }
 
-export const port = isPassenger ? 'passenger' : 3000;
+export const PORT = isPassenger ? 'passenger' : 3000;
 
-export const cookieSecret = 'COOKIE_SECRET';
+export const COOKIE_SECRET = 'COOKIE_SECRET';
 
-export const db = {
+export const DB_CONFIG = {
   host: isPassenger ? "localhost" : "DISTANT_HOST",
   user: "DB_USER",
   password: "DB_PASSWORD",

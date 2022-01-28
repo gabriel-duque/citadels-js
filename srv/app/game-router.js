@@ -2,123 +2,96 @@ import express from 'express';
 import { v4 as uuid } from 'uuid';
 
 import Router from './router.js';
+import Room from './room.js';
 
 import Debug from 'debug';
 const debug = Debug('app:game-router');
 
-export default class GameRouter {
 
-  static lobbies = {};
+export function createRouter(gameName) {
 
-  static createLobby(gameName, GameRoom, io) {
+	const router = express.Router();
 
-    debug(`Creating lobby for game: ${gameName}`);
+	router.route('/')
+		.get(Router.render("lobby", {
+			gameName,
+			ids: getRoomsIds(gameName)
+		}))
+		.post(createRoom(gameName));
 
-    io.initNamespace(`/${gameName}`);
+	router.route('/:roomId')
+		.get(
+			checkRoomExists(gameName),
+			Router.render("room", ({ params: roomId }) => ({
+				gameName,
+				roomId
+			}))
+		);
 
-    this.lobbies[gameName] = {
-      rooms: {},
-      GameRoom,
-      io: io.of(`/${gameName}`)
-    }
-  }
+	router.route('/:roomId/play')
+		.get(
+			checkRoomExists(gameName),
+			Router.askForFile(`-play`)
+		);
 
-  static getLobby(gameName) {
-    return this.lobbies[gameName];
-  }
+	return router;
+}
 
-  static createRoom(gameName) {
 
-    debug(`Creating new room of game: ${gameName}`);
+const lobbies = {};
 
-    const roomId = uuid();
 
-    const lobby = this.getLobby(gameName);
+export function createLobby(gameName, GameRoom, io) {
 
-    lobby.rooms[roomId] = new lobby.GameRoom(lobby.io, roomId);
+	debug(`Creating lobby for game: ${gameName}`);
 
-    return roomId;
-  }
+	io.initNamespace(`/${gameName}`);
 
-  static getRooms(gameName) {
+	lobbies[gameName] = {
+		rooms: {},
+		GameRoom,
+		io: io.of(`/${gameName}`)
+	};
+}
 
-    return this.getLobby(gameName)?.rooms;
-  }
 
-  static getRoom(gameName, roomId) {
+function createRoom(gameName) {
 
-    return this.getRooms(gameName)?.[roomId];
-  }
+	return (_, res) => {
 
-  constructor(gameName, GameRoom, io) {
+		const roomId = uuid();
 
-    GameRouter.createLobby(gameName, GameRoom, io)
+		debug(`Creating new room of game ${gameName} with id ${roomId}`);
 
-    this.gameName = gameName;
+		const { rooms, GameRoom, io } = lobbies[gameName];
 
-    const router = express.Router();
+		rooms[roomId] = new Room(GameRoom, io, roomId);
 
-    router
-      .route('/')
-      .get(this.renderLobbies.bind(this))
-      .post(this.createRoom.bind(this));
+		res.send(JSON.stringify({ roomId }));
+	}
+}
 
-    router
-      .route('/:roomId')
-      .get(
-        this.checkRoomExists.bind(this),
-        this.renderLobby.bind(this)
-      );
+function getRoomsIds(gameName) {
 
-    router
-      .route('/:roomId/play')
-      .get(
-        this.checkRoomExists.bind(this),
-        Router.askForFile(`-play`)
-      );
+	return Object.keys(lobbies[gameName]?.rooms);
+}
 
-    return router;
-  }
 
-  renderLobbies(req, res, next) {
+function checkRoomExists(gameName) {
 
-    const rooms = GameRouter.getRooms(this.gameName);
+	return ({ params: roomId }, res, next) => {
 
-    return Router.render("game-lobby", {
-      gameName: this.gameName,
-      ids: Object.keys(rooms)
-    })(req, res, next);
-  }
+		debug(`Checking if room exists: ${roomId}`);
 
-  createRoom(req, res) {
+		if (!lobbies[gameName]?.rooms?.[roomId]) {
 
-    const roomId = GameRouter.createRoom(this.gameName)
+			debug(`No room of id ${roomId} found in ${gameName} lobby, redirecting`);
 
-    res.send(JSON.stringify({ roomId }));
-  }
+			res.redirect('/');
 
-  renderLobby(req, res, next) {
+			return;
+		}
 
-    return Router.render("game-room", (req) => ({
-      gameName: this.gameName,
-      roomId: req.params.roomId
-    }))(req, res, next)
-  }
-
-  checkRoomExists(req, res, next) {
-
-    const roomId = req.params.roomId;
-
-    debug(`Checking if room exists: ${roomId}`);
-
-    if (!GameRouter.getRoom(this.gameName, roomId)) {
-
-      debug(`No ${this.gameName} room found for this id, redirecting`);
-
-      res.redirect('/');
-      return;
-    }
-
-    next();
-  }
+		next();
+	}
 }

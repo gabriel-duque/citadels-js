@@ -11,52 +11,55 @@ const SERVE_STATIC_OPTIONS = { index: false, extensions: ['html'], }
 
 const SSR_FOLDER = 'pages';
 
+
 export default {
 
 
-  getPublicPath(publicPath) {
+	getPublicPath(publicPath) {
 
-    const folder = path.resolve(PUBLIC_FOLDER, publicPath);
+		const folder = path.resolve(PUBLIC_FOLDER, publicPath);
 
-    debug('Serving static folder:', folder);
+		debug('Serving static folder:', folder);
 
-    return serveStatic(folder, SERVE_STATIC_OPTIONS)
-  },
-
-
-  askForFile(fileName) {
-
-    return (req, _, next) => {
-
-      debug("Sending file", fileName, "on get request:", req.url);
-
-      req.url = fileName;
-
-      next();
-    }
-  },
-
-  render(fileName, locals) {
-
-    return (req, res, next) => {
-
-      if (typeof locals === 'function') {
-
-        locals = locals(req);
-      }
-
-      debug("Rendering page", fileName);
-
-      res.render(`${SSR_FOLDER}/${fileName}`, locals);
-    }
-  },
+		return serveStatic(folder, SERVE_STATIC_OPTIONS)
+	},
 
 
-  redirectAtRoot(req, res) {
+	askForFile(fileName) {
 
-    if (req.url.match("favicon.ico")) return;
+		return (req, _, next) => {
 
-    debug(`Route ${req.url} not found, redirecting to root`);
-  }
+			debug("Sending file", fileName, "on get request:", req.url);
+
+			req.url = fileName;
+
+			next();
+		}
+	},
+
+	render(fileName, locals) {
+
+		return (req, res) => {
+
+			if (typeof locals === 'function') {
+
+				locals = locals(req);
+			}
+
+			debug("Rendering page", fileName);
+
+			res.render(`${SSR_FOLDER}/${fileName}`, locals);
+		}
+	},
+
+
+	redirectAtRoot(req, res) {
+
+		if (req.url.match("favicon.ico")) return;
+
+		debug(`Route ${req.url} not found, redirecting to root`);
+
+		res.redirect('/');
+	}
 
 }

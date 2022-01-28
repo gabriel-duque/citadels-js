@@ -39,6 +39,6 @@ cd srv && npm run serve
 ```
 or 
 ```bash
-node srv/app.js
+node srv/index.js
 ```
 

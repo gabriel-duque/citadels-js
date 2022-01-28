@@ -6,15 +6,15 @@ export const frontConfig = gameName => ({
   lobby: {
     input: {
       folder: path.resolve("views"),
-      entry: "scripts/game-lobby.js",
+      entry: "scripts/lobby.js",
       alias: {
         styles: "styles"
       }
     },
     output: {
-      js: `game-lobby-bundle.js`,
+      js: `lobby-bundle.js`,
       css: `global-styles.css`
-      // js: `game-lobby-bundle.[hash].js`,
+      // js: `lobby-bundle.[hash].js`,
       // css: `global-styles.[hash].css`
     }
   },
@@ -23,12 +23,12 @@ export const frontConfig = gameName => ({
   room: {
     input: {
       folder: path.resolve("views"),
-      entry: "scripts/game-room.js",
+      entry: "scripts/room.js",
       styles: "styles"
     },
     output: {
-      js: `game-room-bundle.js`,
-      // js: `game-room-bundle.[hash].js`,
+      js: `room-bundle.js`,
+      // js: `room-bundle.[hash].js`,
     }
   },
 

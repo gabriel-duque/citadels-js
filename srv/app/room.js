@@ -1,20 +1,22 @@
 import Debug from "debug";
-const debug = Debug("app:game-room");
+const debug = Debug("app:room");
 
-export default class GameRoom {
+export default class Room {
 
     players = {};
 
-    constructor(Game, io, id) {
+    constructor(GameRoom, io, id) {
 
-        this.Game = Game;
+        this.GameRoom = GameRoom;
+
+        this.gameName = GameRoom.name;
 
         this.io = io;
 
         this.id = id;
 
-        this.lobbyPath = `/${Game.name}/${id}`;
-        this.playPath = `/${Game.name}/${id}/play`;
+        this.lobbyPath = `/${this.gameName}/${id}`;
+        this.playPath = `/${this.gameName}/${id}/play`;
 
         this.init();
     }
@@ -28,8 +30,6 @@ export default class GameRoom {
     init() {
 
         this.io.on('connection', socket => {
-
-            debug(socket.id)
 
             if (socket.rooms.size > 1) return;
 
@@ -63,7 +63,7 @@ export default class GameRoom {
         /* Handle existing session */
         if (this.isUserLoggedIn(socket)) {
 
-            if (this.isGameRunning) {
+            if (this.gameRoom?.isGameRunning) {
 
                 /* If game is still running, redirect to the game */
                 this.redirect(socket, this.playPath);
@@ -131,12 +131,9 @@ export default class GameRoom {
 
             /* Starts the game */
 
-            debug(`Starting game of ${this.Game.name} for room ${this.id}`);
-            this.game = new this.Game(Object.values(this.players));
+            debug(`Starting game of ${this.gameName} for room ${this.id}`);
 
-            this.publicGameState = this.getInitialPublicGameState();
-
-            this.bindEvents();
+            this.gameRoom = new this.GameRoom(this.io, this.id, this.players);
 
             /* Redirects all players to the game */
             this.redirectAll(this.playPath);
@@ -160,7 +157,7 @@ export default class GameRoom {
     onPlayConnection(socket) {
 
         /* If no game is running, log player out */
-        if (!this.isGameRunning) {
+        if (!this.gameRoom?.isGameRunning) {
 
             this.io.session.remove(socket);
         }
@@ -193,7 +190,7 @@ export default class GameRoom {
         socket.to(this.id).emit('player_joined', login);
 
         /* This player is ready to playi*/
-        this.onHandshakeDone(socket)
+        this.gameRoom.onHandshakeDone(socket)
     }
 
     onPlayDisconnection(socket) {
@@ -206,7 +203,7 @@ export default class GameRoom {
 
         const logged = socket?.session?.login
 
-        debug(`Client at ${this.Game.name} is ${logged ? "" : "not "}logged in: ${socket.id}`);
+        debug(`Client at ${this.gameName} is ${logged ? "" : "not "}logged in: ${socket.id}`);
 
         return logged;
     }
@@ -223,21 +220,5 @@ export default class GameRoom {
         debug(`Redirecting every socket to ${path}`);
 
         this.room.emit('redirect', path);
-    }
-
-    get isGameRunning() {
-        throw new Error("isGameRunning Method not implemented.");
-    }
-
-    onHandshakeDone() {
-        throw new Error("onHandshakeDone Method not implemented.");
-    }
-
-    getInitialPublicGameState() {
-        throw new Error("getInitialPublicGameState Method not implemented.");
-    }
-
-    bindEvents() {
-        throw new Error("bindEvents Method not implemented.");
     }
 }

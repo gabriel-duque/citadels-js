@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "An implementation of the Citadels card game, client part using JavaScript",
   "main": "src/index.js",
+  "type": "module",
   "dependencies": {
     "core-js": "^3.6.5",
     "socket.io-client": "^4.4.1"
@@ -29,7 +30,6 @@
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.2"
   },
-  "type": "module",
   "browserslist": [
     "last 3 version, > 0.5%, not dead, not ie <= 11"
   ],
