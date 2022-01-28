@@ -1,19 +1,13 @@
+import createServer from './server.js';
 import Router from './router.js';
 import { createLobby, createRouter } from './game-router.js';
-import createServer from './server.js';
 
-/* V2 */
-// import createSessionStore from './session-store.js';
-
-/* V1 */
-import * as store from './session-store.js';
 
 export function init(GAME_ROOMS, SERVER_CONFIG) {
 
-    /* V2 */
-    // const store = createSessionStore(SERVER_CONFIG);
+
+    const { app, io } = createServer(SERVER_CONFIG);
     
-    const { app, io } = createServer(SERVER_CONFIG, store);
 
     app.get('/favicon.ico', (_, res) => res.status(204));
 
