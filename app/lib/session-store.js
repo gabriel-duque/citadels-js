@@ -1,7 +1,7 @@
-import expressSessionStore from 'express-session';
-import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import expressCookieParser from 'cookie-parser';
 
-/* UNCOMMENT WHEN USING MYSQL */
+/* WITH MYSQL */
 // import { createPool } from 'mysql';
 // import mySQLStore from 'express-mysql-session';
 /* -------- */
@@ -9,35 +9,37 @@ import cookieParser from 'cookie-parser';
 import Debug from 'debug';
 const debug = Debug('app:session-store');
 
-
 const EXPRESS_SID_KEY = 'connect.sid';
 
 
-export default function createSessionStore(COOKIE_SECRET, DB_CONFIG) {
+export default function createSessionStore({ COOKIE_SECRET, DB_CONFIG }) {
 
+	debug(`Initializing session store`);
 
-	const isMySql = typeof mySQLStore !== 'undefined';
-	debug(`Initializing session store using ${isMySql ? 'MySQL' : 'memory'}`);
+	/* WITH MYSQL */
+	// const sessionStore = new (mySQLStore(session))({}, createPool(DB_CONFIG));
 
+	/* WITHOUT MYSQL */
+	const sessionStore = new session.MemoryStore();
 
-	const store = expressSessionStore({
-		store: isMySql ?
-			new (mySQLStore(expressSessionStore))({}, createPool(DB_CONFIG)) :
-			new expressSessionStore.MemoryStore(),
+	const expressSessionStore = session({
+		store: sessionStore,
 		resave: false,
 		saveUninitialized: true,
 		secret: COOKIE_SECRET,
 		name: EXPRESS_SID_KEY
 	});
 
+	const cookieParser = expressCookieParser(COOKIE_SECRET);
 
-	function middleware(socket, { }, next) {
+
+	function sessionMiddleware(socket, { }, next) {
 
 		if (!socket.request.headers.cookie) {
 			return next(new Error('No cookie transmitted'));
 		}
 
-		cookieParser(COOKIE_SECRET)(socket.request, {}, parseError => {
+		cookieParser(socket.request, {}, parseError => {
 
 			if (parseError) {
 				return next(new Error('Error parsing cookies'));
@@ -45,7 +47,7 @@ export default function createSessionStore(COOKIE_SECRET, DB_CONFIG) {
 
 			const sessionIdCookie = getSessionIdCookie(socket.request);
 
-			store.load(sessionIdCookie, (error, session) => {
+			sessionStore.load(sessionIdCookie, (error, session) => {
 
 				if (error) {
 					return next(error);
@@ -61,37 +63,39 @@ export default function createSessionStore(COOKIE_SECRET, DB_CONFIG) {
 		});
 	};
 
-	return {
-		store,
-		middleware,
-		socket: {
+	const socketSession = {
 
-			save(socket, sessionData) {
+		save(socket, sessionData) {
 
-				debug("Saving session for:", socket.id, sessionData);
+			debug("Saving session for:", socket.id, sessionData);
 
-				Object.assign(socket.session, sessionData);
+			Object.assign(socket.session, sessionData);
 
-				socket.session.save();
-			},
+			socket.session.save();
+		},
 
 
-			remove(socket) {
+		remove(socket) {
 
-				debug("Remove session data for: ", socket.id);
+			debug("Remove session data for: ", socket.id);
 
-				for (const key in socket.session) {
+			for (const key in socket.session) {
 
-					if (key !== 'cookie') {
+				if (key !== 'cookie') {
 
-						delete socket.session[key];
-					}
+					delete socket.session[key];
 				}
-
-				socket.session.save();
 			}
 
+			socket.session.save();
 		}
+
+	}
+	return {
+		expressSessionStore,
+		cookieParser,
+		sessionMiddleware,
+		socketSession
 	}
 }
 

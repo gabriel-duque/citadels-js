@@ -6,17 +6,22 @@ import createSessionStore from './session-store.js';
 import Debug from 'debug';
 const debug = Debug('app:server');
 
+export default function createServer({ PORT, ...SERVER_CONFIG },) {
 
-export default function createServer({ PORT, COOKIE_SECRET, DB_CONFIG }) {
+	const {
+		expressSessionStore,
+		cookieParser,
+		sessionMiddleware,
+		socketSession
+	} = createSessionStore(SERVER_CONFIG);
 
 	debug(`Initializing server`);
-
-	const session = createSessionStore(COOKIE_SECRET, DB_CONFIG);
 
 	const app = express()
 		.set('view engine', 'ejs')
 		.set('views', '../views')
-		.use(session.store);
+		.use(cookieParser)
+		.use(expressSessionStore);
 
 
 	const httpServer = http
@@ -36,12 +41,15 @@ export default function createServer({ PORT, COOKIE_SECRET, DB_CONFIG }) {
 
 		this.of(name)
 			.use((socket, next) =>
-				session.middleware(socket, {}, next)
+				sessionMiddleware(socket, {}, next)
 			);
 
-		this.of(name).session = session.socket;
+		this.of(name).session = socketSession;
 
 	};
 
-	return { app, io };
+	return {
+		app,
+		io
+	};
 }
