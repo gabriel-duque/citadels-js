@@ -3,10 +3,8 @@ import { colors } from './district.js';
 import Debug from 'debug';
 const debug = Debug("citadels:character");
 
-/* A simple AI to test the game functionnality */
-import * as champion from './test/champion.js';
+import * as champion from '../test/champion.js';
 
-/* This class represents a Character card */
 export class Character {
 
   constructor(name, do_turn, image_path) {
@@ -26,18 +24,53 @@ export class Character {
   }
 };
 
+/* An aray for the different characters */
+export const characters = [{
+  name: 'Assassin',
+  do_turn: assassin,
+},
+{
+  name: 'Voleur',
+  do_turn: thief,
+},
+{
+  name: 'Magicien',
+  do_turn: magician,
+},
+{
+  name: 'Roi',
+  do_turn: king,
+},
+{
+  name: 'Eveque',
+  do_turn: bishop,
+},
+{
+  name: 'Marchand',
+  do_turn: merchant,
+},
+{
+  name: 'Architecte',
+  do_turn: architect,
+},
+{
+  name: 'Condottiere',
+  do_turn: warlord,
+}
+];
+
 /* Choose between gold or cards */
-const coin_or_gold = (player, game) => {
+function coin_or_gold(player, game) {
 
   const choice = champion.get_gold_card(player); // XXX: AI I wrote to test
 
-  if (choice) { // Get gold
+  if (choice) {
 
     debug("gets 2 gold");
 
     player.gold += 2;
 
-  } else { // Get 2 cards and discard one
+  } else {
 
     debug("draws a card");
 
@@ -53,7 +86,7 @@ const coin_or_gold = (player, game) => {
 };
 
 /* The normal ending of a turn played by most characters */
-const do_normal_end = (player, game) => {
+function do_normal_end(player, game) {
 
   /* Handle coin or gold choice */
   coin_or_gold(player, game);
@@ -77,7 +110,7 @@ const do_normal_end = (player, game) => {
 };
 
 /* Assassin's turn */
-const assassin = (player, game) => {
+function assassin(player, game) {
 
   const choice = champion.get_assassin();
 
@@ -92,16 +125,16 @@ const assassin = (player, game) => {
 };
 
 /* Thief's turn */
-const thief = (player, game) => {
+function thief(player, game) {
 
   const choice = champion.get_thief();
 
   /* Can't steel the assassin, it's victim or the thief himself */
   if (choice > 1 && (
-      !game.dead_character ||
-      game.dead_character &&
-      game.characters[choice].name !== game.dead_character.name
-    )) {
+    !game.dead_character ||
+    game.dead_character &&
+    game.characters[choice].name !== game.dead_character.name
+  )) {
 
     game.stolen_character = game.characters[choice];
 
@@ -112,7 +145,7 @@ const thief = (player, game) => {
 };
 
 /* Magician's turn */
-const magician = (player, game) => {
+function magician(player, game) {
 
   const choice = champion.get_magician(player, game.players);
 
@@ -143,7 +176,7 @@ const magician = (player, game) => {
 };
 
 /* King's turn */
-const king = (player, game) => {
+function king(player, game) {
 
   /* Set king */
   game.firstPlayerToPlayIndex = game.players.findIndex(p => p.login === player.login);
@@ -156,7 +189,7 @@ const king = (player, game) => {
 };
 
 /* Bishop's turn */
-const bishop = (player, game) => {
+function bishop(player, game) {
 
   /* Get extra gold for blue districts */
   getExtraGold(player, "BLUE");
@@ -166,7 +199,7 @@ const bishop = (player, game) => {
 };
 
 /* Merchant's turn */
-const merchant = (player, game) => {
+function merchant(player, game) {
 
   /* Extra gold coin */
   ++player.gold;
@@ -178,7 +211,7 @@ const merchant = (player, game) => {
 };
 
 /* Architect's turn */
-const architect = (player, game) => {
+function architect(player, game) {
 
   debug("do turn");
 
@@ -198,7 +231,7 @@ const architect = (player, game) => {
 };
 
 /* Warlord's turn */
-const warlord = (player, game) => {
+function warlord(player, game) {
 
   /* Get extra gold for red districts */
   getExtraGold(player, "RED");
@@ -230,46 +263,3 @@ function getExtraGold(player, color) {
   player.gold += player.districts.filter(d => d.color === colors[color])
     .length;
 }
-
-/* An aray for the different characters */
-export const characters = [{
-    name: 'Assassin',
-    do_turn: assassin,
-    image_path: ''
-  },
-  {
-    name: 'Voleur',
-    do_turn: thief,
-    image_path: ''
-  },
-  {
-    name: 'Magicien',
-    do_turn: magician,
-    image_path: ''
-  },
-  {
-    name: 'Roi',
-    do_turn: king,
-    image_path: ''
-  },
-  {
-    name: 'Eveque',
-    do_turn: bishop,
-    image_path: ''
-  },
-  {
-    name: 'Marchand',
-    do_turn: merchant,
-    image_path: ''
-  },
-  {
-    name: 'Architecte',
-    do_turn: architect,
-    image_path: ''
-  },
-  {
-    name: 'Condottiere',
-    do_turn: warlord,
-    image_path: ''
-  }
-];

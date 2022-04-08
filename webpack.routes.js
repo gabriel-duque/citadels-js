@@ -41,14 +41,14 @@ export const getGameConfig = gameName => ({
 		folder: resolve(`${gameName}/client`),
 		entry: `${gameName}.js`,
 		template: `${gameName}.ejs`,
-		// alias: {
-		//   styles: "styles",
-		// }
+		alias: {	
+		  app: "app",
+		}
 	},
 
 	output: {
 		folder: resolve(`dist/${gameName}`),
-		html: `${gameName}-play.html`,
+		html: `${gameName}.html`,
 		js: `${gameName}-bundle.js`,
 		css: `${gameName}-styles.css`
 		// js: `${gameName}-bundle.[hash].js`,

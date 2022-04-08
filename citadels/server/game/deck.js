@@ -1,12 +1,5 @@
-/* Import what we need from other files */
-import {
-  colors,
-  District
-} from './district.js';
+import { colors, District } from './district.js';
 
-/*
- * The initial deck:
- */
 const initial_deck = [
 
   /* Green */
@@ -266,13 +259,18 @@ const initial_deck = [
 
 /* This is a class to represent a deck */
 export default class Deck {
+
   constructor() {
 
     /* Create our deck of ditricts using the initial deck */
     this.cards = new Array();
+
     for (const district in initial_deck) {
+
       const current = initial_deck[district];
+
       for (let i = 0; i < current.count; ++i) {
+        
         this.cards.push(new District(current.price,
           current.value,
           current.color,
@@ -290,15 +288,20 @@ export default class Deck {
   }
 
   draw(count = 1) {
+
     const cards = new Array();
+
     count = count > this.cards.length ? this.cards.length : count;
 
     for (let i = 0; i < count; ++i)
+
       cards.push(this.cards.pop());
+
     return cards;
   }
 
   discard(cards) {
+
     this.cards.unshift(...cards);
   }
 }

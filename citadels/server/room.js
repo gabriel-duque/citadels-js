@@ -1,4 +1,4 @@
-import CitadelsGame from './game.js';
+import CitadelsGame from './game/game.js';
 
 import Debug from 'debug';
 const debug = Debug('citadels:room');
@@ -24,7 +24,7 @@ export default class CitadelsRoom {
 
 	get isGameRunning() {
 
-		return this.game && this.game.hasStarted && !this.game.isOver
+		return this.game?.hasStarted && !this.game.isOver
 	}
 
 

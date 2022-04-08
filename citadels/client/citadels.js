@@ -1,22 +1,26 @@
 import './citadels.css';
 
-import io from 'socket.io-client';
- 
-const socket = io("/citadels");
+import { socket } from "app/connection";
 
-socket.on('redirect', path => {
-  window.location = path;
-});
+import events from 'app/event-emmitter';
 
-socket.on("initial_game_state", state => {
- console.log("Initial game state:", state);
-})
+import Game from 'app/game';
 
-
-/// TESTING start game
-const button = document.createElement('button');
-button.innerHTML = "Start game";
-button.addEventListener('click', () => {
+/*
+TESTING start game
+*/
+const startGameBtn = document.querySelector('.start-game');
+startGameBtn.addEventListener('click', () => {
   socket.emit('start_loop');
 });
-document.body.appendChild(button);
+/* --------- */
+
+
+events.on('initial_game_state', state => {
+
+  console.log("Initial game state:", state);
+
+  const game = new Game(state);
+
+});
+

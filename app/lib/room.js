@@ -171,7 +171,7 @@ export default class Room {
         }
 
 
-        const { login } = socket.session;
+        const { login } = socket.request.session;
 
         for (const socketId in this.players) {
 
@@ -195,13 +195,13 @@ export default class Room {
 
     onPlayDisconnection(socket) {
 
-        socket.to(this.id).emit('player_left', socket.session.login);
+        socket.to(this.id).emit('player_left', socket.request.session.login);
     }
 
     /* Check if user is logged in */
     isUserLoggedIn(socket) {
 
-        const logged = socket?.session?.login
+        const logged = socket?.request?.session?.login
 
         debug(`Client at ${this.gameName} is ${logged ? "" : "not "}logged in: ${socket.id}`);
 

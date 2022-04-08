@@ -34,7 +34,7 @@ export default function createServer({ PORT, COOKIE_SECRET, DB_CONFIG }) {
 
 		this.of(name)
 			.use((socket, next) =>
-				session.middleware(socket, {}, next)
+				session.middleware(socket.request, {}, next)
 			);
 
 		this.of(name).session = session.socket;

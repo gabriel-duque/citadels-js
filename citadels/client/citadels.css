@@ -1,0 +1,96 @@
+.player-container {
+    border: solid 1px #ccc;
+    position: absolute;
+}
+
+.self-player-container {
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.player-districts {
+    border: solid 1px red;
+    width: 300px;
+    height: 100px;
+    margin-bottom: 1rem;
+}
+
+.player-hand {
+    border: solid 1px brown;
+    display: flex;
+    padding: 0.5rem;
+}
+
+.player-counts {
+    display : flex;
+    margin-right: 1rem;
+}
+
+.player-container {
+    display: flex;
+    padding: 1rem;
+}
+
+.player-money {
+    height: 1rem;
+    width: 1rem;
+    text-align: center;
+    line-height: 1rem;
+    font-weight: bold;
+    background: gold;
+    padding: 0.5rem;
+    border-radius: 50%;
+}
+
+.player-points {
+    height: 1rem;
+    width: 1rem;
+    text-align: center;
+    line-height: 1rem;
+    font-weight: bold;
+    background: silver;
+    padding: 0.5rem;
+    border-radius: 50%;
+}
+
+.player-points:after {
+    content: " pts";
+    font-size: 0.7rem;
+}
+
+.player-money:after {
+    content: " bif";
+    font-size: 0.7rem;
+}
+
+.player-hand .player-card {
+    height: 2rem;
+    width: 1.3rem;
+    text-align: center;
+    line-height: 1rem;
+    font-weight: bold;
+    background: brown;
+    padding: 0.5rem;
+    border-radius: 5px;
+}
+
+.player-hand .player-card:not(:last-child) {
+    margin-right: 0.5rem;
+}
+
+.card.card-Green {
+    border: solid 2px green;
+}
+.card.card-Purple {
+    border: solid 2px purple;
+}
+.card.card-Red {
+    border: solid 2px red;
+}
+.card.card-Blue {
+    border: solid 2px blue;
+}
+.card.card-Yellow {
+    border: solid 2px yellow;
+}

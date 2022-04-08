@@ -33,24 +33,24 @@ export default function createSessionStore(COOKIE_SECRET, DB_CONFIG) {
 			secret: COOKIE_SECRET,
 			name: EXPRESS_SID_KEY
 		}),
-		
-		middleware: function (socket, { }, next) {
 
-			if (!socket.request.headers.cookie) return next(new Error('No cookie transmitted'));
+		middleware: function (req, _, next) {
 
-			parseCookie(socket.request, {}, parseError => {
+			if (!req.headers.cookie) return next(new Error('No cookie transmitted'));
+
+			parseCookie(req, _, parseError => {
 
 				if (parseError) return next(new Error('Error parsing cookies'));
 
-				const sessionIdCookie = getSessionIdCookie(socket.request);
+				const sessionIdCookie = getSessionIdCookie(req);
 
 				sessionStore.load(sessionIdCookie, (error, session) => {
 
 					if (error) return next(error);
 					else if (!session) return next(new Error('Session load failed'));
 
-					socket.session = session;
-					socket.sessionId = sessionIdCookie;
+					req.session = session;
+					req.sessionId = sessionIdCookie;
 
 					return next();
 				});
@@ -63,9 +63,9 @@ export default function createSessionStore(COOKIE_SECRET, DB_CONFIG) {
 
 				debug("Saving session for:", socket.id, sessionData);
 
-				Object.assign(socket.session, sessionData);
+				Object.assign(socket.request.session, sessionData);
 
-				socket.session.save();
+				socket.request.session.save();
 			},
 
 
@@ -73,15 +73,15 @@ export default function createSessionStore(COOKIE_SECRET, DB_CONFIG) {
 
 				debug("Remove session data for: ", socket.id);
 
-				for (const key in socket.session) {
+				for (const key in socket.request.session) {
 
 					if (key !== 'cookie') {
 
-						delete socket.session[key];
+						delete socket.request.session[key];
 					}
 				}
 
-				socket.session.save();
+				socket.request.session.save();
 			}
 
 		}
