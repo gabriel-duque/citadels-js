@@ -1,72 +1,53 @@
 class Player {
 
-    constructor(container, name) {
+    constructor(container, login) {
 
-        this.name = name;
-        this.container = container;
-        this.cards = [];
+        this.login = login;
 
-        this.hand = container.querySelector('.player-hand');
-        this.login = container.querySelector('.player-name');
-        this.points = container.querySelector('.player-points');
-        this.money = container.querySelector('.player-money');
-        this.districts = container.querySelector('.player-districts');
-    }
+        this.view = {
+            container,
+            login: container.querySelector('.player-login'),
+            hand: container.querySelector('.player-hand'),
+            districts: container.querySelector('.player-districts'),
+            points: container.querySelector('.player-points'),
+            money: container.querySelector('.player-money')
+        };
 
-    initialRender() {
-
-        this.login.innerText = this.name;
+        this.view.login.innerText = login;
     }
 
     addCard() {
 
-        const cardView = document.createElement('div');
-        cardView.className = "card player-card";
+        const card = document.createElement('div');
 
-        this.hand.appendChild(cardView);
+        card.className = "card player-card";
 
-        return cardView;
+        this.view.hand.appendChild(card);
+
+        return card;
     }
 
-    removeCard() {
-    }
+    addDistrict(card) {
 
-
-    addDistrict(district) {
-
-        const districtView = document.createElement('div');
-        districtView.className = "card player-district";
-        districtView.innerText = district;
-
-        this.districts.appendChild(districtView);
-    }
-
-    removeDistrict() {
+        this.view.districts.appendChild(card);
     }
 
     updatePoints(points) {
 
-        this.points.innerText = points;
+        this.view.points.innerText = points;
     }
 
-    updateMoney(money) {
+    updateGold(money) {
 
-        this.money.innerText = money;
+        this.view.money.innerText = money;
     }
 }
 
 export class SelfPlayer extends Player {
 
-    constructor(container, name, hand) {
+    constructor(container, login, hand) {
 
-        super(container, name);
-
-        this.initialRender(hand);
-    }
-
-    initialRender(hand) {
-
-        super.initialRender();
+        super(container, login);
 
         for (const card of hand) {
 
@@ -74,35 +55,27 @@ export class SelfPlayer extends Player {
         }
     }
 
-    addCard(card) {
+    addCard({ name, color}) {
 
-        const cardView = super.addCard();
+        const card = super.addCard();
 
-        cardView.className += ` card-${card.color}`;
-        cardView.innerHTML = card.name;
+        card.className += ` card-${color}`;
 
-        this.cards.push(card);
+        card.innerHTML = name;
     }
 }
 
 export class OtherPlayer extends Player {
 
-    constructor(container, name, handLength) {
+    handLength = 4;
 
-        super(container, name);
+    constructor(container, login) {
+
+        super(container, login);
 
         container.querySelector('.player-hand').innerHTML = '';
         container.classList.remove("self-player-container");
         document.body.appendChild(container);
-
-        this.handLength = handLength;
-
-        this.initialRender();
-    }
-
-    initialRender() {
-
-        super.initialRender();
 
         for (let i = 0; i < this.handLength; i++) {
 

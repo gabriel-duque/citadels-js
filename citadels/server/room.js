@@ -8,19 +8,14 @@ export default class CitadelsRoom {
 
 	static name = 'citadels';
 
-	constructor(io, id, players) {
+	constructor(logins) {
 
-		this.io = io;
+		this.logins = logins;
 
-		this.id = id;
-
-		this.players = players;
-
-		this.game = new CitadelsGame(Object.values(this.players));
+		this.game = new CitadelsGame(logins);
 
 		this.bindEvents();
 	}
-
 
 	get isGameRunning() {
 
@@ -28,11 +23,9 @@ export default class CitadelsRoom {
 	}
 
 
-	onHandshakeDone(socket) {
+	onHandshakeDone(socket, login) {
 
-		this.publicGameState = this.getInitialPublicGameState();
-
-		socket.emit("initial_game_state", this.getInitialPrivateGameState(socket));
+		socket.emit("initial_game_state", this.getInitialPrivateGameState(login));
 
 		socket.on("start_loop", () => { // XXX
 
@@ -44,114 +37,93 @@ export default class CitadelsRoom {
 
 
 	/* returns the game state only seen by specific player */
-	getInitialPrivateGameState(socket) {
+	getInitialPrivateGameState(login) {
 
-		const login = this.players[socket.id];
+		return Object.assign({}, {
 
-		const player = this.game.players.find(player => player.login === login);
+			logins: this.logins,
 
-		return Object.assign({},
-			this.publicGameState, {
+			characters: this.game.characters.map(character => character.name),
+
 			player: {
 				login,
-				hand: player.hand,
+				hand: this.game.players.find(player => player.login === login).hand
 			}
-		}
-		);
-	}
-
-
-	/* returns the game state that can be shared publicly */
-	getInitialPublicGameState() {
-
-		return {
-			isLastTurn: this.game.isLastTurn,
-			firstPlayerToPlay: this.game.firstPlayerToPlayIndex,
-			deckLength: this.game.deck.cards.length,
-			characters: this.game.characters.map(character => character.name),
-			players: this.game.players.map(player => {
-
-				return {
-					login: player.login,
-					gold: player.gold,
-					handLength: player.hand.length,
-					districts: player.districts
-				}
-			})
-		};
+		});
 	}
 
 
 	/* Bind server game events to client connections */
 	bindEvents() {
 
+		this.game.on("message", message => {
+			this.emit("message", message);
+		});
+
+		this.game.on('update_player_coins', (login, amount) => {
+
+			this.emit('update_player_coins', login, amount);
+		});
+
+
+
+
+
 		this.game.on('turn', (turn) => {
-			this.gameRoom.emit('turn', turn);
+			this.emit('turn', turn);
 		});
 
-		this.game.on('player_left', (player) => {
-			this.gameRoom.emit('player_left', player);
-		});
-
-		this.game.on('player_turn', (player) => {
-			this.gameRoom.emit('player_turn', player);
+		this.game.on('self_turn', (player) => {
+			this.emit('self_turn', player);
 		});
 
 		this.game.on('player_end_turn', (player) => {
-			this.gameRoom.emit('player_end_turn', player);
+			this.emit('player_end_turn', player);
 		});
 
 		this.game.on('player_draws_card', (player) => {
-			this.gameRoom.emit('player_discard_card', player);
+			this.emit('player_discard_card', player);
 		});
 
 		this.game.on('player_discards_card', (player) => {
-			this.gameRoom.emit('player_discards_card', player);
+			this.emit('player_discards_card', player);
 		});
 
 		this.game.on('player_builds_district', (player) => {
-			this.gameRoom.emit('player_builds_district', player);
+			this.emit('player_builds_district', player);
 		});
 
 		this.game.on('player_steals_gold', (player) => {
-			this.gameRoom.emit('player_steals_gold', player);
+			this.emit('player_steals_gold', player);
 		});
 
 		this.game.on('player_attacks_district', (player) => {
-			this.gameRoom.emit('player_steals_gold', player);
+			this.emit('player_steals_gold', player);
 		});
 
 		this.game.on('player_is_new_first_to_play', (player) => {
-			this.gameRoom.emit('player_is_new_first_to_play', player);
+			this.emit('player_is_new_first_to_play', player);
 		});
 
 		this.game.on('player_exchange_cards_with_deck', (player) => {
-			this.gameRoom.emit('player_exchange_cards_with_deck', player);
+			this.emit('player_exchange_cards_with_deck', player);
 		});
 
 		this.game.on('player_exchange_cards_with_player', (player) => {
-			this.gameRoom.emit('player_exchange_cards_with_player', player);
+			this.emit('player_exchange_cards_with_player', player);
 		});
 
 		this.game.on('game_finished', (scores) => {
 
 			debug(scores, '\n');
 
-			for (const [_, socket] of this.io.sockets) {
+			this.emit('game_finished', scores);
 
-				this.io.session.remove(socket);
-
-				socket.emit('game_finished', scores);
-			}
+			this.closeRoom();
 
 			this.game = null;
-			this.players = {};
-
-			for (const [_, socket] of this.io.sockets) {
-
-				socket.emit('redirect', this.lobbyPath);
-			}
 		});
+
 	}
 
 }

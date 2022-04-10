@@ -6,8 +6,8 @@ const debug = Debug('citadels:champion');
 /* Gold or cards */
 export const get_gold_card = (player) => {
   if (player.hand.length == 0)
-    return false; // Get card
-  return true;
+    return "card"; // Get card
+  return "coin";
 };
 
 /* Should we buy a district district */

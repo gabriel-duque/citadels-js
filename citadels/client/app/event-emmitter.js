@@ -31,4 +31,8 @@ export default new class EventEmitter {
         
         return this;
     }
+
+    removeAllListeners(event) {
+        this.events[event] = [];
+    }
 }

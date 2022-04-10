@@ -5,103 +5,122 @@ export default class Room {
 
     players = {};
 
-    constructor(GameRoom, io, id) {
+    constructor(GameRoom, ioNsp, roomId) {
 
         this.GameRoom = GameRoom;
 
         this.gameName = GameRoom.name;
 
-        this.io = io;
+        this.ioNsp = ioNsp;
 
-        this.id = id;
+        this.roomId = roomId;
 
-        this.lobbyPath = `/${this.gameName}/${id}`;
-        this.playPath = `/${this.gameName}/${id}/play`;
-
-        this.init();
+        this.lobbyPath = `/${this.gameName}/${roomId}`;
+        this.playPath = `/${this.gameName}/${roomId}/play`;
     }
 
     get room() {
 
-        return this.io
-            .to(this.id);
+        return this.ioNsp
+            .to(this.roomId);
     }
 
-    init() {
+    emit(...args) {
+        this.room.emit(...args);
+    }
 
-        this.io.on('connection', socket => {
+    get sockets() {
 
-            if (socket.rooms.size > 1) return;
+        return [...this.room.adapter.sids.keys()]
+            .map(sid => ([
+                sid,
+                this.ioNsp.sockets.get(sid)
+            ])
+            );
+    }
 
-            socket.join(this.id);
+    get logins() {
 
-            const type = socket.handshake.headers.referer.match(/\/play/) ? "play" : "lobby";
+        return Object.values(this.players);
+    }
 
-            debug(`New client ${socket.id} joined room ${this.id} of ${this.io.name} /${type}`);
+    getSocketIdByLogin(login) {
 
-            if (type === "lobby") {
-                this.onLobbyConnection(socket);
-            } else {
-                this.onPlayConnection(socket);
-            }
+        for (const socketId in this.players) {
 
-            socket.on('disconnect', () => {
+            if (this.players[socketId] === login) return socketId;
+        }
+    }
 
-                debug(`Client ${socket.id} left room ${this.id} of ${this.io.name} /${type}`);
+    getSocketByLogin(login) {
 
-                if (type === "lobby") {
-                    this.onLobbyDisconnection(socket);
-                } else {
-                    this.onPlayDisconnection(socket);
-                }
-            });
+        const socketId = this.getSocketIdByLogin(login);
+
+        return this.ioNsp.sockets.get(socketId);
+    }
+
+    getLoginBySocketId(socketId) {
+
+        return this.players[socketId];
+    }
+
+    onConnection(socket) {
+
+        const type = socket.handshake.headers.referer.match(/\/play/) ? "play" : "lobby";
+
+        debug(`New client ${socket.id} joined room ${this.roomId} of ${this.ioNsp.name} /${type}`);
+
+        if (type === "lobby") this.onLobbyConnection(socket);
+
+        else this.onPlayConnection(socket);
+
+        socket.on('disconnect', () => {
+
+            debug(`Client ${socket.id} left room ${this.roomId} of ${this.ioNsp.name} /${type}`);
+
+            if (type === "lobby") this.onLobbyDisconnection(socket);
+
+            else this.onPlayDisconnection(socket);
+
         });
     }
 
+
     onLobbyConnection(socket) {
 
-        /* Handle existing session */
         if (this.isUserLoggedIn(socket)) {
 
-            if (this.gameRoom?.isGameRunning) {
-
-                /* If game is still running, redirect to the game */
-                this.redirect(socket, this.playPath);
-
-                return;
-
-            } else {
-
-                /* If game is not running, remove unwanted login cookie */
-                this.io.session.remove(socket);
-            }
+            this.handleExistingSession(socket);
         }
 
         /* Send already connected clients login to incoming one */
-        socket.emit("player_joined", Object.values(this.players));
+        socket.emit("player_joined", this.logins);
 
         socket.on('log_attempt', login => {
 
             /* Make sure logins and sockets ids are unique */
             for (const socketId in this.players) {
 
-                if (this.players[socketId] === login) {
+                const existingLogin = this.getLoginBySocketId(socketId);
+
+                if (existingLogin === login) {
 
                     /* Prevent user from using someone else's login */
                     if (socketId !== socket.id) {
+
                         socket.emit('login_taken');
                     }
 
                     return;
-                }
 
-                if (socket.id === socketId) {
+                } else if (socket.id === socketId) {
 
-                    this.room.emit("player_left", this.players[socketId]);
+                    this.room.emit("player_left", existingLogin);
                 }
             }
 
             debug(`Binding login ${login} to client ${socket.id}`);
+
             this.players[socket.id] = login;
 
             /* Send incoming client login to connected ones */
@@ -112,7 +131,7 @@ export default class Room {
 
             // this.players[socket.id].ready = ready;
 
-            const login = this.players[socket.id];
+            const login = this.getLoginBySocketId(socket.id);
 
             debug(`Player ${login} is ${ready ? "" : "not "}ready to play`);
 
@@ -122,28 +141,101 @@ export default class Room {
         /*  Launch game when amount of desired players is reached */
         socket.on('room_complete', () => {
 
-            for (const [id, socket] of this.io.sockets) {
-
-                this.io.session.save(socket, {
-                    login: this.players[id]
-                });
-            }
-
             /* Starts the game */
+            debug(`Starting game of ${this.gameName} for room ${this.roomId}`);
 
-            debug(`Starting game of ${this.gameName} for room ${this.id}`);
+            this.saveAllSessions();
 
-            this.gameRoom = new this.GameRoom(this.io, this.id, this.players);
+            this.startGame();
 
-            /* Redirects all players to the game */
             this.redirectAll(this.playPath);
         });
     }
 
+    handleExistingSession(socket) {
+
+        if (this.gameRoom?.isGameRunning) {
+
+            this.redirect(socket, this.playPath);
+
+            return;
+        }
+
+        this.ioNsp.session.remove(socket);
+    }
+
+    startGame() {
+
+        this.gameRoom = new this.GameRoom(this.logins);
+
+        this.gameRoom.emit = this.emit.bind(this);
+
+        this.gameRoom.game.ask = this.ask.bind(this);
+
+        this.gameRoom.closeRoom = this.close.bind(this);
+    }
+
+    saveAllSessions() {
+
+        for (const [socketId, socket] of this.sockets) {
+
+            this.ioNsp.session.save(socket, {
+                login: this.getLoginBySocketId(socketId)
+            });
+        }
+    }
+
+    deleteAllSessions() {
+
+        for (const [_, socket] of this.sockets) {
+
+            this.ioNsp.session.remove(socket);
+        }
+    }
+
+    ask(login) {
+
+        console.log("-----------------------------------------");
+        console.log("-----------------------------------------");
+        console.log("Asking", login);
+
+        const socket = this.getSocketByLogin(login);
+
+        return (questionKey, ...args) => {
+
+            return new Promise((resolve, reject) => {
+
+                debug(`Asking ${login} for ${questionKey}`);
+
+                socket.emit(questionKey, ...args);
+
+                socket.on(questionKey, answer => {
+
+                    debug(`Received answer ${answer} from ${login} for ${questionKey}`);
+
+                    socket.removeAllListeners(questionKey);
+
+                    resolve(answer);
+                });
+            });
+
+        }
+    }
+
+    close() {
+
+        this.room.emit('redirect', this.lobbyPath);
+
+        this.deleteAllSessions();
+
+        this.players = {};
+    }
+
+
     /* Remove a player from the lobby */
     onLobbyDisconnection(socket) {
 
-        const login = this.players[socket.id];
+        const login = this.getLoginBySocketId(socket.id);
 
         if (!login) return;
 
@@ -151,15 +243,17 @@ export default class Room {
 
         delete this.players[socket.id];
 
-        socket.to(this.id).emit('player_left', login);
+        socket.to(this.roomId).emit('player_left', login);
     }
 
     onPlayConnection(socket) {
 
         /* If no game is running, log player out */
-        if (!this.gameRoom?.isGameRunning) {
-
-            this.io.session.remove(socket);
+        if (
+            !this.gameRoom?.isGameRunning &&
+            this.isUserLoggedIn(socket)
+        ) {
+            this.ioNsp.session.remove(socket);
         }
 
         /* If user is not logged in, redirects to lobby */
@@ -173,6 +267,25 @@ export default class Room {
 
         const { login } = socket.request.session;
 
+        this.handlePreviousSocketBound(login);
+
+        /* Bind socket id with player login */
+        debug(`Binding login ${login} to client ${socket.id}`);
+        this.players[socket.id] = login;
+
+        socket.to(this.roomId).emit('player_joined', login);
+
+        /* This player is ready to playi*/
+        this.gameRoom.onHandshakeDone(socket, login);
+    }
+
+    onPlayDisconnection(socket) {
+
+        socket.to(this.roomId).emit('player_left', socket.request.session.login);
+    }
+
+    handlePreviousSocketBound(login) {
+
         for (const socketId in this.players) {
 
             if (this.players[socketId] === login) {
@@ -183,20 +296,9 @@ export default class Room {
             }
         }
 
-        /* Bind socket id with player login */
-        debug(`Binding login ${login} to client ${socket.id}`);
-        this.players[socket.id] = login;
-
-        socket.to(this.id).emit('player_joined', login);
-
-        /* This player is ready to playi*/
-        this.gameRoom.onHandshakeDone(socket)
     }
 
-    onPlayDisconnection(socket) {
 
-        socket.to(this.id).emit('player_left', socket.request.session.login);
-    }
 
     /* Check if user is logged in */
     isUserLoggedIn(socket) {

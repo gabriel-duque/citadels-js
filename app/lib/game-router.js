@@ -8,6 +8,36 @@ import Debug from 'debug';
 const debug = Debug('app:game-router');
 
 
+const LOBBIES = {};
+
+
+export function createLobby(gameName, GameRoom, io) {
+
+	debug(`Creating lobby for game: ${gameName}`);
+
+	io.initNamespace(`/${gameName}`);
+
+	const lobby = LOBBIES[gameName] = {
+		rooms: {},
+		GameRoom,
+		ioNsp: io.of(`/${gameName}`)
+	};
+
+	lobby.ioNsp.on('connection', socket => {
+
+		const clientRoomId = socket.handshake.headers.referer
+			.split(`${gameName}/`)[1]
+			.replace("/play", "");
+		
+		if (!lobby.rooms[clientRoomId]) return;
+
+		socket.join(clientRoomId);
+
+		lobby.rooms[clientRoomId].onConnection(socket);
+	});
+}
+
+
 export function createRouter(gameName) {
 
 	const router = express.Router();
@@ -35,23 +65,6 @@ export function createRouter(gameName) {
 	return router;
 }
 
-
-const lobbies = {};
-
-
-export function createLobby(gameName, GameRoom, io) {
-
-	debug(`Creating lobby for game: ${gameName}`);
-
-	io.initNamespace(`/${gameName}`);
-
-	lobbies[gameName] = {
-		rooms: {},
-		GameRoom,
-		io: io.of(`/${gameName}`)
-	};
-}
-
 function renderLobby(gameName) {
 
 	return (req, res, next) =>
@@ -71,9 +84,9 @@ function createRoom(gameName) {
 
 		debug(`Creating new room of game ${gameName} with id ${roomId}`);
 
-		const { rooms, GameRoom, io } = lobbies[gameName];
+		const { rooms, GameRoom, ioNsp } = LOBBIES[gameName];
 
-		rooms[roomId] = new Room(GameRoom, io, roomId);
+		rooms[roomId] = new Room(GameRoom, ioNsp, roomId);
 
 		res.send(JSON.stringify({ roomId }));
 	}
@@ -89,7 +102,7 @@ function renderRoom(gameName) {
 
 function getRoomsIds(gameName) {
 
-	return Object.keys(lobbies[gameName]?.rooms);
+	return Object.keys(LOBBIES[gameName]?.rooms);
 }
 
 
@@ -99,7 +112,7 @@ function checkRoomExists(gameName) {
 
 		debug(`Checking if room exists: ${roomId}`);
 
-		if (!lobbies[gameName]?.rooms?.[roomId]) {
+		if (!LOBBIES[gameName]?.rooms?.[roomId]) {
 
 			debug(`No room of id ${roomId} found in ${gameName} lobby, redirecting`);
 

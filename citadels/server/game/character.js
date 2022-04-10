@@ -13,15 +13,6 @@ export class Character {
     this.image_path = image_path;
     this.player = null;
   }
-
-  render(hidden = false) {
-
-    if (hidden) {
-      debug("This is a hidden character card.");
-    } else {
-      debug(this);
-    }
-  }
 };
 
 /* An aray for the different characters */
@@ -60,19 +51,23 @@ export const characters = [{
 ];
 
 /* Choose between gold or cards */
-function coin_or_gold(player, game) {
+async function coin_or_gold(player, game) {
+  
+  const choice = await game.ask(player.login)("coin_or_gold");
+  // const choice = champion.get_gold_card(player); // XXX: AI I wrote to test
 
-  const choice = champion.get_gold_card(player); // XXX: AI I wrote to test
-
-  if (choice) {
-
-    debug("gets 2 gold");
+  if (choice === "coin") {
 
     player.gold += 2;
+
+    game.emit("update_player_coins", player.login, player.gold);
+
+    debug("gets 2 gold");
 
   } else {
 
     debug("draws a card");
+    game.emit("message", `${player.login} has chosen to get a card`);
 
     const cards = game.deck.draw(2);
 
@@ -86,10 +81,10 @@ function coin_or_gold(player, game) {
 };
 
 /* The normal ending of a turn played by most characters */
-function do_normal_end(player, game) {
+async function do_normal_end(player, game) {
 
   /* Handle coin or gold choice */
-  coin_or_gold(player, game);
+  await coin_or_gold(player, game);
 
   /* Possibly buy a district */
   const choice = champion.get_buy_district(player);
@@ -110,7 +105,7 @@ function do_normal_end(player, game) {
 };
 
 /* Assassin's turn */
-function assassin(player, game) {
+async function assassin(player, game) {
 
   const choice = champion.get_assassin();
 
@@ -121,11 +116,11 @@ function assassin(player, game) {
 
   debug("kills", game.dead_character && game.dead_character.name);
 
-  do_normal_end(player, game);
+  await do_normal_end(player, game);
 };
 
 /* Thief's turn */
-function thief(player, game) {
+async function thief(player, game) {
 
   const choice = champion.get_thief();
 
@@ -141,11 +136,11 @@ function thief(player, game) {
     debug("steals", game.stolen_character.name);
   }
 
-  do_normal_end(player, game);
+  await do_normal_end(player, game);
 };
 
 /* Magician's turn */
-function magician(player, game) {
+async function magician(player, game) {
 
   const choice = champion.get_magician(player, game.players);
 
@@ -172,11 +167,10 @@ function magician(player, game) {
     }
   }
 
-  do_normal_end(player, game);
+  await do_normal_end(player, game);
 };
 
-/* King's turn */
-function king(player, game) {
+async function king(player, game) {
 
   /* Set king */
   game.firstPlayerToPlayIndex = game.players.findIndex(p => p.login === player.login);
@@ -185,21 +179,19 @@ function king(player, game) {
   getExtraGold(player, "YELLOW");
 
   /* Get extra gold */
-  do_normal_end(player, game);
+  await do_normal_end(player, game);
 };
 
-/* Bishop's turn */
-function bishop(player, game) {
+async function bishop(player, game) {
 
   /* Get extra gold for blue districts */
   getExtraGold(player, "BLUE");
 
   /* Get extra gold */
-  do_normal_end(player, game);
+  await do_normal_end(player, game);
 };
 
-/* Merchant's turn */
-function merchant(player, game) {
+async function merchant(player, game) {
 
   /* Extra gold coin */
   ++player.gold;
@@ -207,11 +199,11 @@ function merchant(player, game) {
   /* Get extra gold for green districts */
   getExtraGold(player, "GREEN");
 
-  do_normal_end(player, game);
+  await do_normal_end(player, game);
 };
 
 /* Architect's turn */
-function architect(player, game) {
+async function architect(player, game) {
 
   debug("do turn");
 
@@ -231,7 +223,7 @@ function architect(player, game) {
 };
 
 /* Warlord's turn */
-function warlord(player, game) {
+async function warlord(player, game) {
 
   /* Get extra gold for red districts */
   getExtraGold(player, "RED");
@@ -255,7 +247,7 @@ function warlord(player, game) {
     }
   }
 
-  do_normal_end(player, game);
+  await do_normal_end(player, game);
 };
 
 function getExtraGold(player, color) {

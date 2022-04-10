@@ -271,7 +271,8 @@ export default class Deck {
 
       for (let i = 0; i < current.count; ++i) {
         
-        this.cards.push(new District(current.price,
+        this.cards.push(new District(
+          current.price,
           current.value,
           current.color,
           current.name,

@@ -64,15 +64,18 @@
     font-size: 0.7rem;
 }
 
-.player-hand .player-card {
-    height: 2rem;
-    width: 1.3rem;
+.card {
     text-align: center;
     line-height: 1rem;
-    font-weight: bold;
-    background: brown;
     padding: 0.5rem;
     border-radius: 5px;
+}
+
+.player-card {
+    height: 2rem;
+    width: 1.3rem;
+    background: brown;
+    color: white;
 }
 
 .player-hand .player-card:not(:last-child) {
@@ -93,4 +96,55 @@
 }
 .card.card-Yellow {
     border: solid 2px yellow;
+}
+
+
+/* CHARACTERS */
+
+.characters-container {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: solid 1px green;
+}
+
+.character-card {
+    height: 2rem;
+    background: grey;
+    margin: 0.2rem;
+}
+
+.character-card.chosen {
+    border: solid 1px red;
+}
+
+.character-card:not(.active){
+    opacity: 0.7;
+}
+
+.modal {
+    position: fixed;
+    z-index: 900;
+    padding: 1rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6rem;
+    height: 8rem;
+    background: white;
+    border: solid 1px black;
+}
+
+.modal:not(.active) {
+    display: none;
+}
+
+.console p {
+    margin: 0;
+    padding: 0;
+    font-size: 0.7rem;
 }
