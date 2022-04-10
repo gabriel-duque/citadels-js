@@ -1,35 +1,31 @@
 import Debug from 'debug';
 const debug = Debug('citadels:players');
 
-/* This is a class to represent a player */
 export default class Player {
 
-  gold = 2; /* Players start with 2 gold coins */
-  
+  gold = 2;
+
   districts = [];
 
   constructor(login, hand) {
+
     this.login = login;
+
     this.hand = hand;
   }
 
-  render() {
-    debug(this);
-  }
+  buildDistrict(choice) {
 
-  buildDistrict(choiceIndex) {
+    if (!choice || this.gold < choice.price) return;
 
-    if (
-      choiceIndex >= 0 &&
-      choiceIndex < this.hand.length &&
-      this.gold >= this.hand[choiceIndex].price
-    ) {
+    const choiceIndex = this.hand.findIndex(card => card.name === choice.name);
 
-      this.gold -= this.hand[choiceIndex].price;
+    if (!choiceIndex) return;
 
-      debug("builds", this.hand[choiceIndex].name);
+    this.gold -= choice.price;
 
-      this.districts.push(...this.hand.splice(choiceIndex, 1));
-    }
+    debug("builds", choice.name);
+
+    this.districts.push(...this.hand.splice(choiceIndex, 1));
   }
 }

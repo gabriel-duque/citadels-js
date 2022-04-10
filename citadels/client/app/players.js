@@ -1,3 +1,5 @@
+import events from 'app/event-emmitter';
+
 class Player {
 
     constructor(container, login) {
@@ -49,19 +51,53 @@ export class SelfPlayer extends Player {
 
         super(container, login);
 
+        this.hand = hand;
+
         for (const card of hand) {
 
             this.addCard(card);
         }
     }
 
-    addCard({ name, color}) {
+    addCard({ name, color }) {
 
         const card = super.addCard();
 
         card.className += ` card-${color}`;
 
+        card.setAttribute('data-name', name);
+
         card.innerHTML = name;
+    }
+
+    highlightHand() {
+
+        console.log(this);
+
+
+        [...this.view.hand.querySelectorAll(".card")]
+            .forEach(card => {
+                // todo check if enough gold to build
+                this.proposeCard(card);
+            });
+    }
+
+    proposeCard(cardView) {
+
+        cardView.classList.add('highlight');
+
+        cardView.addEventListener('click', choseCard.bind(this));
+
+        function choseCard() {
+
+            const name = cardView.getAttribute('data-name');
+            
+            const card = this.hand.find(c => c.name === name);
+
+            events.emit('chose_district', card);
+
+            cardView.removeEventListener('click', choseCard);
+        }
     }
 }
 

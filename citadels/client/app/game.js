@@ -53,5 +53,10 @@ export default class Game {
 
             this.getPlayer(login).updateGold(amount);
         });
+
+        events.on("build_district", () => {
+            this.player.highlightHand();
+        });
+
     }
 }

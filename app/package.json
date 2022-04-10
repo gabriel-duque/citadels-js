@@ -18,7 +18,7 @@
   "type": "module",
   "scripts": {
     "serve": "node index.js",
-    "dev": "nodemon index.js --ignore src/ --ignore dist/ --watch citadels/server",
+    "dev": "nodemon index.js --watch ../citadels/server",
     "debug:app": "cross-env DEBUG=app:*,citadels:* npm run dev",
     "debug:all": "cross-env DEBUG=* npm run dev"
   },

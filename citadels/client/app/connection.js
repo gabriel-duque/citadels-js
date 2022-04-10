@@ -12,18 +12,22 @@ startGameBtn.addEventListener('click', () => {
 });
 /* --------- */
 
+
 socket.on('redirect', path => {
   window.location = path;
 });
+
 
 socket.on("initial_game_state", state => {
 
   events.emit("initial_game_state", state);
 });
 
+
 socket.on("message", message => {
   events.emit("console", message)
 });
+
 
 socket.on("chose_character", remaining_characters => {
 
@@ -39,6 +43,7 @@ socket.on("chose_character", remaining_characters => {
   });
 });
 
+
 socket.on("coin_or_gold", () => {
 
   events.emit("coin_or_gold");
@@ -51,7 +56,19 @@ socket.on("coin_or_gold", () => {
   });
 });
 
+
 socket.on("update_player_coins", (login, amount) => {
   
     events.emit("update_player_coin", login, amount);
 });
+
+
+socket.on("build_district", () => {
+
+    events.emit("build_district");
+
+    events.on("chose_district", district => {
+      
+      socket.emit("build_district", district);
+    });
+})

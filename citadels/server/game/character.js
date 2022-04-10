@@ -15,7 +15,6 @@ export class Character {
   }
 };
 
-/* An aray for the different characters */
 export const characters = [{
   name: 'Assassin',
   do_turn: assassin,
@@ -50,19 +49,14 @@ export const characters = [{
 }
 ];
 
-/* Choose between gold or cards */
 async function coin_or_gold(player, game) {
-  
+
   const choice = await game.ask(player.login)("coin_or_gold");
   // const choice = champion.get_gold_card(player); // XXX: AI I wrote to test
 
   if (choice === "coin") {
 
-    player.gold += 2;
-
-    game.emit("update_player_coins", player.login, player.gold);
-
-    debug("gets 2 gold");
+    game.emit("update_player_coins", player, 2);
 
   } else {
 
@@ -87,24 +81,23 @@ async function do_normal_end(player, game) {
   await coin_or_gold(player, game);
 
   /* Possibly buy a district */
-  const choice = champion.get_buy_district(player);
+  const buildDistrictChoice = await game.ask(player.login)("build_district");
+  // const choice = champion.get_buy_district(player);
+  if (!buildDistrictChoice) return
+  player.buildDistrict(buildDistrictChoice);
+  checkIsLastTurn(player, game);
+}
 
-  player.buildDistrict(choice);
 
-  /* Check if this is the 8th district */
-  if (player.districts.length === 8) {
+function checkIsLastTurn(player, game) {
 
-    if (game.first_8th === null) {
+  if (player.districts.length < 8 || game.first_8th) return;
 
-      debug("has built 8 districts");
-      game.first_8th = player;
-    }
+  game.isLastTurn = true;
+  debug("has built 8 districts");
+  game.first_8th = player;
+}
 
-    game.isLastTurn = true;
-  }
-};
-
-/* Assassin's turn */
 async function assassin(player, game) {
 
   const choice = champion.get_assassin();
@@ -119,7 +112,6 @@ async function assassin(player, game) {
   await do_normal_end(player, game);
 };
 
-/* Thief's turn */
 async function thief(player, game) {
 
   const choice = champion.get_thief();

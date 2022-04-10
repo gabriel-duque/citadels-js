@@ -168,11 +168,20 @@ export default class Room {
 
         this.gameRoom = new this.GameRoom(this.logins);
 
-        this.gameRoom.emit = this.emit.bind(this);
+        this.gameRoom.sockets = { emit: this.emit.bind(this) };
 
         this.gameRoom.game.ask = this.ask.bind(this);
 
         this.gameRoom.closeRoom = this.close.bind(this);
+    }
+
+    close() {
+
+        this.room.emit('redirect', this.lobbyPath);
+
+        this.deleteAllSessions();
+
+        this.players = {};
     }
 
     saveAllSessions() {
@@ -195,23 +204,19 @@ export default class Room {
 
     ask(login) {
 
-        console.log("-----------------------------------------");
-        console.log("-----------------------------------------");
-        console.log("Asking", login);
-
         const socket = this.getSocketByLogin(login);
 
         return (questionKey, ...args) => {
 
             return new Promise((resolve, reject) => {
 
-                debug(`Asking ${login} for ${questionKey}`);
+                debug(`Asking ${login} for question: "${questionKey}"`);
 
                 socket.emit(questionKey, ...args);
 
                 socket.on(questionKey, answer => {
 
-                    debug(`Received answer ${answer} from ${login} for ${questionKey}`);
+                    debug(`Received answer: ${answer}`);
 
                     socket.removeAllListeners(questionKey);
 
@@ -221,16 +226,6 @@ export default class Room {
 
         }
     }
-
-    close() {
-
-        this.room.emit('redirect', this.lobbyPath);
-
-        this.deleteAllSessions();
-
-        this.players = {};
-    }
-
 
     /* Remove a player from the lobby */
     onLobbyDisconnection(socket) {
@@ -298,9 +293,6 @@ export default class Room {
 
     }
 
-
-
-    /* Check if user is logged in */
     isUserLoggedIn(socket) {
 
         const logged = socket?.request?.session?.login

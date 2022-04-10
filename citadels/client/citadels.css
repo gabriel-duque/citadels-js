@@ -82,6 +82,10 @@
     margin-right: 0.5rem;
 }
 
+.player-hand .player-card.highlight {
+    outline: solid 2px gold;
+}
+
 .card.card-Green {
     border: solid 2px green;
 }
