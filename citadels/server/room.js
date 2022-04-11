@@ -77,16 +77,16 @@ export default class CitadelsRoom {
 
 
 		this.game.on("player_to_chose_character", login => {
-			
-			debug(`${login} is choosing a character`);	
+
+			debug(`${login} is choosing a character`);
 
 			this.sockets.emit("message", `${login} is choosing a character`);
 		});
 
 
 		this.game.on("player_has_chosen_character", (login, character) => {
-			
-			debug(`${login} has chosen character ${character}`);	
+
+			debug(`${login} has chosen character ${character}`);
 
 			this.sockets.emit("message", `${login} has chosen a character`);
 		});
@@ -115,10 +115,9 @@ export default class CitadelsRoom {
 
 		this.game.on("reveal_character", (login, character) => {
 
-			this.sockets.emit("message", `${character} was chosen by ${login}`);
+			this.sockets.emit("reveal_character", login, character);
 
 			debug(`- ${character} is played by ${login}`);
-
 		});
 
 		this.game.on("player_got_stolen", (login, character) => {
@@ -137,6 +136,16 @@ export default class CitadelsRoom {
 		});
 
 
+		this.game.on('player_chose_coin', player => {
+
+			player.gold += 2;
+
+			debug(`${player.login} chose 2 coins`);
+
+			this.sockets.emit('player_chose_coin', player.login, player.gold);
+		});
+
+
 		this.game.on("player_has_chosen_card", (login, card) => {
 
 			this.sockets[login].emit("new_card", card);
@@ -147,23 +156,13 @@ export default class CitadelsRoom {
 
 			debug(`${login} has picked card:`, card.name);
 		});
-		
-		this.game.on("player_built_8_districts", login => {
-
-			this.sockets.emit("message", `${login} has built 8th district`);
-
-			debug(`${login} has built 8th district`);
-		});
 
 
+		this.game.on("player_to_build_district", login => {
+			
+			this.sockets.emit("message", `${login} can now chose to build a district`);
 
-		this.game.on('update_player_coins', (player, amount) => {
-
-			player.gold += amount;
-
-			debug(`${player.login} got ${amount} coins`);
-
-			this.sockets.emit('update_player_coins', player.login, player.gold);
+			debug(`${login} can now chose to build a district`);
 		});
 
 
@@ -172,6 +171,14 @@ export default class CitadelsRoom {
 			debug(`${login} built district: ${district.name}`);
 
 			this.sockets.emit('player_builds_district', login, district);
+		});
+	
+
+		this.game.on("player_built_8_districts", login => {
+
+			this.sockets.emit("message", `${login} has built 8th district`);
+
+			debug(`${login} has built 8th district`);
 		});
 
 
@@ -185,5 +192,14 @@ export default class CitadelsRoom {
 
 			this.game = null;
 		});
+
+
+		this.game.on("character_killed", deadCharacter => {
+
+            debug(`${deadCharacter} is dead`);
+		});
+
+
 	}
+
 }
