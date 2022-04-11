@@ -32,7 +32,7 @@
     padding: 1rem;
 }
 
-.player-money {
+.player-coins {
     height: 1rem;
     width: 1rem;
     text-align: center;
@@ -59,7 +59,7 @@
     font-size: 0.7rem;
 }
 
-.player-money:after {
+.player-coins:after {
     content: " bif";
     font-size: 0.7rem;
 }

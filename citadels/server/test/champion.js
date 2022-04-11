@@ -3,31 +3,46 @@
 import Debug from 'debug';
 const debug = Debug('citadels:champion');
 
-/* Gold or cards */
-export const get_gold_card = (player) => {
-  if (player.hand.length == 0)
-    return "card"; // Get card
-  return "coin";
+
+export const chose_character = (player, playableCharacters) => {
+
+  return playableCharacters[Math.floor(Math.random() * playableCharacters.length)].name;
 };
 
-/* Should we buy a district district */
-export const get_buy_district = (player) => {
-  for (const district in player.hand)
-    if (player.hand[district].price <= player.gold)
+
+export const card_or_coin = (player) => {
+
+  return (player.hand.length === 0) ? "card" : "coin";
+};
+
+
+export const chose_card = (cards) => 0;
+
+
+export const chose_build_district = (player, amountAllowed) => {
+
+  // for (let i = 0; i < amountAllowed; i++) {
+
+  for (const district in player.hand) {
+
+    if (player.hand[district].price <= player.gold) {
+
       return district;
-  return -1;
+    }
+    // }
+  }
 };
 
-export const choseCard = (cards) => 0;
 
-/* Who should the assassin kill */
 export const get_assassin = () => 1 + Math.floor(Math.random() * 7);
 
-/* Who should the thief rob */
+
 export const get_thief = () => 2 + Math.floor(Math.random() * 6);
 
-/* What should the magician do */
+
 export const get_magician = (player, players) => {
+
+  if (players.length < 2) return;
 
   let discard = player.hand.length && Boolean(Math.round(Math.random()));
   let exchange = Boolean(Math.round(Math.random()));
@@ -56,20 +71,12 @@ export const get_magician = (player, players) => {
     }
   }
 
-  return {
-    exchange,
-    discard
-  };
+  return { exchange, discard };
 };
 
-/* Architect */
-export const get_architect = () => {
-  
-  return new Array(Math.round(Math.random() * 3)).fill(1);
-};
-
-/* Warlord */
 export const get_warlord = (player, players) => {
+
+  if (players.length < 2) return;
 
   const attackablePlayersIndexes = players.map((p, i) => p.login !== player.login && p.districts.length ? i : null)
     .filter(Boolean)
@@ -81,12 +88,12 @@ export const get_warlord = (player, players) => {
   const playerToAttackIndex =
     attackablePlayersIndexes[Math.floor(Math.random() * attackablePlayersIndexes.length)];
 
-    debug('playerToAttackIndex', playerToAttackIndex);
-    
+  debug('playerToAttackIndex', playerToAttackIndex);
+
   const districtToAttackIndex = Math.floor(Math.random() * players[playerToAttackIndex].districts.length);
 
   debug("districtToAttackIndex", districtToAttackIndex);
-  
+
   return {
     playerIndex: playerToAttackIndex,
     districtIndex: districtToAttackIndex

@@ -38,8 +38,7 @@ export default class Game {
     }
 
     getPlayer(login) {
-        console.log(login);
-        
+
         return this.player.login === login ?
             this.player :
             this.players.find(player => player.login === login);
@@ -47,16 +46,26 @@ export default class Game {
 
     bindEvents() {
 
-        events.on("update_player_coin", (login, amount) => {
+        events.on("new_turn", firstPlayer => {
+            
+            this.console.log(`New turn, ${firstPlayer} plays first`);
 
-            events.emit("console", `${login} has chosen to get 2 gold`);
-
-            this.getPlayer(login).updateGold(amount);
+            this.getPlayer(firstPlayer).view.container.style.outline = '3px solid #ff0000'
         });
 
-        events.on("build_district", () => {
+        events.on("update_player_coins", (login, amount) => {
+
+            events.emit("console", `${login} has chosen to get 2 gold`);
+            
+            this.getPlayer(login).updateCoins(amount);
+        });
+
+        events.on("chose_build_district", () => {
             this.player.highlightHand();
         });
 
+        events.on("player_builds_district", (login, district) => {
+            this.getPlayer(login).buildDistrict(district);
+        });
     }
 }

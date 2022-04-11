@@ -1,25 +1,21 @@
-/*
- * This is a simple implementation for the Citadels board game in JavaScript
- *
- * if you want to learn about this game:
- *          https://en.wikipedia.org/wiki/Citadels_(card_game)
- *
- */
-
-import { characters, Character } from './character.js';
+import Character from './character.js';
+import CHARACTERS from './characters.js';
 import Deck from './deck.js';
-import Player from './player.js';
 import EventEmitter from 'events';
+
+import * as champion from '../test/champion.js';
 
 import Debug from 'debug';
 const debug = Debug('citadels:game');
 
-/* This class represents a game */
+
 export default class Game extends EventEmitter {
+
 
   static name = "citadels";
 
-  players = [];
+
+  delay = 200;
 
   hasStarted = false;
 
@@ -27,12 +23,12 @@ export default class Game extends EventEmitter {
 
   isLastTurn = false;
 
-  dead_character = null;
+  deadCharacter = null;
 
-  stolen_character = null;
+  stolenCharacter = null;
 
-  /* First player to put an 8th district */
-  first_8th = null;
+  first8th = null;
+
 
   constructor(logins) {
 
@@ -40,184 +36,237 @@ export default class Game extends EventEmitter {
 
     this.hasStarted = true;
 
-    /* The deck for this game */
     this.deck = new Deck();
 
-    /* The players */
-    this.players = logins.map(login =>
-      new Player(login, this.deck.draw(4))
+    this.players = logins.map(login => {
+
+      return {
+        login,
+        gold: 2,
+        districts: [],
+        hand: this.deck.draw(4)
+      }
+    });
+
+    this.characters = CHARACTERS.map(character =>
+      new Character(character, this)
     );
-
-    this.characters = characters.map(character => new Character(
-      character.name,
-      character.do_turn,
-      character.image_path
-    ));
-
-    /* Set the initial first player to play */
-    this.firstPlayerToPlayIndex = Math.floor(Math.random() * this.players.length);
 
     // debug(this);
   }
 
+
+  askChampion(player, message, ...args) {
+
+    return champion[message](player, ...args);
+  }
+
+
+  setFirstPlayerToPlay() {
+
+    this.firstPlayerToPlayIndex = this.firstPlayerToPlay ?
+      this.players.findIndex(p => p.login === this.firstPlayerToPlay) :
+      Math.floor(Math.random() * this.players.length);
+
+    const firstPlayer = this.firstPlayerToPlay ||
+      this.players[this.firstPlayerToPlayIndex].login;
+
+    this.emit("new_turn", firstPlayer);
+  }
+
+
   async loop() {
 
-    const firstPlayer = this.players[this.firstPlayerToPlayIndex].login;
-
-    debug('First player to play: ', firstPlayer);
-
-    this.emit("message", `${firstPlayer} plays first`);
-
-    /* The actual game loop */
     while (!this.isLastTurn) {
 
-      /* Choose characters */
-      await this.distribute_characters();
+      this.setFirstPlayerToPlay();
 
-      /* Resolve turn */
-      await this.reveal_characters();
+      this.resetCharacters();
+
+      const playableCharacters = this.prepareCharacters();
+
+      await this.distributeCharacters(playableCharacters);
+
+      await this.revealCharacters();
     }
+
+    this.endGame();
+  }
+
+
+  endGame() {
 
     this.isOver = true;
 
-    /* Count points and dump score */
     this.scores = this.dump();
+
     this.emit('game_finished', this.scores);
   }
 
-  /* Distribute characters to all players */
-  async distribute_characters() {
 
-    this.characters.forEach(character => {
-      character.player = null;
-    });
+  resetCharacters() {
 
-    debug("----------------\nNew turn, distributing characters");
+    this.characters.forEach(character => character.player = null);
 
-    this.emit("message", "New turn, distributing characters");
+    this.deadCharacter = null;
 
-    /* Get the index of the card ignored this turn */
-    const ignoredIndex = Math.floor(Math.random() * this.characters.length);
+    this.stolenCharacter = null;
+  }
 
-    debug('Ignoring character: ', this.characters[ignoredIndex].name);
 
-    /* Get the list of available characters */
-    const remaining_characters = this.characters.filter((_, i) => i !== ignoredIndex);
+  prepareCharacters() {
 
-    /* Actually get the players choices */
-    for (let i = 0; i < this.players.length; ++i) {
+    // todo handle several metas
 
-      const player = (this.firstPlayerToPlayIndex + i) % this.players.length;
+    const ignoredCharacter = this.characters[Math.floor(Math.random() * this.characters.length)].name;
 
-      // XXX: actually get the input from the player
-      this.emit("message", `${this.players[player].login} is choosing a character`);
-      const character = await this.ask(this.players[player].login)("chose_character", remaining_characters);
-      // YYY: champion way
-      // const character = Math.floor(Math.random() * remaining_characters.length);
-      const characterIndex = remaining_characters.findIndex(c => c.name === character);
+    this.emit("preparing_characters", ignoredCharacter);
 
-      remaining_characters[characterIndex].player = this.players[player];
+    return this.characters.filter(({ name }) => name !== ignoredCharacter);
+  }
 
-      debug(this.players[player].login + ' chose ' + remaining_characters[characterIndex].name);
 
-      /* Remove the character from the remaining characters array */
-      remaining_characters.splice(characterIndex, 1);
+  async distributeCharacters(playableCharacters) {
+
+    for (const index in this.players) {
+
+      const player = this.getActivePlayer(index);
+
+      const character = await this.ask(player)("chose_character", playableCharacters);
+
+      this.pickCharacter(player, character, playableCharacters);
     }
   }
 
-  /* Reveal characters and actually play turns */
-  async reveal_characters() {
 
-    debug("--------\nRevealing characters");
+  getActivePlayer(i) {
 
-    this.emit("message", "Revealing characters");
+    const player = this.players[(this.firstPlayerToPlayIndex + i) % this.players.length];
 
-    for (let i = 0; i < this.characters.length; ++i) {
+    this.emit("player_to_chose_character", player.login);
 
-      const character = this.characters[i];
-
-      if (!character.player) {
-
-        debug(`-${character.name} is not used`);
-        this.emit("message", `-${character.name} is not used`);
-
-        continue
-      };
-
-      const isAlive = !this.dead_character ||
-        this.dead_character && character.name !== this.dead_character.name
-
-      if (isAlive) {
-
-        this.emit("message", `${character.name} was chosen by ${character.player.login}`);
-
-        if (this.stolen_character?.player && character.player.login === this.stolen_character.player.login) {
-
-          debug(`-${character.name} got stolen`);
-          this.emit("message", `-${character.name} got stolen`);
-
-          this.characters[1].player.gold += character.player.gold;
-
-          character.player.gold = 0;
-        }
-
-        await character.do_turn(character.player, this);
-
-      } else {
-        debug(`-${character.name} is dead and doesnt play`);
-        this.emit("message", `-${character.name} is dead and doesnt play`);
-      }
-    }
-
-    this.dead_character = null;
-    this.stolen_character = null;
+    return player;
   }
 
-  /* Count points and dump scores */
+
+  pickCharacter(player, character, playableCharacters) {
+
+    const characterIndex = playableCharacters.findIndex(c => c.name === character);
+
+    playableCharacters[characterIndex].player = player;
+
+    playableCharacters.splice(characterIndex, 1);
+
+    this.emit("player_has_chosen_character", player.login, character);
+  }
+
+
+  async revealCharacters() {
+
+    this.emit("revealing_characters");
+
+    for (const character of this.characters) {
+
+      if (
+        this.isNotUsed(character) ||
+        this.isDead(character)
+      ) continue;
+
+      await this.doCharacterTurn(character);
+    }
+  }
+
+
+  isNotUsed(character) {
+
+    if (!character.player) {
+
+      this.emit("character_not_used", character.name);
+
+      return true
+    };
+  }
+
+
+  isDead(character) {
+
+    if (character.name === this.deadCharacter) {
+
+      this.emit("character_is_dead", character.name);
+
+      return true;
+    }
+  }
+
+
+  async doCharacterTurn(character) {
+
+    this.emit("reveal_character", character.player.login, character.name);
+
+    this.handleStealing(character);
+
+    await character.doTurn(this);
+
+    this.checkIsLastTurn(character.player);
+  }
+
+
+  handleStealing(character) {
+
+    if (
+      !this.stolenCharacter?.player ||
+      character.player.login !== this.stolenCharacter.player.login
+    ) return;
+
+    this.characters[1].player.gold += character.player.gold;
+
+    character.player.gold = 0;
+
+    this.emit("player_got_stolen", character.player.login, this.stolenCharacter.name);
+  }
+
+
+  checkIsLastTurn(player) {
+
+    if (player.districts.length < 8 || this.first8th) return;
+
+    this.first8th = player;
+
+    this.isLastTurn = true;
+
+    this.emit("player_built_8_districts", player.login);
+  }
+
+
   dump() {
 
-    debug("============\n Game finished, scores:");
-    this.emit("message", 'Game finished');
-
-    return this.players.map(({
-      districts,
-      login
-    }) => {
-
-      let colorsCount = [];
-
-      let score = districts.reduce((score, district) => {
-
-        if (
-          !colorsCount.includes(district.color)
-        ) {
-          colorsCount.push(district.color);
-        }
-
-        if (district.name == 'Cour des miracles') {
-          colorsCount.push("BONUS");
-        }
-
-        return score + district.value;
-      }, 0)
-
-      /* Give points for colors */
-      if (colorsCount.length >= 5) {
-        score += 3;
-      }
-
-      /* Special case for the first player to build 8th district */
-      if (this.first_8th.login == login) {
-        score += 4;
-      } else if (districts.length >= 8) {
-        score += 2;
-      }
-
-      return {
-        login,
-        score
-      };
-    })
+    return this.players
+      .map(this.calculateScore)
       .sort((p1, p2) => p2.score - p1.score);
+  }
+
+
+  calculateScore = ({ districts, login }) => {
+
+    const colorsCount = [];
+
+    let score = districts.reduce(addDistrictPoints, 0);
+
+    if (colorsCount.length >= 5) score += 3;
+
+    if (this.first8th.login === login) score += 4;
+
+    else if (districts.length >= 8) score += 2;
+
+    return { score, login };
+
+    function addDistrictPoints(score, { name, color, value }) {
+
+      if (!colorsCount.includes(color)) colorsCount.push(color);
+
+      if (name === 'Cour des miracles') colorsCount.push("BONUS");
+
+      return score + value;
+    }
   }
 }

@@ -4,38 +4,64 @@ export default class Modal {
 
     constructor() {
 
-        this.dom = document.querySelector(".modal");
+        this.container = document.querySelector(".modal");
 
-        events.on("coin_or_gold", () => {
+        events.on("card_or_coin", () => {
 
             this.show();
         });
 
-        const coinBtn = this.dom.querySelector('.chose-coin');
+        const coinBtn = this.container.querySelector('.chose-coin');
 
         coinBtn.addEventListener('click', () => {
 
-            events.emit("chose_coin_or_gold", "coin");
+            events.emit("chose_card_or_coin", "coin");
 
             this.hide();
         });
 
-        const cardBtn = this.dom.querySelector('.chose-card');
+        const cardBtn = this.container.querySelector('.chose-card');
 
         cardBtn.addEventListener('click', () => {
 
-            events.emit("chose_coin_or_gold", "card");
+            events.emit("chose_card_or_coin", "card");
 
             this.hide();
+        });
+
+
+        events.on("chose_card", cards => {
+
+            this.show();
+
+            cards.forEach((card, i) => {
+
+                console.log(card);
+                
+
+                const cardView = document.createElement("div");
+                cardView.classList.add("card");
+                cardView.innerHTML = card.name;
+                this.container.appendChild(cardView);
+
+                cardView.addEventListener('click', () => {
+                    events.emit("card_chosen", i);
+
+                    [...this.container.querySelectorAll(".card")]
+                        .forEach(card => card.remove());
+
+                    this.hide();
+                });
+            });
         });
     }
 
     show() {
-        this.dom.classList.add("active");
+        this.container.classList.add("active");
     }
 
     hide() {
-        this.dom.classList.remove("active");
+        this.container.classList.remove("active");
     }
 
 }

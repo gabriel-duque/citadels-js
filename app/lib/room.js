@@ -3,7 +3,9 @@ const debug = Debug("app:room");
 
 export default class Room {
 
+
     players = {};
+
 
     constructor(GameRoom, ioNsp, roomId) {
 
@@ -18,6 +20,7 @@ export default class Room {
         this.lobbyPath = `/${this.gameName}/${roomId}`;
         this.playPath = `/${this.gameName}/${roomId}/play`;
     }
+
 
     get room() {
 
@@ -63,6 +66,7 @@ export default class Room {
 
         return this.players[socketId];
     }
+
 
     onConnection(socket) {
 
@@ -170,7 +174,22 @@ export default class Room {
 
         this.gameRoom.sockets = { emit: this.emit.bind(this) };
 
-        this.gameRoom.game.ask = this.ask.bind(this);
+        const delay = this.gameRoom.game.delay;
+
+        this.gameRoom.game.ask = (player) => {
+
+            return async (message, ...args) => {
+
+                const ask = this.askClient.call(this, player, delay);
+
+                const response = await ask(message, ...args);
+
+                return (
+                    response || this.gameRoom.game.askChampion(player, message, ...args)
+                );
+            };
+        }
+
 
         this.gameRoom.closeRoom = this.close.bind(this);
     }
@@ -202,23 +221,31 @@ export default class Room {
         }
     }
 
-    ask(login) {
+    askClient(player, delay) {
 
-        const socket = this.getSocketByLogin(login);
+        const socket = this.getSocketByLogin(player.login);
 
-        return (questionKey, ...args) => {
+        return (message, ...args) => {
 
             return new Promise((resolve, reject) => {
 
-                debug(`Asking ${login} for question: "${questionKey}"`);
+                debug(`Asking ${player.login} for question: "${message}"`);
 
-                socket.emit(questionKey, ...args);
+                socket.emit(message, ...args);
 
-                socket.on(questionKey, answer => {
+                setTimeout(() => {
+
+                    debug(`${player.login} did not answer in time`);
+
+                    resolve(null);
+
+                }, delay)
+
+                socket.on(message, answer => {
 
                     debug(`Received answer: ${answer}`);
 
-                    socket.removeAllListeners(questionKey);
+                    socket.removeAllListeners(message);
 
                     resolve(answer);
                 });

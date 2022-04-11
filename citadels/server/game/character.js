@@ -1,249 +1,72 @@
-import { colors } from './district.js';
 
-import Debug from 'debug';
-const debug = Debug("citadels:character");
+export default class Character {
 
-import * as champion from '../test/champion.js';
 
-export class Character {
+  player = null;
 
-  constructor(name, do_turn, image_path) {
+
+  constructor({ name, action }) {
+
     this.name = name;
-    this.do_turn = do_turn;
-    this.image_path = image_path;
-    this.player = null;
+
+    this.action = action;
   }
-};
 
-export const characters = [{
-  name: 'Assassin',
-  do_turn: assassin,
-},
-{
-  name: 'Voleur',
-  do_turn: thief,
-},
-{
-  name: 'Magicien',
-  do_turn: magician,
-},
-{
-  name: 'Roi',
-  do_turn: king,
-},
-{
-  name: 'Eveque',
-  do_turn: bishop,
-},
-{
-  name: 'Marchand',
-  do_turn: merchant,
-},
-{
-  name: 'Architecte',
-  do_turn: architect,
-},
-{
-  name: 'Condottiere',
-  do_turn: warlord,
-}
-];
 
-async function coin_or_gold(player, game) {
+  async doTurn(game) {
 
-  const choice = await game.ask(player.login)("coin_or_gold");
-  // const choice = champion.get_gold_card(player); // XXX: AI I wrote to test
+    await this.getCoinOrGold(game);
 
-  if (choice === "coin") {
+    await this.action({ game, player: this.player });
 
-    game.emit("update_player_coins", player, 2);
+    // todo x3 if is architect
+    await this.buildDistrict(game, this.name === 'Architecte' ? 3 : 1);
+  }
 
-  } else {
 
-    debug("draws a card");
-    game.emit("message", `${player.login} has chosen to get a card`);
+  async getCoinOrGold(game) {
+
+    const choice = await game.ask(this.player)("card_or_coin");
+
+    if (choice === "coin") {
+
+      game.emit("update_player_coins", this.player, 2);
+
+      return;
+    }
+
+    game.emit("player_to_chose_card", this.player.login);
+
+    await this.pickCard(game);
+  }
+
+
+  async pickCard(game) {
 
     const cards = game.deck.draw(2);
 
-    // XXX: for now let's always choose the first card
-    const kept_card = champion.choseCard(cards);
+    const keptCardIndex = await game.ask(this.player)("chose_card", cards);
 
-    player.hand.push(...cards.splice(kept_card, 1));
+    game.emit("player_has_chosen_card", this.player.login, cards[keptCardIndex]);
+
+    this.player.hand.push(...cards.splice(keptCardIndex, 1));
 
     game.deck.discard(cards);
   }
-};
-
-/* The normal ending of a turn played by most characters */
-async function do_normal_end(player, game) {
-
-  /* Handle coin or gold choice */
-  await coin_or_gold(player, game);
-
-  /* Possibly buy a district */
-  const buildDistrictChoice = await game.ask(player.login)("build_district");
-  // const choice = champion.get_buy_district(player);
-  if (!buildDistrictChoice) return
-  player.buildDistrict(buildDistrictChoice);
-  checkIsLastTurn(player, game);
-}
 
 
-function checkIsLastTurn(player, game) {
+  async buildDistrict(game, amountAllowed) {
 
-  if (player.districts.length < 8 || game.first_8th) return;
+    const choiceIndex = await game.ask(this.player)("chose_build_district", amountAllowed);
 
-  game.isLastTurn = true;
-  debug("has built 8 districts");
-  game.first_8th = player;
-}
+    const choice = this.player.hand[choiceIndex];
 
-async function assassin(player, game) {
+    if (!choiceIndex || this.player.gold < choice.price) return;
 
-  const choice = champion.get_assassin();
+    this.player.gold -= choice.price;
 
-  if (choice !== 0) {
+    game.emit('player_builds_district', this.player.login, choice);
 
-    game.dead_character = game.characters[choice];
+    this.player.districts.push(...this.player.hand.splice(choiceIndex, 1));
   }
-
-  debug("kills", game.dead_character && game.dead_character.name);
-
-  await do_normal_end(player, game);
 };
-
-async function thief(player, game) {
-
-  const choice = champion.get_thief();
-
-  /* Can't steel the assassin, it's victim or the thief himself */
-  if (choice > 1 && (
-    !game.dead_character ||
-    game.dead_character &&
-    game.characters[choice].name !== game.dead_character.name
-  )) {
-
-    game.stolen_character = game.characters[choice];
-
-    debug("steals", game.stolen_character.name);
-  }
-
-  await do_normal_end(player, game);
-};
-
-/* Magician's turn */
-async function magician(player, game) {
-
-  const choice = champion.get_magician(player, game.players);
-
-  if (choice.exchange) { // Exchange
-
-    const exchangedPlayer = game.players.find(p => p.login === choice.exchange);
-
-    [player.hand, exchangedPlayer.hand] = [exchangedPlayer.hand, player.hand];
-
-    debug("   ", player.login, "exchanges with", choice.exchange);
-
-  } else if (choice.discard && choice.discard.length) { // Discard
-
-    debug("changes", choice.discard.length, "cards");
-
-    for (
-      const cardToRemoveIndex in choice.discard
-        .sort()
-        .reverse()
-    ) {
-
-      game.deck.discard(player.hand.splice(cardToRemoveIndex, 1));
-      player.hand.push(game.deck.draw());
-    }
-  }
-
-  await do_normal_end(player, game);
-};
-
-async function king(player, game) {
-
-  /* Set king */
-  game.firstPlayerToPlayIndex = game.players.findIndex(p => p.login === player.login);
-
-  /* Get extra gold for yellow districts */
-  getExtraGold(player, "YELLOW");
-
-  /* Get extra gold */
-  await do_normal_end(player, game);
-};
-
-async function bishop(player, game) {
-
-  /* Get extra gold for blue districts */
-  getExtraGold(player, "BLUE");
-
-  /* Get extra gold */
-  await do_normal_end(player, game);
-};
-
-async function merchant(player, game) {
-
-  /* Extra gold coin */
-  ++player.gold;
-
-  /* Get extra gold for green districts */
-  getExtraGold(player, "GREEN");
-
-  await do_normal_end(player, game);
-};
-
-/* Architect's turn */
-async function architect(player, game) {
-
-  debug("do turn");
-
-  /* Can draw 2 cards */
-  player.hand.push(...game.deck.draw(2));
-
-  /* Handle coin or gold choice */
-  coin_or_gold(player, game);
-
-  const choices = champion.get_architect()
-    .map((_, i) => i)
-    .reverse();
-
-  choices.forEach(choice =>
-    player.buildDistrict(choice)
-  )
-};
-
-/* Warlord's turn */
-async function warlord(player, game) {
-
-  /* Get extra gold for red districts */
-  getExtraGold(player, "RED");
-
-  /* Destroy a district */
-  const choice = champion.get_warlord(player, game.players);
-
-  if (choice) {
-
-    const attackedPlayer = game.players[choice.playerIndex];
-
-    const attackedDistrict = attackedPlayer.districts[choice.districtIndex];
-
-    if (player.gold >= attackedDistrict.price - 1) {
-
-      debug("destroys card", attackedDistrict.name, "of", attackedPlayer.login);
-
-      player.gold -= attackedDistrict.price - 1;
-
-      attackedPlayer.districts.splice(choice.district, 1);
-    }
-  }
-
-  await do_normal_end(player, game);
-};
-
-function getExtraGold(player, color) {
-
-  player.gold += player.districts.filter(d => d.color === colors[color])
-    .length;
-}

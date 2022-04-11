@@ -28,6 +28,10 @@ socket.on("message", message => {
   events.emit("console", message)
 });
 
+socket.on("new_turn", firstPlayer => {
+  events.emit("new_turn", firstPlayer)
+});
+
 
 socket.on("chose_character", remaining_characters => {
 
@@ -44,31 +48,63 @@ socket.on("chose_character", remaining_characters => {
 });
 
 
-socket.on("coin_or_gold", () => {
+socket.on("card_or_coin", () => {
 
-  events.emit("coin_or_gold");
+  events.emit("card_or_coin");
 
-  events.on("chose_coin_or_gold", coin_or_gold => {
+  events.on("chose_card_or_coin", card_or_coin => {
 
-    socket.emit("coin_or_gold", coin_or_gold);
+    socket.emit("card_or_coin", card_or_coin);
 
-    events.removeAllListeners("coin_or_gold");
+    events.removeAllListeners("card_or_coin");
   });
 });
 
 
 socket.on("update_player_coins", (login, amount) => {
-  
-    events.emit("update_player_coin", login, amount);
+
+  events.emit("update_player_coins", login, amount);
 });
 
 
-socket.on("build_district", () => {
+socket.on("chose_card", cards => {
 
-    events.emit("build_district");
+  events.emit("chose_card", cards);
 
-    events.on("chose_district", district => {
-      
-      socket.emit("build_district", district);
-    });
-})
+  events.on("card_chosen", keptCardIndex => {
+
+    socket.emit("chose_card", keptCardIndex);
+
+    events.removeAllListeners("card_chosen");
+  });
+});
+
+socket.on("new_card", card => {
+
+  events.emit("new_card", card);
+
+});
+
+socket.on("player_new_card", login => {
+
+  events.emit("player_new_card", login);
+
+});
+
+
+
+socket.on("chose_build_district", amountAllowed => {
+
+  events.emit("chose_build_district", amountAllowed);
+
+  events.on("chose_district", district => {
+
+    socket.emit("chose_build_district", district);
+  });
+});
+
+socket.on('player_builds_district', (login, district) => {
+
+  events.emit("player_builds_district", login, district);
+});
+

@@ -1,4 +1,10 @@
-import { colors, District } from './district.js';
+export const colors = {
+  RED: 'Red',
+  BLUE: 'Blue',
+  GREEN: 'Green',
+  PURPLE: 'Purple',
+  YELLOW: 'Yellow',
+};
 
 const initial_deck = [
 
@@ -257,48 +263,47 @@ const initial_deck = [
 
 ];
 
-/* This is a class to represent a deck */
+
 export default class Deck {
+
+
+  cards = [];
+
 
   constructor() {
 
-    /* Create our deck of ditricts using the initial deck */
-    this.cards = new Array();
+    for (const { count, ...district } of initial_deck) {
 
-    for (const district in initial_deck) {
+      this.cards.push(...new Array(count).fill(district))
 
-      const current = initial_deck[district];
-
-      for (let i = 0; i < current.count; ++i) {
-        
-        this.cards.push(new District(
-          current.price,
-          current.value,
-          current.color,
-          current.name,
-          current.description,
-          current.image_path));
-      }
     }
 
-    /* Shuffle our deck of districts */
+    this.shuffle();
+    
+  }
+
+
+  shuffle() {
+
     for (let i = this.cards.length - 1; i > 0; --i) {
+
       const j = Math.floor(Math.random() * (i + 1));
+
       [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
     }
   }
 
   draw(count = 1) {
 
-    const cards = new Array();
+    if (count > this.cards.length) {
+      count = this.cards.length;
+    }
 
-    count = count > this.cards.length ? this.cards.length : count;
-
-    for (let i = 0; i < count; ++i)
-
-      cards.push(this.cards.pop());
-
-    return cards;
+    return new Array(count)
+      .fill()
+      .map(() =>
+        this.cards.pop()
+      );
   }
 
   discard(cards) {
