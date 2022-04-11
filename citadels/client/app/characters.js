@@ -1,65 +1,44 @@
-import events from 'app/event-emmitter';
+import { socket } from "app/connection";
+
+import { CharacterCard } from "app/card";
 
 export default class Characters {
 
     collection = {};
 
+    container = document.querySelector('.characters-container');
+
     constructor(characters) {
 
-        this.container = document.querySelector('.characters-container');
+        this.characters = characters;
 
-        for (const character of characters) {
+        characters.forEach((character, i) => {
 
-            const card = document.createElement('div');
+            this.collection[character] = new CharacterCard(this.container, character);
 
-            card.className = "card character-card";
+            this.collection[character].view.setAttribute("data-index", i);
+        });
 
-            card.innerHTML = character;
+        socket.on("chose_character", remaining_characters => {
 
-            this.container.appendChild(card);
+            this.revealCharacters(remaining_characters, "pick");
+        });
 
-            this.collection[character] = card;
-        }
+        socket.on("get_assassin", () => {
 
-        events.on("reveal_remaining_characters", this.revealRemainingCharacters.bind(this));
+            const killableCharacters = this.characters
+                .filter(c => c !== "assassin")
+                .map(c => ({ name: c }));
+
+            this.revealCharacters(killableCharacters, "kill");
+        });
     }
 
-    get cards() {
-        return Object.values(this.collection);
-    }
-
-    get activeCards() {
-
-        return [...this.container.querySelectorAll(".active")];
-    }
-
-    revealRemainingCharacters(characters) {
+    revealCharacters(characters, onClick) {
 
         for (const { name } of characters) {
 
-            this.collection[name].classList.add("active");
+            this.collection[name].setActive(onClick);
         }
-
-        this.activeCards.forEach(card => {
-
-            card.addEventListener("click", selectCharacter.bind(this));
-
-            function selectCharacter() {
-
-                const name = card.innerHTML;
-
-                this.collection[name].classList.add("chosen");
-
-                this.cards.forEach(c => {
-                    c.classList.remove("active");
-                });
-
-                this.activeCards.forEach(c => {
-                    c.removeEventListener("click", selectCharacter);
-                });
-
-                events.emit("chose_character", name);
-            }
-        });
     }
 }

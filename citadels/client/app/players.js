@@ -1,4 +1,6 @@
-import events from 'app/event-emmitter';
+import { socket } from "app/connection";
+
+import { HiddenDistrictCard, VisibleDistrictCard } from "app/card";
 
 class Player {
 
@@ -18,37 +20,36 @@ class Player {
         this.view.login.innerText = login;
     }
 
-    addCard() {
+    set points(points) {
+        this.view.points.innerHTML = points;
+    }
 
-        const card = document.createElement('div');
+    set coins(coins) {
+        this.view.coins.innerHTML = coins;
+    }
 
-        card.className = "card player-card";
+    get points() {
+        return parseInt(this.view.points.innerHTML, 10);
+    }
 
-        this.view.hand.appendChild(card);
-
-        return card;
+    get coins() {
+        return parseInt(this.view.coins.innerHTML, 10);
     }
 
     buildDistrict(district) {
 
-        this.view.coins.innerHTML -= district.price;
-        this.view.points.innerHTML += district.value;
+        this.coins -= district.price;
+        this.points += district.value;
 
-        const districtView = document.createElement('div');
-        districtView.className = "card district player-district";
-        districtView.innerHTML = district.name;
-
-        this.view.districts.appendChild(districtView);
+        new VisibleDistrictCard(this.view.districts, district);
     }
 
-    updatePoints(points) {
-
-        this.view.points.innerText = points;
+    highlight() {
+        this.view.container.classList.add("active");
     }
 
-    updateCoins(coins) {
-
-        this.view.coins.innerText = coins;
+    unhighlight() {
+        this.view.container.classList.remove("active");
     }
 }
 
@@ -64,26 +65,15 @@ export class SelfPlayer extends Player {
 
             this.addCard(card);
         }
-
-        events.on("new_card", card => {
-
-            this.addCard(card);
-        });
     }
 
-    addCard({ name, color }) {
+    addCard(card) {
 
-        const card = super.addCard();
-
-        card.className += ` card-${color}`;
-
-        card.setAttribute('data-name', name);
-
-        card.innerHTML = name;
+        new VisibleDistrictCard(this.view.hand, card);
     }
 
     buildDistrict(district) {
-        
+
         super.buildDistrict(district);
 
         this.removeCard(district.name);
@@ -121,7 +111,7 @@ export class SelfPlayer extends Player {
 
             const card = this.hand.find(c => c.name === name);
 
-            events.emit('chose_district', card);
+            socket.emit("chose_build_district", card);
 
             cardView.removeEventListener('click', choseCard);
         }
@@ -144,15 +134,15 @@ export class OtherPlayer extends Player {
 
             this.addCard();
         }
+    }
 
-        events.on("player_new_card", login => { // todo not here
+    addCard() {
 
-            if (login === this.login) this.addCard();
-        });
+        new HiddenDistrictCard(this.view.hand);
     }
 
     buildDistrict(district) {
-        
+
         super.buildDistrict(district);
 
         this.removeCard();

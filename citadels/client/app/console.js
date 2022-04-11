@@ -1,15 +1,8 @@
-import events from 'app/event-emmitter';
+export default {
 
-export default class Console {
+    nMessages: 0,
 
-    nMessages = 0;
-
-    constructor() {
-
-        this.dom = document.querySelector(".console");
-
-        events.on("console", message => this.log(message));
-    }
+    container: document.querySelector(".console"),
 
     log(message) {
 
@@ -17,7 +10,7 @@ export default class Console {
             document.querySelector(".console-message:first-child").remove();
         }
 
-        this.dom.innerHTML += `<p class="console-message">${message}</p>`;
+        this.container.innerHTML += `<p class="console-message">${message}</p>`;
 
         this.nMessages++;
     }

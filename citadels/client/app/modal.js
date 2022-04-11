@@ -1,58 +1,49 @@
-import events from 'app/event-emmitter';
+import { socket } from "app/connection";
+import { VisibleDistrictCard } from "app/card";
 
 export default class Modal {
 
+    container = document.querySelector(".modal");
+
+    coinBtn = this.container.querySelector('.chose-coin');
+
+    cardBtn = this.container.querySelector('.chose-card');
+
     constructor() {
 
-        this.container = document.querySelector(".modal");
-
-        events.on("card_or_coin", () => {
+        socket.on("card_or_coin", () => {
 
             this.show();
         });
 
-        const coinBtn = this.container.querySelector('.chose-coin');
+        this.coinBtn.addEventListener('click', () => {
 
-        coinBtn.addEventListener('click', () => {
-
-            events.emit("chose_card_or_coin", "coin");
-
-            this.hide();
-        });
-
-        const cardBtn = this.container.querySelector('.chose-card');
-
-        cardBtn.addEventListener('click', () => {
-
-            events.emit("chose_card_or_coin", "card");
-
-            this.hide();
+            socket.emit("card_or_coin", "coin");
         });
 
 
-        events.on("chose_card", cards => {
+        this.cardBtn.addEventListener('click', () => {
 
-            this.show();
+            socket.emit("card_or_coin", "card");
+        });
 
-            cards.forEach((card, i) => {
 
-                console.log(card);
-                
+        socket.on("chose_card", cards => {
 
-                const cardView = document.createElement("div");
-                cardView.classList.add("card");
-                cardView.innerHTML = card.name;
-                this.container.appendChild(cardView);
+            cards.forEach(this.proposeCard);
+        });
+    }
 
-                cardView.addEventListener('click', () => {
-                    events.emit("card_chosen", i);
+    proposeCard = (card, i) => {
 
-                    [...this.container.querySelectorAll(".card")]
-                        .forEach(card => card.remove());
+        const cardView = new VisibleDistrictCard(this.container, card);
 
-                    this.hide();
-                });
-            });
+        cardView.addEventListener('click', () => {
+
+            socket.emit("chose_card", i);
+
+            [...this.container.querySelectorAll(".card")]
+                .forEach(card => card.remove());
         });
     }
 

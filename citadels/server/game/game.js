@@ -15,7 +15,7 @@ export default class Game extends EventEmitter {
   static name = "citadels";
 
 
-  delay = 200;
+  delay = 10000;
 
   hasStarted = false;
 
@@ -183,6 +183,11 @@ export default class Game extends EventEmitter {
 
       this.emit("character_not_used", character.name);
 
+      if (character.player) {
+
+        this.emit("reveal_character", character.player.login, character.name);
+      }
+
       return true
     };
   }
@@ -193,6 +198,11 @@ export default class Game extends EventEmitter {
     if (character.name === this.deadCharacter) {
 
       this.emit("character_is_dead", character.name);
+
+      if (character.player) {
+
+        this.emit("reveal_character", character.player.login, character.name);
+      }
 
       return true;
     }

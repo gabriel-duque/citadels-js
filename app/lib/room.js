@@ -233,22 +233,33 @@ export default class Room {
 
                 socket.emit(message, ...args);
 
+                let answered = false;
+
                 setTimeout(() => {
+
+                    if (answered) return;
 
                     debug(`${player.login} did not answer in time`);
 
-                    resolve(null);
+                    resolveAnswer(message, null);
 
                 }, delay)
 
                 socket.on(message, answer => {
 
-                    debug(`Received answer: ${answer}`);
+                    // debug(`Received answer: ${answer}`);
+
+                    resolveAnswer(message, answer);
+                });
+
+                function resolveAnswer(message, answer) {
+
+                    answered = true;
 
                     socket.removeAllListeners(message);
 
                     resolve(answer);
-                });
+                }
             });
 
         }

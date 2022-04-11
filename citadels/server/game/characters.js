@@ -13,12 +13,12 @@ export default [
 
             const choice = await game.ask(player)("get_assassin");
 
-            if (choice !== 0) {
+            if (choice === 0) return
 
-                game.deadCharacter = game.characters[choice].name;
-            }
+            game.deadCharacter = game.characters[choice].name;
+            
+            game.emit("character_killed", game.deadCharacter);
 
-            debug("kills", game.deadCharacter && game.deadCharacter.name);
         }
     },
 
@@ -29,14 +29,13 @@ export default [
 
             const choice = await game.ask(player)("get_thief");
 
-            /* Can't steel the assassin, it's victim or the thief himself */
             if (choice > 1 && (
                 game.characters[choice].name !== game.deadCharacter
             )) {
 
                 game.stolenCharacter = game.characters[choice];
 
-                debug("steals", game.stolenCharacter.name);
+                debug("steals", game.stolenCharacter);
             }
         }
     },

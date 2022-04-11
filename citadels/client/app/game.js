@@ -2,13 +2,15 @@ import { SelfPlayer, OtherPlayer } from 'app/players';
 
 import Characters from 'app/characters';
 
-import Console from 'app/console';
+import console from 'app/console';
 
 import Modal from 'app/modal';
 
-import events from 'app/event-emmitter';
+import { socket } from "app/connection";
 
 export default class Game {
+
+    players = {};
 
     constructor({
         characters,
@@ -18,7 +20,7 @@ export default class Game {
 
         this.characters = new Characters(characters);
 
-        this.console = new Console();
+        this.console = console;
 
         this.modal = new Modal();
 
@@ -26,46 +28,73 @@ export default class Game {
 
         this.player = new SelfPlayer(container, player.login, player.hand);
 
-        this.players = logins
-            .filter(login =>
-                login !== player.login
-            )
-            .map(login =>
+        for (const login of logins) {
+            this.players[login] = login === player.login ?
+                this.player :
                 new OtherPlayer(container.cloneNode(true), login)
-            );
+        }
 
         this.bindEvents();
     }
 
-    getPlayer(login) {
+    highlightPlayer(login) {
 
-        return this.player.login === login ?
-            this.player :
-            this.players.find(player => player.login === login);
+        for (const l in this.players) {
+
+            this.players[l][l === login ? "highlight" : "unhighlight"]();
+        }
     }
+
 
     bindEvents() {
 
-        events.on("new_turn", firstPlayer => {
-            
-            this.console.log(`New turn, ${firstPlayer} plays first`);
+        socket.on("message", this.console.log.bind(this.console));
 
-            this.getPlayer(firstPlayer).view.container.style.outline = '3px solid #ff0000'
+        socket.on("new_turn", firstPlayerLogin => {
+
+            this.console.log(`New turn, ${firstPlayerLogin} plays first`);
+
+            this.highlightPlayer(firstPlayerLogin);
         });
 
-        events.on("update_player_coins", (login, amount) => {
+        socket.on("reveal_character", (login, character) => {
 
-            events.emit("console", `${login} has chosen to get 2 gold`);
-            
-            this.getPlayer(login).updateCoins(amount);
+            this.console.log(`- ${character} was chosen by ${login}`);
+
+            this.highlightPlayer(login);
+
+            // this.highlightCharacter(character);
         });
 
-        events.on("chose_build_district", () => {
-            this.player.highlightHand();
+        socket.on("player_chose_coin", login => {
+
+            this.console.log(`${login} has chosen to get 2 coins`);
+
+            this.modal.hide();
+
+            this.players[login].coins += 2;
         });
 
-        events.on("player_builds_district", (login, district) => {
-            this.getPlayer(login).buildDistrict(district);
+        socket.on("new_card", card => {
+
+            this.modal.hide();
+
+            this.player.addCard(card);
+        });
+
+        socket.on("player_new_card", login => {
+
+            this.players[login].addCard();
+        });
+
+        socket.on("chose_build_district", amountAllowed => {
+
+            this.player.highlightHand(amountAllowed);
+        });
+
+        socket.on('player_builds_district', (login, district) => {
+
+            this.players[login].buildDistrict(district);
         });
     }
 }

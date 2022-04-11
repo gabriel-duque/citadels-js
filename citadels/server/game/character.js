@@ -30,18 +30,18 @@ export default class Character {
 
     if (choice === "coin") {
 
-      game.emit("update_player_coins", this.player, 2);
+      game.emit("player_chose_coin", this.player);
 
       return;
     }
-
-    game.emit("player_to_chose_card", this.player.login);
 
     await this.pickCard(game);
   }
 
 
   async pickCard(game) {
+
+    game.emit("player_to_chose_card", this.player.login);
 
     const cards = game.deck.draw(2);
 
@@ -57,8 +57,15 @@ export default class Character {
 
   async buildDistrict(game, amountAllowed) {
 
-    const choiceIndex = await game.ask(this.player)("chose_build_district", amountAllowed);
+    game.emit("player_to_build_district", this.player.login);
 
+    let choiceIndex = await game.ask(this.player)("chose_build_district", amountAllowed);
+
+    if (typeof choiceIndex !== 'number') {
+
+      choiceIndex = this.player.hand.findIndex(card => card.name === choiceIndex.name);
+    }
+    
     const choice = this.player.hand[choiceIndex];
 
     if (!choiceIndex || this.player.gold < choice.price) return;
