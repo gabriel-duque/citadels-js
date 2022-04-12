@@ -182,11 +182,13 @@ export default class Room {
 
                 const ask = this.askClient.call(this, player, delay);
 
-                const response = await ask(message, ...args);
+                let response = await ask(message, ...args);
 
-                return (
-                    response || this.gameRoom.game.askChampion(player, message, ...args)
-                );
+                response ??= this.gameRoom.game.askChampion(player, message, ...args);
+
+                // debug(`Received answer: ${response}`);
+
+                return response;
             };
         }
 
@@ -229,7 +231,7 @@ export default class Room {
 
             return new Promise((resolve, reject) => {
 
-                debug(`Asking ${player.login} for question: "${message}"`);
+                // debug(`Asking ${player.login} for question: "${message}"`);
 
                 socket.emit(message, ...args);
 
@@ -239,15 +241,13 @@ export default class Room {
 
                     if (answered) return;
 
-                    debug(`${player.login} did not answer in time`);
+                    // debug(`${player.login} did not answer in time`);
 
                     resolveAnswer(message, null);
 
                 }, delay)
 
                 socket.on(message, answer => {
-
-                    // debug(`Received answer: ${answer}`);
 
                     resolveAnswer(message, answer);
                 });

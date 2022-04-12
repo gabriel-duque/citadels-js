@@ -2,7 +2,7 @@ import { SelfPlayer, OtherPlayer } from 'app/players';
 
 import Characters from 'app/characters';
 
-import console from 'app/console';
+import Console from 'app/console';
 
 import Modal from 'app/modal';
 
@@ -18,9 +18,11 @@ export default class Game {
         logins
     }) {
 
+        this.logins = logins;
+
         this.characters = new Characters(characters);
 
-        this.console = console;
+        this.console = new Console();
 
         this.modal = new Modal();
 
@@ -66,18 +68,53 @@ export default class Game {
             // this.highlightCharacter(character);
         });
 
+        socket.on("card_or_coin", () => {
+
+            this.modal.show();
+
+            this.modal.showCardOrCoin();
+        });
+
+        this.modal.coinBtn.addEventListener('click', () => {
+
+            socket.emit("card_or_coin", "coin");
+        });
+
+
+        this.modal.cardBtn.addEventListener('click', () => {
+
+            socket.emit("card_or_coin", "card");
+        });
+
+
         socket.on("player_chose_coin", login => {
 
             this.console.log(`${login} has chosen to get 2 coins`);
 
+            this.players[login].coins += 2;
+
+            if (login !== this.player.login) return;
+
             this.modal.hide();
 
-            this.players[login].coins += 2;
+            this.modal.hideCardOrCoin();
+        })
+
+        socket.on("chose_card", cards => {
+
+            this.modal.hideCardOrCoin();
+
+            this.modal.showChoseCard();
+
+            cards.forEach(this.modal.proposeCard);
         });
+
 
         socket.on("new_card", card => {
 
             this.modal.hide();
+
+            this.modal.hideChoseCard();
 
             this.player.addCard(card);
         });
@@ -96,5 +133,93 @@ export default class Game {
 
             this.players[login].buildDistrict(district);
         });
+
+
+        socket.on('get_magician', players => {
+
+            this.modal.show();
+
+            this.modal.showMagician();
+        });
+
+        this.modal.exchangeBtn.addEventListener('click', () => {
+
+            this.modal.hideMagician();
+
+            const logins = this.logins
+                .filter(l => l !== this.player.login);
+
+            this.modal.showExchange(logins);
+        });
+
+        socket.on("new_hand", hand => {
+
+            [...this.modal.exchangePlayersContainer.querySelectorAll("button")]
+                .forEach(b => b.remove());
+
+            [...this.player.view.hand.querySelectorAll(".card")]
+                .forEach(c => c.remove());
+
+            for (const card of hand) {
+
+                this.player.addCard(card);
+            }
+
+            this.modal.hideExchange();
+
+            this.modal.hideDiscard();
+
+            this.modal.hide();
+        });
+
+        socket.on("new_hand_length", (login, handLength) => {
+
+            this.players[login].setHandLength?.(handLength);
+        });
+
+
+        this.modal.discardBtn.addEventListener('click', () => {
+
+            [...this.modal.discardCardsContainer.querySelectorAll(".card")]
+                .forEach(c => c.remove());
+
+            this.modal.hideMagician();
+
+            this.modal.showDiscard([...this.player.view.hand.querySelectorAll(".card")]);
+        });
+
+        socket.on("new_gold", login => {
+
+            this.players[login].coins += 1;
+        });
+
+
+        socket.on("extra_gold", (login, amount) => {
+
+            this.players[login].coins += amount;
+        });
+
+
+        socket.on("get_warlord", () => {
+
+            this.modal.show();
+
+            this.modal.showWarlord();
+
+            const logins = this.logins
+                .filter(l => l !== this.player.login);
+
+            this.modal.showWarlordPlayers(logins, login => {
+                return [...this.players[login].view.districts.querySelectorAll(".card")];
+            });
+        });
+
+        socket.on("destroyed_district", (login, attackedPlayerLogin, attackedDistrict, price) => {
+
+            this.players[login].coins -= price;
+
+            this.players[attackedPlayerLogin].removeDistrict(attackedDistrict);
+        });
+
     }
 }

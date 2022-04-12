@@ -44,6 +44,15 @@ class Player {
         new VisibleDistrictCard(this.view.districts, district);
     }
 
+    removeDistrict(name) {
+            
+            const district = this.view.districts.querySelector(`[data-name="${name}"]`);
+
+            this.points -= district.getAttribute("data-value");
+    
+            district.remove();
+    }
+
     highlight() {
         this.view.container.classList.add("active");
     }
@@ -58,8 +67,6 @@ export class SelfPlayer extends Player {
     constructor(container, login, hand) {
 
         super(container, login);
-
-        this.hand = hand;
 
         for (const card of hand) {
 
@@ -93,8 +100,10 @@ export class SelfPlayer extends Player {
     highlightHand() {
 
         [...this.view.hand.querySelectorAll(".card")]
+            .filter(card =>
+                parseInt(card.getAttribute("data-price"), 10) <= this.coins
+            )
             .forEach(card => {
-                // todo check if enough gold to build
                 this.proposeCard(card);
             });
     }
@@ -107,11 +116,12 @@ export class SelfPlayer extends Player {
 
         function choseCard() {
 
+            [...this.view.hand.querySelectorAll(".card")]
+                .forEach(card => card.classList.remove("highlight"));
+
             const name = cardView.getAttribute('data-name');
 
-            const card = this.hand.find(c => c.name === name);
-
-            socket.emit("chose_build_district", card);
+            socket.emit("chose_build_district", name);
 
             cardView.removeEventListener('click', choseCard);
         }
@@ -120,8 +130,6 @@ export class SelfPlayer extends Player {
 
 export class OtherPlayer extends Player {
 
-    handLength = 4;
-
     constructor(container, login) {
 
         super(container, login);
@@ -129,6 +137,17 @@ export class OtherPlayer extends Player {
         container.querySelector('.player-hand').innerHTML = '';
         container.classList.remove("self-player-container");
         document.body.appendChild(container);
+
+        this.setHandLength(4);
+    }
+
+    setHandLength(length) {
+
+        this.handLength = length;
+
+        [...this.view.container.querySelectorAll(".card")].forEach(card => {
+            card.remove();
+        });
 
         for (let i = 0; i < this.handLength; i++) {
 
@@ -141,13 +160,6 @@ export class OtherPlayer extends Player {
         new HiddenDistrictCard(this.view.hand);
     }
 
-    buildDistrict(district) {
-
-        super.buildDistrict(district);
-
-        this.removeCard();
-    }
-
     removeCard() {
 
         const cardView = this.view.hand.querySelector(".card");
@@ -157,5 +169,12 @@ export class OtherPlayer extends Player {
         } else {
             console.log(`No district to remove`);
         }
+    }
+
+    buildDistrict(district) {
+
+        super.buildDistrict(district);
+
+        this.removeCard();
     }
 }

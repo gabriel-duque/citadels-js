@@ -99,6 +99,14 @@ export default class CitadelsRoom {
 			this.sockets.emit("message", "Revealing characters");
 		});
 
+		this.game.on("reveal_character", (login, character) => {
+
+			this.sockets.emit("reveal_character", login, character);
+
+			debug(`- ${character} is played by ${login}`);
+		});
+
+
 		this.game.on("character_not_used", character => {
 
 			debug(`- ${character} is not used`);
@@ -113,28 +121,12 @@ export default class CitadelsRoom {
 			this.sockets.emit("message", `- ${character} is dead`);
 		});
 
-		this.game.on("reveal_character", (login, character) => {
-
-			this.sockets.emit("reveal_character", login, character);
-
-			debug(`- ${character} is played by ${login}`);
-		});
-
 		this.game.on("player_got_stolen", (login, character) => {
 
 			this.sockets.emit("message", `${login} got stolen as ${character}`);
 
 			debug(`${login} got stolen as ${character}`);
 		});
-
-
-		this.game.on("player_to_chose_card", login => {
-
-			this.sockets.emit("message", `${login} has chosen to get a card`);
-
-			debug(`${login} has chosen to get a card`);
-		});
-
 
 		this.game.on('player_chose_coin', player => {
 
@@ -143,6 +135,14 @@ export default class CitadelsRoom {
 			debug(`${player.login} chose 2 coins`);
 
 			this.sockets.emit('player_chose_coin', player.login, player.gold);
+		});
+
+
+		this.game.on("player_to_chose_card", login => {
+
+			this.sockets.emit("message", `${login} has chosen to get a card`);
+
+			debug(`${login} has chosen to get a card`);
 		});
 
 
@@ -158,8 +158,77 @@ export default class CitadelsRoom {
 		});
 
 
+		this.game.on("character_killed", deadCharacter => {
+
+			this.sockets.emit("message", `${deadCharacter} is dead`);
+
+			debug(`${deadCharacter} is dead`);
+		});
+
+		this.game.on("character_stolen", deadCharacter => {
+
+			this.sockets.emit("message", `${deadCharacter} got stolen`);
+
+			debug(`${deadCharacter} got stolen`);
+		});
+
+		this.game.on("player_exchanged", (player, exchangedPlayer) => {
+
+			this.sockets.emit("message", `${player.login} exchanged with ${exchangedPlayer.login}`);
+
+			this.sockets[player.login].emit("new_hand", player.hand);
+
+			this.sockets[exchangedPlayer.login].emit("new_hand", exchangedPlayer.hand);
+
+			this.sockets.emit("new_hand_length", player.login, player.hand.length);
+			this.sockets.emit("new_hand_length", exchangedPlayer.login, exchangedPlayer.hand.length);
+
+			debug(`${player.login} exchanges cards with ${exchangedPlayer.login}`);
+		});
+
+
+		this.game.on("player_discarded", (player, amount) => {
+
+			this.sockets.emit("message", `${player.login} discarded ${amount} cards`);
+
+			this.sockets[player.login].emit("new_hand", player.hand);
+
+			this.sockets.emit("new_hand_length", player.login, player.hand.length);
+
+			debug(`${player.login} discarded ${amount} cards`);
+		});
+
+		this.game.on("player_got_one_gold", (player) => {
+
+			this.sockets.emit("message", `${player.login} got 1 gold as merchant`);
+
+			this.sockets.emit("new_gold", player.login);
+
+			debug(`${player.login} got 1 gold as merchant`);
+		});
+
+
+		this.game.on("extra_gold", (player, color, amount) => {
+
+			this.sockets.emit("message", `${player.login} got ${amount} gold for ${color} districts`);
+
+			this.sockets.emit("extra_gold", player.login, amount);
+
+			debug(`${player.login} got ${amount} gold for ${color} districts`);
+		});
+
+		this.game.on("player_destroyed_district", (player, attackedPlayer, attackedDistrict, price) => {
+
+			this.sockets.emit("message", `${player.login} destroyed ${attackedDistrict.name} of ${attackedPlayer.login} for ${price} gold`);
+
+			this.sockets.emit("destroyed_district", player.login, attackedPlayer.login, attackedDistrict.name, price);
+
+			debug(`${player.login} destroyed ${attackedDistrict.name} of ${attackedPlayer.login} for ${price} gold`);
+		});
+
+
 		this.game.on("player_to_build_district", login => {
-			
+
 			this.sockets.emit("message", `${login} can now chose to build a district`);
 
 			debug(`${login} can now chose to build a district`);
@@ -172,7 +241,7 @@ export default class CitadelsRoom {
 
 			this.sockets.emit('player_builds_district', login, district);
 		});
-	
+
 
 		this.game.on("player_built_8_districts", login => {
 
@@ -192,14 +261,6 @@ export default class CitadelsRoom {
 
 			this.game = null;
 		});
-
-
-		this.game.on("character_killed", deadCharacter => {
-
-            debug(`${deadCharacter} is dead`);
-		});
-
-
 	}
 
 }

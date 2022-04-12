@@ -5,11 +5,13 @@ export default class Character {
   player = null;
 
 
-  constructor({ name, action }) {
+  constructor(character) {
 
-    this.name = name;
+    this.character = character;
 
-    this.action = action;
+    this.name = character.name;
+
+    this.action = character.action;
   }
 
 
@@ -17,7 +19,7 @@ export default class Character {
 
     await this.getCoinOrGold(game);
 
-    await this.action({ game, player: this.player });
+    await this.action.bind(this.character)({ game, player: this.player });
 
     // todo x3 if is architect
     await this.buildDistrict(game, this.name === 'Architecte' ? 3 : 1);
@@ -59,21 +61,18 @@ export default class Character {
 
     game.emit("player_to_build_district", this.player.login);
 
-    let choiceIndex = await game.ask(this.player)("chose_build_district", amountAllowed);
+    let choice = await game.ask(this.player)("chose_build_district", amountAllowed);
 
-    if (typeof choiceIndex !== 'number') {
-
-      choiceIndex = this.player.hand.findIndex(card => card.name === choiceIndex.name);
-    }
+    const choiceIndex = this.player.hand.findIndex(card => card.name === choice);
     
-    const choice = this.player.hand[choiceIndex];
+    const [district] = this.player.hand.splice(choiceIndex, 1);
 
-    if (!choiceIndex || this.player.gold < choice.price) return;
+    if (!district || this.player.gold < district.price) return;
 
-    this.player.gold -= choice.price;
+    this.player.gold -= district.price;
 
-    game.emit('player_builds_district', this.player.login, choice);
+    game.emit('player_builds_district', this.player.login, district);
 
-    this.player.districts.push(...this.player.hand.splice(choiceIndex, 1));
+    this.player.districts.push(district);
   }
 };

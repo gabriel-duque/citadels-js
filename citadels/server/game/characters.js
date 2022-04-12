@@ -16,7 +16,7 @@ export default [
             if (choice === 0) return
 
             game.deadCharacter = game.characters[choice].name;
-            
+
             game.emit("character_killed", game.deadCharacter);
 
         }
@@ -35,7 +35,7 @@ export default [
 
                 game.stolenCharacter = game.characters[choice];
 
-                debug("steals", game.stolenCharacter);
+                game.emit("character_stolen", game.stolenCharacter);
             }
         }
     },
@@ -49,28 +49,44 @@ export default [
 
             if (!choice) return;
 
-            if (choice.exchange) { // Exchange
+            if (choice.exchange) {
 
-                const exchangedPlayer = game.players.find(p => p.login === choice.exchange);
+                this.exchange({ player, game }, choice);
 
-                [player.hand, exchangedPlayer.hand] = [exchangedPlayer.hand, player.hand];
+            } else if (choice.discard && choice.discard.length) {
 
-                debug("   ", player.login, "exchanges with", choice.exchange);
-
-            } else if (choice.discard && choice.discard.length) { // Discard
-
-                debug("changes", choice.discard.length, "cards");
-
-                for (
-                    const cardToRemoveIndex in choice.discard
-                        .sort()
-                        .reverse()
-                ) {
-
-                    game.deck.discard(player.hand.splice(cardToRemoveIndex, 1));
-                    player.hand.push(game.deck.draw());
-                }
+                this.discard({ player, game }, choice);
             }
+        },
+
+        async exchange({ player, game }, choice) {
+
+            const exchangedPlayer = game.players.find(p => p.login === choice.exchange);
+
+            [player.hand, exchangedPlayer.hand] = [exchangedPlayer.hand, player.hand];
+
+            game.emit("player_exchanged", player, exchangedPlayer);
+        },
+
+        async discard({ player, game }, choice) {
+
+            const cardsToRemoveIndex = choice.discard.map(d =>
+                player.hand.findIndex(c => c.name = d)
+            );
+
+            for (
+                const cardToRemoveIndex in cardsToRemoveIndex
+                    .sort()
+                    .reverse()
+            ) {
+
+                game.deck.discard(player.hand.splice(cardToRemoveIndex, 1));
+
+                player.hand.push(...game.deck.draw());
+            }
+
+            game.emit("player_discarded", player, cardsToRemoveIndex.length);
+
         }
     },
 
@@ -81,27 +97,29 @@ export default [
 
             game.firstPlayerToPlay = player.login;
 
-            getExtraGold(player, "YELLOW");
+            getExtraGold(game, player, "YELLOW");
         },
     },
 
     {
         name: 'Eveque',
 
-        async action({ player }) {
+        async action({ game, player }) {
 
-            getExtraGold(player, "BLUE");
+            getExtraGold(game, player, "BLUE");
         }
     },
 
     {
         name: 'Marchand',
 
-        async action({ player }) {
+        async action({ game, player }) {
 
             ++player.gold;
 
-            getExtraGold(player, "GREEN");
+            game.emit("player_got_one_gold", player);
+
+            getExtraGold(game, player, "GREEN");
         }
     },
 
@@ -119,29 +137,38 @@ export default [
 
         async action({ player, game }) {
 
-            getExtraGold(player, "RED");
+            getExtraGold(game, player, "RED");
 
             const choice = await game.ask(player)("get_warlord", game.players);
 
             if (!choice) return;
 
-            const attackedPlayer = game.players[choice.playerIndex];
+            const attackedPlayer = game.players.find(p => p.login === choice.player);
 
-            const attackedDistrict = attackedPlayer.districts[choice.districtIndex];
+            const attackedDistrictIndex = attackedPlayer.districts.findIndex(d => d.name === choice.district);
 
-            if (!player.gold < attackedDistrict.price - 1) return;
+            const attackedDistrict = attackedPlayer.districts[attackedDistrictIndex];
 
-            debug("destroys card", attackedDistrict.name, "of", attackedPlayer.login);
+            const price = attackedDistrict.price - 1;
 
-            player.gold -= attackedDistrict.price - 1;
+            if (player.gold < price) return;
 
-            attackedPlayer.districts.splice(choice.district, 1);
+            player.gold -= price;
+
+            attackedPlayer.districts.splice(attackedDistrictIndex, 1);
+
+            game.emit("player_destroyed_district", player, attackedPlayer, attackedDistrict, price);
         }
     }
 ];
 
-function getExtraGold(player, color) {
+function getExtraGold(game, player, color) {
 
-    player.gold += player.districts.filter(d => d.color === colors[color])
+    const amount = player.districts
+        .filter(d => d.color === colors[color])
         .length;
+
+    game.emit("extra_gold", player, color, amount);
+
+    player.gold += amount
 }

@@ -1,17 +1,45 @@
-export default {
+export default class Console {
 
-    nMessages: 0,
+    container = document.querySelector(".console");
 
-    container: document.querySelector(".console"),
+    messages = this.container.querySelector(".messages");
+
+    button = this.container.querySelector(".toggle-expansion");
+
+    open = false;
+
+    constructor() {
+
+        this.button.addEventListener("click", () => {
+
+            this.open = !this.open;
+
+            if (this.open) {
+                this.button.innerHTML = "&#x25B2;";
+                this.messages.classList.add("open");
+            } else {
+                this.button.innerHTML = "&#x25BC;";
+                this.messages.classList.remove("open");
+            }
+        });
+    }
 
     log(message) {
 
-        if (this.nMessages > 6) {
-            document.querySelector(".console-message:first-child").remove();
+        if (this.lastMessage) {
+            this.lastMessage.classList.remove("last-message");
         }
 
-        this.container.innerHTML += `<p class="console-message">${message}</p>`;
+        this.lastMessage = document.createElement("p");
 
-        this.nMessages++;
+        this.lastMessage.className = "console-message last-message";
+
+        this.lastMessage.innerHTML = message;
+
+        this.messages.appendChild(this.lastMessage);
+
+        if (this.open) {
+            this.messages.scrollTop = this.messages.scrollHeight;
+        }
     }
 }

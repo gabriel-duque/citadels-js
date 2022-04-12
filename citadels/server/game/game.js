@@ -15,7 +15,7 @@ export default class Game extends EventEmitter {
   static name = "citadels";
 
 
-  delay = 10000;
+  delay = 1000;
 
   hasStarted = false;
 

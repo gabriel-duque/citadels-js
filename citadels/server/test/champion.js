@@ -6,7 +6,7 @@ const debug = Debug('citadels:champion');
 
 export const chose_character = (player, playableCharacters) => {
 
-  return playableCharacters[Math.floor(Math.random() * playableCharacters.length)].name;
+  return getRandomElement(playableCharacters).name;
 };
 
 
@@ -23,11 +23,11 @@ export const chose_build_district = (player, amountAllowed) => {
 
   // for (let i = 0; i < amountAllowed; i++) {
 
-  for (const district in player.hand) {
+  for (const district of player.hand) {
 
-    if (player.hand[district].price <= player.gold) {
+    if (district.price <= player.gold) {
 
-      return district;
+      return district.name;
     }
     // }
   }
@@ -44,59 +44,70 @@ export const get_magician = (player, players) => {
 
   if (players.length < 2) return;
 
-  let discard = player.hand.length && Boolean(Math.round(Math.random()));
-  let exchange = Boolean(Math.round(Math.random()));
+  let discard = player.hand.length && flipCoin();
+
+  let exchange = flipCoin();
 
   if (exchange) {
 
-    const exchangeable = players.filter(p => p.login !== player.login);
+    const exchangeablePlayers = players.filter(p => p.login !== player.login);
 
-    exchange = exchangeable[Math.floor(Math.random() * exchangeable.length)].login;
+    exchange = getRandomElement(exchangeablePlayers).login;
+
+    discard = false;
 
   } else if (discard) {
 
     discard = [];
 
-    const shallowCopy = player.hand.map((_, i) => i);
+    const handShallowCopy = player.hand.map(c => c.name);
 
-    const nOfcardsToChange = Math.ceil(Math.random() * shallowCopy.length);
+    const nOfcardsToChange = Math.ceil(Math.random() * handShallowCopy.length);
 
     for (let i = 0; i < nOfcardsToChange; ++i) {
 
-      const randomCardIndex = Math.floor(Math.random() * shallowCopy.length);
+      const randomCardIndex = getRandomIndex(handShallowCopy);
 
-      discard.push(shallowCopy[randomCardIndex]);
-
-      shallowCopy.splice(randomCardIndex, 1);
+      discard.push(handShallowCopy.splice(randomCardIndex, 1));
     }
   }
 
-  return { exchange, discard };
+  return { discard, exchange};
 };
 
 export const get_warlord = (player, players) => {
 
   if (players.length < 2) return;
 
-  const attackablePlayersIndexes = players.map((p, i) => p.login !== player.login && p.districts.length ? i : null)
-    .filter(Boolean)
+  const choseToAttack = true || flipCoin();
 
-  const choseToAttack = true || Boolean(Math.round(Math.random()));
+  const attackablePlayers = players
+    .filter(p =>
+      p.login !== player.login && p.districts.length
+    )
 
-  if (!choseToAttack || !attackablePlayersIndexes.length) return;
+  if (!choseToAttack || !attackablePlayers.length) return;
 
-  const playerToAttackIndex =
-    attackablePlayersIndexes[Math.floor(Math.random() * attackablePlayersIndexes.length)];
-
-  debug('playerToAttackIndex', playerToAttackIndex);
-
-  const districtToAttackIndex = Math.floor(Math.random() * players[playerToAttackIndex].districts.length);
-
-  debug("districtToAttackIndex", districtToAttackIndex);
+  const attackedPlayer = getRandomElement(attackablePlayers);
 
   return {
-    playerIndex: playerToAttackIndex,
-    districtIndex: districtToAttackIndex
+    player: attackedPlayer.login,
+    district: getRandomElement(attackedPlayer.districts).name
   }
 
 };
+
+function flipCoin() {
+
+  return Boolean(Math.round(Math.random()));
+}
+
+function getRandomIndex(array) {
+
+  return Math.floor(Math.random() * array.length);
+}
+
+function getRandomElement(array) {
+
+  return array[getRandomIndex(array)];
+}

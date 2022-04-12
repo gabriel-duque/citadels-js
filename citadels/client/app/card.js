@@ -25,7 +25,7 @@ export class CharacterCard extends Card {
         this.view.innerHTML = character;
     }
 
-    setActive(onClick) {
+    setActive({ onClick }) {
 
         this.view.classList.add("active");
 
@@ -36,6 +36,10 @@ export class CharacterCard extends Card {
         } else if (onClick === "kill") {
 
             this.view.addEventListener("click", this.killCharacter);
+
+        } else if (onClick === "steal") {
+
+            this.view.addEventListener("click", this.stealCharacter);
         }
     }
 
@@ -48,6 +52,25 @@ export class CharacterCard extends Card {
         this.desactivateCards();
 
         socket.emit("chose_character", name);
+    }
+
+
+    killCharacter = () => {
+
+        const index = parseInt(this.view.getAttribute("data-index"), 10);
+
+        this.desactivateCards(this.killCharacter);
+
+        socket.emit("get_assassin", index);
+    }
+
+    stealCharacter = () => {
+
+        const index = parseInt(this.view.getAttribute("data-index"), 10);
+
+        this.desactivateCards(this.stealCharacter);
+
+        socket.emit("get_thief", index);
     }
 
     setChosen() {
@@ -64,17 +87,6 @@ export class CharacterCard extends Card {
             });
     }
 
-
-    killCharacter = () => {
-
-        const index = parseInt(this.view.getAttribute("data-index"), 10);
-
-        this.desactivateCards(this.killCharacter);
-
-        socket.emit("get_assassin", index);
-    }
-
-
     setInactive() {
 
         this.view.classList.remove("active");
@@ -88,17 +100,23 @@ export class HiddenDistrictCard extends Card {
 
         super(container);
 
-        this.view.classList.add("district-card");
+        this.view.classList.add("hidden-district-card");
     }
 }
 
-export class VisibleDistrictCard extends HiddenDistrictCard {
+export class VisibleDistrictCard extends Card {
 
     constructor(container, card) {
 
         super(container);
 
+        this.view.classList.add("district-card");
+
         this.view.setAttribute("data-name", card.name);
+
+        this.view.setAttribute("data-price", card.price);
+        
+        this.view.setAttribute("data-value", card.value);
 
         this.view.classList.add(`card-${card.color}`);
 
