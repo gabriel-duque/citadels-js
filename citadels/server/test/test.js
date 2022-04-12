@@ -1,10 +1,21 @@
-import Game from '../game.js';
-import Debug from 'debug';
+import Game from '../game/game.js';
 
-const logins = ["player1", "player2", "player3", "player4", "player5", "player6"];
+
+const N_PLAYERS = 2;
+
+
+const logins = new Array(N_PLAYERS)
+    .fill()
+    .map((_, i) => `player${i}`);
+
 
 const game = new Game(logins);
 
-game.loop();
+game.ask = player =>
+    (message, ...args) =>
+        game.askChampion(player, message, ...args);
 
-Debug("citadels:test")(this.nameSpace.namegame.scores);
+game.emit = (message, ...args) =>
+    console.log(`"${message}":`, ...args);
+
+game.loop();

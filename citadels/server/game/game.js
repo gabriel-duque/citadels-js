@@ -5,9 +5,6 @@ import EventEmitter from 'events';
 
 import * as champion from '../test/champion.js';
 
-import Debug from 'debug';
-const debug = Debug('citadels:game');
-
 
 export default class Game extends EventEmitter {
 
@@ -51,8 +48,6 @@ export default class Game extends EventEmitter {
     this.characters = CHARACTERS.map(character =>
       new Character(character, this)
     );
-
-    // debug(this);
   }
 
 
@@ -136,9 +131,6 @@ export default class Game extends EventEmitter {
 
       const choice = await this.ask(player)("chose_character", playableCharacters.map(c => c.name), this.characters);
 
-      console.log("-----------------------------------------");
-      console.log(choice);
-      
       const character = this.characters[choice];
 
       character.player = player;
