@@ -1,14 +1,17 @@
-export default class Console {
+export default {
 
-    container = document.querySelector(".console");
 
-    messages = this.container.querySelector(".messages");
+    open: false,
 
-    button = this.container.querySelector(".toggle-expansion");
 
-    open = false;
+    container: document.querySelector(".console"),
 
-    constructor() {
+
+    init() {
+
+        this.messages = this.container.querySelector(".messages");
+
+        this.button = this.container.querySelector(".toggle-expansion");
 
         this.button.addEventListener("click", () => {
 
@@ -22,13 +25,14 @@ export default class Console {
                 this.messages.classList.remove("open");
             }
         });
-    }
+
+        return this;
+    },
+
 
     log(message) {
 
-        if (this.lastMessage) {
-            this.lastMessage.classList.remove("last-message");
-        }
+        this.lastMessage?.classList.remove("last-message");
 
         this.lastMessage = document.createElement("p");
 
@@ -38,8 +42,8 @@ export default class Console {
 
         this.messages.appendChild(this.lastMessage);
 
-        if (this.open) {
-            this.messages.scrollTop = this.messages.scrollHeight;
-        }
+        if (!this.open) return;
+
+        this.messages.scrollTop = this.messages.scrollHeight;
     }
 }

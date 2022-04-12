@@ -13,6 +13,12 @@ export default [
 
             const choice = await game.ask(player)("get_assassin");
 
+            console.log("-----------------------------------------");
+            console.log(choice);
+            console.log(game.characters[choice].name);
+        
+            
+
             if (choice === 0) return
 
             game.deadCharacter = game.characters[choice].name;

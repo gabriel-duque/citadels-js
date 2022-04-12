@@ -1,5 +1,4 @@
-import { socket } from "app/connection";
-import { VisibleDistrictCard } from "app/card";
+import { createDistrictCard } from "app/cards";
 
 export default class Modal {
 
@@ -59,10 +58,14 @@ export default class Modal {
 
     hideCardOrCoin() {
 
+        this.hide();
+
         this.coinOrCardContainer.style.display = "none";
     }
 
     showChoseCard() {
+
+        this.hideCardOrCoin();
 
         this.choseCardContainer.style.display = "block";
     }
@@ -74,6 +77,8 @@ export default class Modal {
 
     showMagician() {
 
+        this.show();
+
         this.magicianContainer.style.display = "block";
     }
 
@@ -82,7 +87,9 @@ export default class Modal {
         this.magicianContainer.style.display = "none";
     }
 
-    showExchange(logins) {
+    showExchange(logins, resolve) {
+
+        this.hideMagician();
 
         this.exchangeContainer.style.display = "block";
 
@@ -98,7 +105,7 @@ export default class Modal {
 
             btn.addEventListener("click", () => {
 
-                socket.emit("get_magician", { exchange: login });
+                resolve({ exchange: login });
             });
         }
     }
@@ -110,7 +117,22 @@ export default class Modal {
         this.exchangePlayersContainer.style.display = "block";
     }
 
-    showDiscard(hand) {
+    resetExchange() {
+
+        this.hideExchange();
+
+        this.hideDiscard();
+
+        this.hide();
+
+        this.exchangePlayersContainer.innerHTML = "";
+    }
+
+    showDiscard(hand, resolve) {
+
+        this.resetDiscard();
+
+        this.hideMagician();
 
         this.discardContainer.style.display = "block";
 
@@ -125,8 +147,9 @@ export default class Modal {
             cardView.addEventListener("click", () => {
 
                 // todo handle several choices
+                const discardedCards = [card.getAttribute("data-name")];
 
-                socket.emit("get_magician", { discard: [card.getAttribute("data-name")] });
+                resolve(discardedCards);
             });
         }
 
@@ -139,6 +162,11 @@ export default class Modal {
         this.discardCardsContainer.style.display = "none";
     }
 
+    resetDiscard() {
+
+        this.discardCardsContainer.innerHTML = "";
+    }
+
     showWarlord() {
 
         this.warlordContainer.style.display = "block";
@@ -149,7 +177,11 @@ export default class Modal {
         this.warlordContainer.style.display = "none";
     }
 
-    showWarlordPlayers(logins, getDistricts) {
+    showWarlordPlayers(logins, getDistricts, resolve) {
+
+        this.show();
+
+        this.showWarlord();
 
         this.warlordPlayersContainer.style.display = "block";
 
@@ -165,7 +197,7 @@ export default class Modal {
 
                 this.hideWarlordPlayers();
 
-                this.showWarlordDistricts(login, getDistricts(login));
+                this.showWarlordDistricts(login, getDistricts(login), resolve);
             });
 
         }
@@ -176,9 +208,7 @@ export default class Modal {
         this.warlordPlayersContainer.style.display = "none";
     }
 
-    showWarlordDistricts(login, districts) {
-
-        console.log(districts);
+    showWarlordDistricts(login, districts, resolve) {
 
 
         this.warlordDistrictsContainer.style.display = "block";
@@ -191,17 +221,16 @@ export default class Modal {
 
             cardView.addEventListener("click", () => {
 
-                socket.emit("get_warlord", {
+                resolve({
                     player: login,
                     district: district.getAttribute("data-name")
                 });
 
                 /* todo move this elsewhere */
-                [...this.warlordDistrictsContainer.querySelectorAll(".card")]
-                    .forEach(card => card.remove());
-                
-                [...this.warlordPlayersContainer.querySelectorAll("button")]
-                    .forEach(b => b.remove());
+
+                this.warlordDistrictsContainer.innerHTML = "";
+
+                this.warlordPlayersContainer.innerHTML = "";
 
                 this.hideWarlordDistricts();
             });
@@ -216,16 +245,15 @@ export default class Modal {
     }
 
 
-    proposeCard = (card, i) => {
+    proposeCard = (card, i, resolve) => {
 
-        const cardView = new VisibleDistrictCard(this.choseCardContainer, card);
+        const cardView = createDistrictCard(this.choseCardContainer, card);
 
         cardView.addEventListener('click', () => {
 
-            socket.emit("chose_card", i);
+            resolve(i);
 
-            [...this.choseCardContainer.querySelectorAll(".card")]
-                .forEach(card => card.remove());
+            this.choseCardContainer.innerHTML = "";
         });
     }
 }

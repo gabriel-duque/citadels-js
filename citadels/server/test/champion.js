@@ -4,9 +4,12 @@ import Debug from 'debug';
 const debug = Debug('citadels:champion');
 
 
-export const chose_character = (player, playableCharacters) => {
+export const chose_character = (player, playableCharacters, characters) => {
 
-  return getRandomElement(playableCharacters).name;
+  const name = getRandomElement(playableCharacters);
+  
+  return characters.findIndex(c => c.name === name);
+
 };
 
 
@@ -72,7 +75,7 @@ export const get_magician = (player, players) => {
     }
   }
 
-  return { discard, exchange};
+  return { discard, exchange };
 };
 
 export const get_warlord = (player, players) => {

@@ -80,7 +80,7 @@ export default class CitadelsRoom {
 
 			debug(`${login} is choosing a character`);
 
-			this.sockets.emit("message", `${login} is choosing a character`);
+			this.sockets.emit("player_to_chose_character", login);
 		});
 
 
@@ -99,11 +99,12 @@ export default class CitadelsRoom {
 			this.sockets.emit("message", "Revealing characters");
 		});
 
+
 		this.game.on("reveal_character", (login, character) => {
 
-			this.sockets.emit("reveal_character", login, character);
-
 			debug(`- ${character} is played by ${login}`);
+
+			this.sockets.emit("reveal_character", login, character);
 		});
 
 
@@ -111,22 +112,25 @@ export default class CitadelsRoom {
 
 			debug(`- ${character} is not used`);
 
-			this.sockets.emit("message", `- ${character} is not used`);
+			this.sockets.emit("character_not_used", character);
 		});
+
 
 		this.game.on("character_is_dead", character => {
 
 			debug(`- ${character} is dead`);
 
-			this.sockets.emit("message", `- ${character} is dead`);
+			this.sockets.emit("character_is_dead", character);
 		});
+
 
 		this.game.on("player_got_stolen", (login, character) => {
 
-			this.sockets.emit("message", `${login} got stolen as ${character}`);
-
 			debug(`${login} got stolen as ${character}`);
+
+			this.sockets.emit("player_got_stolen", login, character);
 		});
+
 
 		this.game.on('player_chose_coin', player => {
 

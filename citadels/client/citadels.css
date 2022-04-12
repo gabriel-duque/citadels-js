@@ -53,18 +53,25 @@ body {
     line-height: 1rem;
     font-weight: bold;
     padding: 0.5rem;
-    border-radius: 50%;
 }
+
 .player-counts>*::after {
     font-size: 0.7rem;
 }
 
+.player-card-count {
+    background: brown;
+    border-radius: 5px;
+}
+
 .player-coins {
     background: gold;
+    border-radius: 50%;
 }
 
 .player-points {
     background: silver;
+    border-radius: 50%;
 }
 
 .player-points:after {
@@ -154,23 +161,31 @@ body {
 
 /* Character cards */
 
-.character-card.chosen {
-    border: solid 1px white;
-    outline: solid 1px lightpink;
-}
+/* .character-card:not(.selectable) {
+    opacity: 0.5;
+} */
 
-.character-card:not(.active){
-    opacity: 0.7;
+.character-card.selectable {
     transform: translateY(-20%);
 }
 
-/* Other players' district cards */
-
-.hidden-district-card {
-    background: brown;
+.character-card.active {
+    outline: 1px solid red;
 }
 
-/* Visible district cards */
+.character-card.inactive {
+    opacity: 0.3;
+}
+
+.character-card.dead {
+    background: grey;
+}
+
+.character-card.stolen {
+    background: gold;
+}
+
+/* District cards */
 
 .district-card.highlight {
     transform: translateY(-20%);

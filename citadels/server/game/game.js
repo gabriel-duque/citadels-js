@@ -15,7 +15,7 @@ export default class Game extends EventEmitter {
   static name = "citadels";
 
 
-  delay = 1000;
+  delay = 500;
 
   hasStarted = false;
 
@@ -130,34 +130,23 @@ export default class Game extends EventEmitter {
 
     for (const index in this.players) {
 
-      const player = this.getActivePlayer(index);
+      const player = this.players[(this.firstPlayerToPlayIndex + index) % this.players.length];
 
-      const character = await this.ask(player)("chose_character", playableCharacters);
+      this.emit("player_to_chose_character", player.login);
 
-      this.pickCharacter(player, character, playableCharacters);
+      const choice = await this.ask(player)("chose_character", playableCharacters.map(c => c.name), this.characters);
+
+      console.log("-----------------------------------------");
+      console.log(choice);
+      
+      const character = this.characters[choice];
+
+      character.player = player;
+
+      playableCharacters.splice(playableCharacters.findIndex(c => c.name === character.name), 1);
+  
+      this.emit("player_has_chosen_character", player.login, character.name);
     }
-  }
-
-
-  getActivePlayer(i) {
-
-    const player = this.players[(this.firstPlayerToPlayIndex + i) % this.players.length];
-
-    this.emit("player_to_chose_character", player.login);
-
-    return player;
-  }
-
-
-  pickCharacter(player, character, playableCharacters) {
-
-    const characterIndex = playableCharacters.findIndex(c => c.name === character);
-
-    playableCharacters[characterIndex].player = player;
-
-    playableCharacters.splice(characterIndex, 1);
-
-    this.emit("player_has_chosen_character", player.login, character);
   }
 
 
