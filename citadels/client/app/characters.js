@@ -3,7 +3,7 @@ import { createCharacterCard } from "app/cards";
 
 export default {
 
-    
+
     container: document.querySelector('.characters-container'),
 
 
@@ -24,15 +24,26 @@ export default {
 
     get(name) {
 
-        return this.container.querySelector(`[data-name="${name}"]`);
+        this[name] ??= this.container.querySelector(`[data-name="${name}"]`);
+
+        return this[name];
     },
+
+    getCards(selector = '.character-card') {
+
+        this[selector] ??= [...this.container.querySelectorAll(selector)];
+
+        return this[selector];
+    },
+
 
     highlight(name) {
 
-        this.container.querySelectorAll('.character-card').forEach(card => {
+        for (const card of this.getCards()) {
 
             card.classList.remove('active');
-        });
+
+        }
 
         this.get(name).classList.add('active');
     },
@@ -54,13 +65,14 @@ export default {
 
     reset() {
 
-        this.container.querySelectorAll('.character-card').forEach(card => {
+        for (const card of this.getCards()) {
+
             card.classList.remove('active');
             card.classList.remove('selectable');
             card.classList.remove('inactive');
             card.classList.remove('dead');
             card.classList.remove('stolen');
-        });
+        }
     },
 
 
@@ -68,23 +80,28 @@ export default {
 
         characters.forEach((name, index) => {
 
-            const cardView = this.get(name);
+            activate.call(this, this.get(name));
 
-            cardView.classList.add("selectable");
+            function activate(card) {
 
-            cardView.addEventListener("click", selectCharacter.bind(this));
+                card.classList.add("selectable");
+
+                card.addEventListener("click", selectCharacter.bind(this));
+            }
 
             function selectCharacter() {
 
                 resolve(index);
 
-                [...this.container.querySelectorAll(".selectable")]
-                    .forEach(cardView => {
+                this.getCards(".selectable")
+                    .forEach(desactivate);
+            }
 
-                        cardView.removeEventListener("click", selectCharacter);
+            function desactivate(card) {
 
-                        cardView.classList.remove("selectable");
-                    });
+                card.classList.remove("selectable");
+
+                card.removeEventListener("click", selectCharacter);
             }
         });
 

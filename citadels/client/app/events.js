@@ -207,7 +207,7 @@ export default function bindEvents(socket, game) {
 
     modal.discardBtn.addEventListener('click', () => {
 
-        modal.showDiscard(player.copyHand(), discardedCards => {
+        modal.showDiscard(player.handCards, discardedCards => {
 
             socket.emit("get_magician", { discard: discardedCards });
         });

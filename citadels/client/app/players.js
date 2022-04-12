@@ -40,8 +40,11 @@ export default {
 
         for (const login in this.players) {
 
-            this.players[login].container
-                .classList[login === activeLogin ? "add" : "remove"]("active");
+            const { container } = this.players[login];
+
+            const set = login === activeLogin ? "add" : "remove";
+
+            container.classList[set]("active");
         }
     }
 }
@@ -54,7 +57,6 @@ class Player {
         this.login = login;
 
         container.querySelector('.player-login').innerText = login;
-
 
         this.container = container;
 
@@ -113,10 +115,7 @@ class SelfPlayer extends Player {
 
         this.hand = this.container.querySelector('.player-hand');
 
-        for (const card of hand) {
-
-            this.addCardToHand(card);
-        }
+        this.newHand(hand);
     }
 
     addCardToHand(card) {
@@ -124,9 +123,14 @@ class SelfPlayer extends Player {
         createDistrictCard(this.hand, card);
     }
 
+    getHandCard(name) {
+
+        return this.hand.querySelector(`.card[data-name="${name}"]`);
+    }
+
     removeCardFromHand(name) {
 
-        const cardView = this.hand.querySelector(`.card[data-name="${name}"]`);
+        const cardView = this.getHandCard(name);
 
         if (cardView) cardView.remove();
 
@@ -143,9 +147,16 @@ class SelfPlayer extends Player {
         }
     }
 
-    copyHand() {
+    get handCards() {
 
         return [...this.hand.querySelectorAll(".card")];
+    }
+
+    get affordableCards() {
+
+        return this.handCards.filter(card =>
+            parseInt(card.getAttribute("data-price"), 10) <= this.coins
+        );
     }
 
     buildDistrict(district) {
@@ -157,28 +168,31 @@ class SelfPlayer extends Player {
 
     proposeCards(amountAllowed, resolve) {
 
-        [...this.hand.querySelectorAll(".card")]
-            .filter(cardView =>
-                parseInt(cardView.getAttribute("data-price"), 10) <= this.coins
-            )
-            .forEach(cardView => {
+        this.affordableCards.forEach(card => {
 
-                cardView.classList.add('highlight');
+            activate.call(this, card);
 
-                cardView.addEventListener('click', choseCard.bind(this));
+            function activate(card) {
 
-                function choseCard() {
+                card.classList.add('highlight');
 
-                    const name = cardView.getAttribute('data-name');
+                card.addEventListener('click', choseCard.bind(this));
+            }
 
-                    resolve(name);
+            function choseCard() {
 
-                    [...this.hand.querySelectorAll(".card")]
-                        .forEach(card => card.classList.remove("highlight"));
+                resolve(card.getAttribute('data-name'));
 
-                    cardView.removeEventListener('click', choseCard);
-                }
-            });
+                desactivate.call(this, card);
+            }
+
+            function desactivate(card) {
+
+                this.handCards.forEach(c => c.classList.remove("highlight"));
+
+                card.removeEventListener('click', choseCard);
+            }
+        });
     }
 }
 
